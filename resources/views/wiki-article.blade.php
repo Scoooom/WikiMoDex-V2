@@ -122,6 +122,11 @@
         // Insert after the active link's <li>
         active.parentElement.after(subList);
 
+        // Recalculate max-height for all category lists so sublist is visible
+        document.querySelectorAll('.wiki-sidebar-list').forEach(list => {
+            list.style.maxHeight = list.scrollHeight + 'px';
+        });
+
         // Highlight active sublink on scroll
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
