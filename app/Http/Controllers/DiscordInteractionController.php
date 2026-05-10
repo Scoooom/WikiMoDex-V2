@@ -340,7 +340,8 @@ class DiscordInteractionController extends Controller
 
             $fields[] = ['name' => 'Ability 1', 'value' => "**{$ab1Name}**\n{$ab1Desc}", 'inline' => true];
             $fields[] = ['name' => 'Ability 2', 'value' => "**{$ab2Name}**\n{$ab2Desc}", 'inline' => true];
-            $fields[] = ['name' => 'Hidden Ability', 'value' => "**{$haName}**\n{$haDesc}", 'inline' => true];
+            $fields[] = ['name' => "\u{200B}", 'value' => "\u{200B}", 'inline' => true];
+            $fields[] = ['name' => 'Hidden Ability', 'value' => "**{$haName}**\n{$haDesc}", 'inline' => false];
 
             if ($smittyItemsStr) {
                 $fields[] = ['name' => 'SMITTY Items', 'value' => $smittyItemsStr, 'inline' => false];
