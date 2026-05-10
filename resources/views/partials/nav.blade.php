@@ -98,7 +98,7 @@ document.addEventListener('click', function(e) {
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+function initWikiSearch() {
     const btn      = document.getElementById('wikiSearchOpen');
     const backdrop = document.getElementById('wikiSearchBackdrop');
     const modal    = document.getElementById('wikiSearchModal');
@@ -221,5 +221,11 @@ document.addEventListener('DOMContentLoaded', function() {
             a.addEventListener('click', close);
         });
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWikiSearch);
+} else {
+    initWikiSearch();
+}
 </script>
