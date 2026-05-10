@@ -36,7 +36,7 @@ function normaliseSpeciesId(sid) {
   // Convert underscores to hyphens
   var s = sid.replace(/_/g, '-')
 
-  // Strip regional prefixes entirely — just use the base mon for the default sprite
+  // Strip regional prefixes — use base mon for default sprite
   var regions = ['alola-', 'galar-', 'hisui-', 'paldea-']
   for (var i = 0; i < regions.length; i++) {
     if (s.indexOf(regions[i]) === 0) {
@@ -45,28 +45,78 @@ function normaliseSpeciesId(sid) {
     }
   }
 
-  // Special name fixes
-  var fixes = {
-    'farfetchd':    'farfetch-d',
-    'sirfetchd':    'sirfetch-d',
-    'ho-oh':        'ho-oh',
-    'jangmo-o':     'jangmo-o',
-    'hakamo-o':     'hakamo-o',
-    'kommo-o':      'kommo-o',
-    'porygon-z':    'porygon-z',
-    'chi-yu':       'chi-yu',
-    'chien-pao':    'chien-pao',
-    'ting-lu':      'ting-lu',
-    'wo-chien':     'wo-chien',
-    'mime-jr':      'mime-jr',
-    'mr-mime':      'mr-mime',
-    'mr-rime':      'mr-rime',
+  // Explicit overrides for mons that 404 on their bare name in PokeAPI
+  // (mons that only exist under a specific form slug)
+  var overrides = {
+    'farfetchd':       'farfetch-d',
+    'sirfetchd':       'sirfetch-d',
+    'oricorio':        'oricorio-baile',
+    'indeedee':        'indeedee-male',
+    'pumpkaboo':       'pumpkaboo-average',
+    'gourgeist':       'gourgeist-average',
+    'basculin':        'basculin-red-striped',
+    'meowstic':        'meowstic-male',
+    'aegislash':       'aegislash-shield',
+    'mimikyu':         'mimikyu-disguised',
+    'minior':          'minior-red-meteor',
+    'wishiwashi':      'wishiwashi-solo',
+    'lycanroc':        'lycanroc-midday',
+    'toxtricity':      'toxtricity-amped',
+    'eiscue':          'eiscue-ice',
+    'morpeko':         'morpeko-full-belly',
+    'urshifu':         'urshifu-single-strike',
+    'calyrex':         'calyrex',
+    'zacian':          'zacian-hero',
+    'zamazenta':       'zamazenta-hero',
+    'eternatus':       'eternatus',
+    'zarude':          'zarude',
+    'keldeo':          'keldeo-ordinary',
+    'shaymin':         'shaymin-land',
+    'giratina':        'giratina-altered',
+    'tornadus':        'tornadus-incarnate',
+    'thundurus':       'thundurus-incarnate',
+    'landorus':        'landorus-incarnate',
+    'enamorus':        'enamorus-incarnate',
+    'deoxys':          'deoxys-normal',
+    'wormadam':        'wormadam-plant',
+    'rotom':           'rotom',
+    'castform':        'castform',
+    'cherrim':         'cherrim',
+    'darmanitan':      'darmanitan-standard',
+    'meloetta':        'meloetta-aria',
+    'kyurem':          'kyurem',
+    'necrozma':        'necrozma',
+    'silvally':        'silvally',
+    'eternal-floette': 'floette',
+    'brute-bonnet':    'brute-bonnet',
+    'flutter-mane':    'flutter-mane',
+    'great-tusk':      'great-tusk',
+    'scream-tail':     'scream-tail',
+    'sandy-shocks':    'sandy-shocks',
+    'iron-treads':     'iron-treads',
+    'iron-bundle':     'iron-bundle',
+    'iron-hands':      'iron-hands',
+    'iron-jugulis':    'iron-jugulis',
+    'iron-moth':       'iron-moth',
+    'iron-thorns':     'iron-thorns',
+    'iron-valiant':    'iron-valiant',
+    'iron-leaves':     'iron-leaves',
+    'iron-boulder':    'iron-boulder',
+    'iron-crown':      'iron-crown',
+    'roaring-moon':    'roaring-moon',
+    'walking-wake':    'walking-wake',
+    'gouging-fire':    'gouging-fire',
+    'raging-bolt':     'raging-bolt',
+    'bloodmoon-ursaluna': 'ursaluna-bloodmoon',
+    'chi-yu':          'chi-yu',
+    'chien-pao':       'chien-pao',
+    'ting-lu':         'ting-lu',
+    'wo-chien':        'wo-chien',
   }
-  if (fixes[s] !== undefined) return fixes[s]
+  if (overrides[s] !== undefined) return overrides[s]
 
-  // Strip gender suffixes (-f, -m) and any other form suffixes
-  // Keep only the base species name
-  s = s.replace(/-(f|m|male|female|red-striped|blue-striped|white-striped|standard|incarnate|aria|baile|natural|50|complete|midnight|dusk|original|alola|galar|hisui|paldea|bloodmoon|eternal)$/, '')
+  // Strip gender/form suffixes as last resort
+  s = s.replace(/-(f|m|male|female)$/, '')
 
   return s
 }
