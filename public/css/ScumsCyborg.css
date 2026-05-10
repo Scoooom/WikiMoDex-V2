@@ -1165,6 +1165,8 @@ img { max-width: 100%; display: block; }
 .wiki-heading-anchor:hover {
     color: var(--accent3);
 }
+
+.wiki-prose h1 {
     font-size: 1.9rem;
     font-weight: 800;
     color: var(--accent3);
