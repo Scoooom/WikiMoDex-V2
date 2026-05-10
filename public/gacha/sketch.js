@@ -33,24 +33,40 @@ function pullImage(i) {
 }
 
 function normaliseSpeciesId(sid) {
-  // Game uses underscores; PokeAPI uses hyphens
+  // Convert underscores to hyphens
   var s = sid.replace(/_/g, '-')
 
-  // Special apostrophe cases
-  s = s.replace(/^farfetchd$/, "farfetch-d")
-  s = s.replace(/^galar-farfetchd$/, "farfetch-d-galar")
-  s = s.replace(/^sirfetchd$/, "sirfetch-d")
-
-  // ho-oh stays as-is after underscore replace
-  // Regional form prefix -> suffix (PokeAPI convention)
-  var regions = ['alola', 'galar', 'hisui', 'paldea']
+  // Strip regional prefixes entirely — just use the base mon for the default sprite
+  var regions = ['alola-', 'galar-', 'hisui-', 'paldea-']
   for (var i = 0; i < regions.length; i++) {
-    var prefix = regions[i] + '-'
-    if (s.indexOf(prefix) === 0) {
-      s = s.slice(prefix.length) + '-' + regions[i]
+    if (s.indexOf(regions[i]) === 0) {
+      s = s.slice(regions[i].length)
       break
     }
   }
+
+  // Special name fixes
+  var fixes = {
+    'farfetchd':    'farfetch-d',
+    'sirfetchd':    'sirfetch-d',
+    'ho-oh':        'ho-oh',
+    'jangmo-o':     'jangmo-o',
+    'hakamo-o':     'hakamo-o',
+    'kommo-o':      'kommo-o',
+    'porygon-z':    'porygon-z',
+    'chi-yu':       'chi-yu',
+    'chien-pao':    'chien-pao',
+    'ting-lu':      'ting-lu',
+    'wo-chien':     'wo-chien',
+    'mime-jr':      'mime-jr',
+    'mr-mime':      'mr-mime',
+    'mr-rime':      'mr-rime',
+  }
+  if (fixes[s] !== undefined) return fixes[s]
+
+  // Strip gender suffixes (-f, -m) and any other form suffixes
+  // Keep only the base species name
+  s = s.replace(/-(f|m|male|female|red-striped|blue-striped|white-striped|standard|incarnate|aria|baile|natural|50|complete|midnight|dusk|original|alola|galar|hisui|paldea|bloodmoon|eternal)$/, '')
 
   return s
 }
@@ -69,17 +85,7 @@ function pullRusImage(speciesId) {
       if (r.sprites.front_default) {
         RusImages[speciesId] = loadImage(r.sprites.front_default)
       }
-    }).catch(function() {
-      // Try base form as fallback (strip form suffix)
-      var base = apiId.replace(/-[^-]+$/, '')
-      if (base !== apiId) {
-        P.getPokemon(base).then(function(r) {
-          if (r.sprites.front_default) {
-            RusImages[speciesId] = loadImage(r.sprites.front_default)
-          }
-        }).catch(function() {})
-      }
-    })
+    }).catch(function() {})
   }
 }
 
