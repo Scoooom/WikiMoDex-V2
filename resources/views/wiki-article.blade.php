@@ -116,6 +116,22 @@
     } else {
         window.addEventListener('load', scrollToHash);
     }
+
+    // Fix anchor clicks hiding heading under nav
+    document.querySelectorAll('a[href^="#"], .wiki-heading-anchor').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (!href || !href.startsWith('#')) return;
+            const target = document.getElementById(decodeURIComponent(href.slice(1)));
+            if (!target) return;
+            e.preventDefault();
+            const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h') || '54');
+            const offset = navH + 24;
+            const top = target.getBoundingClientRect().top + window.scrollY - offset;
+            window.scrollTo({ top, behavior: 'smooth' });
+            history.pushState(null, '', href);
+        });
+    });
 })();
 </script>
 
