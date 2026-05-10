@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.js"></script>
+    <script src="https://unpkg.com/pokeapi-js-wrapper@1.2.8/dist/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/addons/p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js" integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  </head>
+  <body>
+    <main>
+      <script>
+        pokeapi_loaded = false
+        if (typeof Pokedex == 'undefined') {
+          console.error("PokeAPI didn't connect! Images are unavailable")
+        } else {
+          P = new Pokedex.Pokedex()
+          pokeapi_loaded = true
+        }
+        special_key = "x0i2O7WRiANTqPmZ"
+        egg_seed = 1073741824
+      </script>
+    </main>
+    <script src="pokerogue_data/pokemonData.js"></script>
+    <script src="phaser-rand.js"></script>
+    <script src="sketch.js"></script>
+  </body>
+</html>

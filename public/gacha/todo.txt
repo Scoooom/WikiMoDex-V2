@@ -1,0 +1,1 @@
+Modify getLegendaryGachaSpeciesForTimestamp to use Day object

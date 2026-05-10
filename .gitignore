@@ -1,0 +1,82 @@
+# Laravel / PHP
+/vendor/
+/node_modules/
+/.phpunit.result.cache
+/.phpunit.cache/
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Application cache & compiled files
+/bootstrap/cache/*.php
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/testing/
+/storage/framework/views/
+/storage/logs/
+/storage/debugbar/
+
+# User-uploaded content
+/storage/app/glitchimgs/
+/storage/app/private/
+
+# PokeVoid source (separate repo)
+/pokevoid/
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts
+/public/hot
+/public/storage
+/public/mix-manifest.json
+/public/build/
+
+# Composer lock (optional — include if you want reproducible installs)
+# composer.lock
+
+# Test coverage
+/coverage/
+/.php-cs-fixer.cache
+
+*.log
+.DS_Store
+.env
+.env.backup
+.env.production
+.phpactor.json
+.phpunit.result.cache
+/.codex
+/.cursor/
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
+/public/build
+/public/fonts-manifest.dev.json
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+_ide_helper.php
+Homestead.json
+Homestead.yaml
+Thumbs.db
+pokevoid/
