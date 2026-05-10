@@ -369,18 +369,33 @@ function inRectArea(X, Y, x, y, w, h, inclusive) {
 
 click = false
 
+// Colour palette matching site
+var C_BG       = [19,  16,  34]
+var C_CARD     = [34,  25,  64]
+var C_CARD2    = [43,  32,  80]
+var C_HOVER    = [58,  44,  100]
+var C_BORDER   = [53,  40,  96]
+var C_ACCENT   = [124, 92,  191]
+var C_TEXT     = [237, 230, 255]
+var C_MUTED    = [157, 143, 192]
+var C_DIM      = [90,  72,  128]
+var C_TODAY    = [168, 125, 232]
+
+var CORNER = 8   // cell corner radius
+var CORNER_SM = 5 // small corner radius
+
 LOG = []
 function draw() {
-  background(19, 16, 34);
+  background(C_BG[0], C_BG[1], C_BG[2])
   // Update sidebar scale
   sidebarSz = lerp(sidebarSz, sidebarTarg, 0.1)
   if (abs(sidebarSz - sidebarTarg) <= 0.001) {
     sidebarSz = sidebarTarg
   }
-  // Reset log and cursor
   LOG = []
   cursor('auto')
-  // Count number of rows
+
+  // Count rows
   rows = 1
   var lastcol = -1
   for (var i = 0; i < m.length; i++) {
@@ -391,189 +406,240 @@ function draw() {
     }
     lastcol = m[i].date.getUTCDay()
   }
-  // Draw calendar
+
+  var PAD = 6       // padding between cells
+  var TOP = 34      // weekday header height
+  var BOT = 36      // bottom bar height
+  var SB  = max(0, sidebarSz)
+
+  // Draw calendar cells
   var lastcol = 0
   var r = 0
   for (var i = 0; i < m.length; i++) {
-    if (lastcol > m[i].date.getUTCDay()) {
-      r++
-    }
-    stroke(53, 40, 96)
+    if (lastcol > m[i].date.getUTCDay()) r++
     lastcol = m[i].date.getUTCDay()
-    var X = scalar(lastcol, 7, 4, width - 4 - max(0, sidebarSz), 4)
-    var Y = scalar(r, rows, 28, height - 28, 4)
-    var W = scalarSize(7, 4, width - 4 - max(0, sidebarSz), 4)
-    var H = scalarSize(rows, 28, height - 28, 4)
-    fill(34, 25, 64)
-    if (m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()) {
-      fill(43, 32, 80)
-    }
-    if (inRectArea(mouseX, mouseY, X, Y, W, H)) {
-      //fill(184, 228, 230)
-      //fill(43, 32, 80)
-    }
-    if (m[i].date.getUTCMonth() == 3 && m[i].date.getDate() == 1) {
-      // April 1
-      X += 2
-      Y += 1
-    }
-    if (true && inRectArea(mouseX, mouseY, X, Y, W, H)) {
+
+    var X = scalar(lastcol, 7, PAD, width - PAD - SB, PAD)
+    var Y = scalar(r, rows, TOP + PAD, height - BOT, PAD)
+    var W = scalarSize(7, PAD, width - PAD - SB, PAD)
+    var H = scalarSize(rows, TOP + PAD, height - BOT, PAD)
+
+    var isToday = m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()
+    var isHover = inRectArea(mouseX, mouseY, X, Y, W, H)
+
+    noStroke()
+    if (isToday) {
+      fill(C_CARD2[0], C_CARD2[1], C_CARD2[2])
+      // Accent left border for today
+      fill(C_ACCENT[0], C_ACCENT[1], C_ACCENT[2])
+      rect(X, Y, 3, H, CORNER, 0, 0, CORNER)
+      fill(C_CARD2[0], C_CARD2[1], C_CARD2[2])
+      rect(X + 3, Y, W - 3, H, 0, CORNER, CORNER, 0)
+    } else if (isHover) {
+      fill(C_HOVER[0], C_HOVER[1], C_HOVER[2])
+      rect(X, Y, W, H, CORNER)
       cursor('pointer')
-      rect(X-1, Y-1, W+2, H+2)
-      rect(X, Y, W, H)
-      if (click) {
-        //console.log(m[i])
-        if (sidebarTarg == 0) {
-          // Sidebar is hidden; show current day
-          toggleSidebar()
-          sidebarCurrentDay = m[i].getDate()
-          sidebarCurrentMonth = m[i].getMonth()
-          sidebarCurrentYear = m[i].getYear()
-          sidebarDisplayDate = months[m[i].date.getUTCMonth()] + " " + m[i].date.getUTCDate() + ", " + m[i].date.getUTCFullYear()
-          sidebarDisplaySubtitle = "(" + (m[i].date.getMonth() + 1) + "/" + m[i].date.getDate() + "/" + m[i].date.getFullYear() + " @ " + (m[i].date.getHours() > 12 ? m[i].date.getHours() - 12 : m[i].date.getHours()) + ":00 " + (m[i].date.getHours() >= 12 ? "PM" : "AM") + ")"
-          sidebar_leg = m[i].mon
-          sidebar_rus = m[i].rus
-          sidebar_rus.forEach(function(id) { pullRusImage(id) })
-        } else if (isCurrent(m[i])) {
-          // Sidebar is showing this day already; close it
-          toggleSidebar()
-        } else {
-          // Sidebar is showing a different day; change it to this one
-          sidebarCurrentDay = m[i].getDate()
-          sidebarCurrentMonth = m[i].getMonth()
-          sidebarCurrentYear = m[i].getYear()
-          sidebarDisplayDate = months[m[i].date.getUTCMonth()] + " " + m[i].date.getUTCDate() + ", " + m[i].date.getUTCFullYear()
-          sidebarDisplaySubtitle = "(" + (m[i].date.getMonth() + 1) + "/" + m[i].date.getDate() + "/" + m[i].date.getFullYear() + " @ " + (m[i].date.getHours() > 12 ? m[i].date.getHours() - 12 : m[i].date.getHours()) + ":00 " + (m[i].date.getHours() >= 12 ? "PM" : "AM") + ")"
-          sidebar_leg = m[i].mon
-          sidebar_rus = m[i].rus
-          sidebar_rus.forEach(function(id) { pullRusImage(id) })
-        }
+    } else {
+      fill(C_CARD[0], C_CARD[1], C_CARD[2])
+      rect(X, Y, W, H, CORNER)
+    }
+
+    // Click handler
+    if (isHover && click) {
+      if (sidebarTarg == 0) {
+        toggleSidebar()
+        sidebarCurrentDay = m[i].getDate()
+        sidebarCurrentMonth = m[i].getMonth()
+        sidebarCurrentYear = m[i].getYear()
+        sidebarDisplayDate = months[m[i].date.getUTCMonth()] + " " + m[i].date.getUTCDate() + ", " + m[i].date.getUTCFullYear()
+        sidebarDisplaySubtitle = "(" + (m[i].date.getMonth() + 1) + "/" + m[i].date.getDate() + "/" + m[i].date.getFullYear() + " @ " + (m[i].date.getHours() > 12 ? m[i].date.getHours() - 12 : m[i].date.getHours()) + ":00 " + (m[i].date.getHours() >= 12 ? "PM" : "AM") + ")"
+        sidebar_leg = m[i].mon
+        sidebar_rus = m[i].rus
+        sidebar_rus.forEach(function(id) { pullRusImage(id) })
+      } else if (isCurrent(m[i])) {
+        toggleSidebar()
+      } else {
+        sidebarCurrentDay = m[i].getDate()
+        sidebarCurrentMonth = m[i].getMonth()
+        sidebarCurrentYear = m[i].getYear()
+        sidebarDisplayDate = months[m[i].date.getUTCMonth()] + " " + m[i].date.getUTCDate() + ", " + m[i].date.getUTCFullYear()
+        sidebarDisplaySubtitle = "(" + (m[i].date.getMonth() + 1) + "/" + m[i].date.getDate() + "/" + m[i].date.getFullYear() + " @ " + (m[i].date.getHours() > 12 ? m[i].date.getHours() - 12 : m[i].date.getHours()) + ":00 " + (m[i].date.getHours() >= 12 ? "PM" : "AM") + ")"
+        sidebar_leg = m[i].mon
+        sidebar_rus = m[i].rus
+        sidebar_rus.forEach(function(id) { pullRusImage(id) })
       }
-    } else {
-      rect(X, Y, W, H)
     }
-    if (m[i].date.getUTCMonth() == 3 && m[i].date.getDate() == 1) {
-      // April 1
-      X -= 2
-      Y -= 1
-    }
-    fill(237, 230, 255)
-    stroke(53, 40, 96)
-    line(X, Y + 15, X + W, Y + 15)
+
+    // Thin separator line inside cell
+    stroke(C_BORDER[0], C_BORDER[1], C_BORDER[2])
+    strokeWeight(0.5)
+    line(X + CORNER, Y + 16, X + W - CORNER, Y + 16)
+    strokeWeight(1)
     noStroke()
-    if (m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()) {
-      fill(168, 125, 232)
+
+    // Date number
+    if (isToday) {
+      fill(C_TODAY[0], C_TODAY[1], C_TODAY[2])
+    } else {
+      fill(C_MUTED[0], C_MUTED[1], C_MUTED[2])
     }
-    rectText(m[i].date.getUTCDate(), X, Y, 15, 16)
-    if (m[i].mon == undefined || m[i].mon == "") {
-      setDailyLegend(m[i])
-    }
-    if (m[i].rus.length == 0) {
-      m[i].rus = guessPokerus(m[i].date, false, true)
-    }
+    textSize(11)
+    rectText(m[i].date.getUTCDate(), X + 2, Y, 18, 16)
+    textSize(12)
+
+    // Legendary name
+    fill(C_TEXT[0], C_TEXT[1], C_TEXT[2])
+    if (m[i].mon == undefined || m[i].mon == "") setDailyLegend(m[i])
+    if (m[i].rus.length == 0) m[i].rus = guessPokerus(m[i].date, false, true)
+
+    textSize(10)
+    rectText(m[i].mon, X + 20, Y, W - 22, 16)
+    textSize(12)
+
+    // Legendary sprite
     if (LegendaryImages[LEGENDARIES.indexOf(m[i].mon)] != undefined) {
-      image(LegendaryImages[LEGENDARIES.indexOf(m[i].mon)], X + W/2 - min(W, H - 15) / 2, Y + 15 + (H-15)/2 - min(W, H - 15) / 2, min(W, H - 15), min(W, H - 15))
-    } else {
-      //rect(X + W/2 - min(W, H - 15) / 2, Y + 15 + (H-15)/2 - min(W, H - 15) / 2, min(W, H - 15), min(W, H - 15))
+      var sprSz = min(W - 4, H - 20)
+      image(LegendaryImages[LEGENDARIES.indexOf(m[i].mon)],
+        X + W/2 - sprSz/2, Y + 16 + (H - 16)/2 - sprSz/2, sprSz, sprSz)
     }
-    rectText(m[i].mon, X + 15, Y, W - 15, 16)
   }
-  // Draw buttons at bottom right
-  var btns = 6
-  fill(34, 25, 64)
-  stroke(53, 40, 96)
-  rect(4, height - 24, width - 8 - (btns * 24), 20)
-  rectB(width - 24*6, height - 24, 20, 20, ___,
-       prevYear)
-  rectB(width - 24*5, height - 24, 20, 20, ___,
-       prevMonth)
-  rectB(width - 24*4, height - 24, 44, 20, ___,
-       resetMonth)
-  rectB(width - 24*2, height - 24, 20, 20, ___,
-       nextMonth)
-  rectB(width - 24*1, height - 24, 20, 20, ___,
-       nextYear)
-  // Draw button labels
-  fill(237, 230, 255)
-  noStroke()
-  rectText(months[currentMonth - 1] + " " + currentYear, 4, height - 24, width - 8 - (btns * 24), 20)
-  rectText("<<",    width - 24*6, height - 24, 20, 20)
-  rectText("<",     width - 24*5, height - 24, 20, 20)
-  rectText("Today", width - 24*4, height - 24, 44, 20)
-  rectText(">",     width - 24*2, height - 24, 20, 20)
-  rectText(">>",    width - 24*1, height - 24, 20, 20)
-  // Draw weekday labels
+
+  // Weekday header row
   for (var i = 0; i < 7; i++) {
-    var X = scalar(i, 7, 4, width - 4 - max(0, sidebarSz), 4)
-    var W = scalarSize(7, 4, width - 4 - max(0, sidebarSz), 4)
-    fill(34, 25, 64)
-    stroke(53, 40, 96)
-    rect(X, 4, W, 20)
-    fill(237, 230, 255)
+    var X = scalar(i, 7, PAD, width - PAD - SB, PAD)
+    var W = scalarSize(7, PAD, width - PAD - SB, PAD)
     noStroke()
-    rectText(days[i], X, 4, W, 20)
+    fill(C_CARD2[0], C_CARD2[1], C_CARD2[2])
+    rect(X, PAD, W, TOP - PAD * 2, CORNER_SM)
+    fill(C_MUTED[0], C_MUTED[1], C_MUTED[2])
+    textSize(11)
+    rectText(days[i], X, PAD, W, TOP - PAD * 2)
+    textSize(12)
   }
-  // Draw sidebar, if visible
-  if (true) {
-    fill(34, 25, 64)
-    stroke(53, 40, 96)
-    push()
-    var X = width - sidebarSz + (sidebarSz < 100 ? (1 - sidebarSz/100) : 0)
-    var Y = 4
-    var W = sidebarDefaultSize - 4
-    var H = height - 33
-    beginClip()
-    Rect(X - 1, Y - 1, W + 2, H + 2)
-    endClip()
-    Rect(X, Y, W, H)
-    fill(237, 230, 255)
+
+  // Bottom bar
+  var btns = 6
+  var barY = height - BOT + PAD
+  var barH = BOT - PAD * 2
+  noStroke()
+  fill(C_CARD[0], C_CARD[1], C_CARD[2])
+  rect(PAD, barY, width - PAD * 2 - SB, barH, CORNER_SM)
+
+  // Month label
+  fill(C_TEXT[0], C_TEXT[1], C_TEXT[2])
+  rectText(months[currentMonth - 1] + " " + currentYear, PAD + 8, barY, width - PAD * 2 - SB - btns * (barH + PAD) - 8, barH)
+
+  // Nav buttons
+  var btnW = barH
+  var bx = width - PAD - SB - btns * (btnW + PAD)
+  var btnDefs = [
+    ["<<", prevYear],
+    ["<",  prevMonth],
+    ["Today", resetMonth],
+    [">",  nextMonth],
+    [">>", nextYear],
+  ]
+  // "Today" button is wider
+  var btnXs = []
+  var cx = width - PAD - SB
+  cx -= btnW; btnXs.unshift([cx, btnW, ">>",    nextYear])
+  cx -= PAD + btnW; btnXs.unshift([cx, btnW, ">",     nextMonth])
+  cx -= PAD + btnW * 2.5; btnXs.unshift([cx, btnW * 2.5, "Today", resetMonth])
+  cx -= PAD + btnW; btnXs.unshift([cx, btnW, "<",     prevMonth])
+  cx -= PAD + btnW; btnXs.unshift([cx, btnW, "<<",    prevYear])
+
+  for (var b = 0; b < btnXs.length; b++) {
+    var bx = btnXs[b][0], bw = btnXs[b][1], blabel = btnXs[b][2], bfn = btnXs[b][3]
+    var isHover = inRectArea(mouseX, mouseY, bx, barY, bw, barH)
     noStroke()
-    rectText(sidebarDisplayDate, X + 4, Y + 4, W - 8, 16)
-    var W2 = textWidth(sidebarDisplaySubtitle) * 0.9
-    rectText(sidebarDisplaySubtitle, X + W / 2 - W2/2, Y + 22, W2, 8)
-    fill(34, 25, 64)
-    stroke(53, 40, 96)
-    Rect(X + 4, Y + 22 + 16, W - 8, sidebarDefaultSize - 12)
-    if (LegendaryImages[LEGENDARIES.indexOf(sidebar_leg)] != undefined) {
-      var X_1 = X + 4
-      var Y_1 = Y + 38
-      var W_1 = W - 8
-      var H_1 = sidebarDefaultSize - 12
-      image(LegendaryImages[LEGENDARIES.indexOf(sidebar_leg)], X_1 + W_1/2 - min(W_1, H_1 - 15) / 2, Y_1 + 15 + (H_1-15)/2 - min(W_1, H_1 - 15) / 2, min(W_1, H_1 - 15), min(W_1, H_1 - 15))
+    fill(isHover ? C_ACCENT[0] : C_CARD2[0], isHover ? C_ACCENT[1] : C_CARD2[1], isHover ? C_ACCENT[2] : C_CARD2[2])
+    rect(bx, barY, bw, barH, CORNER_SM)
+    fill(isHover ? 255 : C_MUTED[0], isHover ? 255 : C_MUTED[1], isHover ? 255 : C_MUTED[2])
+    textSize(11)
+    rectText(blabel, bx, barY, bw, barH)
+    textSize(12)
+    if (isHover) {
+      cursor('pointer')
+      if (click) { click = false; bfn() }
     }
-    fill(237, 230, 255)
-    var Y2 = Y + 16 + 16 + sidebarDefaultSize
-    line(X, Y2, X + W, Y2)
+  }
+
+  // Sidebar
+  if (sidebarSz > 1) {
+    var SX = width - sidebarSz + (sidebarSz < 100 ? (1 - sidebarSz/100) : 0)
+    var SY = PAD
+    var SW = sidebarDefaultSize - PAD
+    var SH = height - BOT - PAD
+
+    push()
+    beginClip()
+    Rect(SX, SY, SW + 2, SH + 2)
+    endClip()
+
+    // Sidebar background
     noStroke()
-    // Draw sidebar's text here
-    fill(237, 230, 255)
+    fill(C_CARD2[0], C_CARD2[1], C_CARD2[2])
+    rect(SX, SY, SW, SH, CORNER)
+
+    // Date heading
+    fill(C_TEXT[0], C_TEXT[1], C_TEXT[2])
+    textSize(12)
+    rectText(sidebarDisplayDate, SX + 4, SY + 4, SW - 8, 16)
+    fill(C_DIM[0], C_DIM[1], C_DIM[2])
+    textSize(9)
+    rectText(sidebarDisplaySubtitle, SX + 4, SY + 20, SW - 8, 12)
+    textSize(12)
+
+    // Separator
+    stroke(C_BORDER[0], C_BORDER[1], C_BORDER[2])
+    strokeWeight(0.5)
+    line(SX + 8, SY + 34, SX + SW - 8, SY + 34)
+    strokeWeight(1)
     noStroke()
-    rectText("Pokérus", X, Y2, W, 16)
-    // Draw rus sprites in a grid with names
+
+    // Legendary sprite box
+    var sprBoxY = SY + 38
+    var sprBoxH = sidebarDefaultSize - 12
+    fill(C_CARD[0], C_CARD[1], C_CARD[2])
+    rect(SX + 4, sprBoxY, SW - 8, sprBoxH, CORNER_SM)
+    if (LegendaryImages[LEGENDARIES.indexOf(sidebar_leg)] != undefined) {
+      var s = min(SW - 16, sprBoxH - 8)
+      image(LegendaryImages[LEGENDARIES.indexOf(sidebar_leg)],
+        SX + SW/2 - s/2, sprBoxY + sprBoxH/2 - s/2, s, s)
+    }
+
+    // Pokérus section
+    var Y2 = sprBoxY + sprBoxH + 8
+    stroke(C_BORDER[0], C_BORDER[1], C_BORDER[2])
+    strokeWeight(0.5)
+    line(SX + 8, Y2, SX + SW - 8, Y2)
+    strokeWeight(1)
+    noStroke()
+    fill(C_MUTED[0], C_MUTED[1], C_MUTED[2])
+    textSize(10)
+    rectText("Pokérus", SX, Y2 + 2, SW, 14)
+    textSize(12)
+
     var cols = 3
-    var sprSz = (W - 8) / cols
-    var nameH = 14
-    var cellH = sprSz + nameH
+    var sprSz = (SW - 8) / cols
+    var nameH = 13
+    var cellH = sprSz + nameH + 2
     for (var ri = 0; ri < 5; ri++) {
-      var rx = X + 4 + (ri % cols) * sprSz
-      var ry = Y2 + 20 + floor(ri / cols) * cellH
+      var rx = SX + 4 + (ri % cols) * sprSz
+      var ry = Y2 + 18 + floor(ri / cols) * cellH
       var sid = sidebar_rus[ri]
       if (sid != undefined) {
         pullRusImage(sid)
-        if (RusImages[sid]) {
-          image(RusImages[sid], rx, ry, sprSz, sprSz)
-        } else {
-          fill(53, 40, 96)
-          stroke(53, 40, 96)
-          rect(rx + 2, ry + 2, sprSz - 4, sprSz - 4)
-          noStroke()
-        }
-        // Pretty name: replace hyphens, title case
-        var displayName = getDisplayName(sid)
-        fill(157, 143, 192)
+        // Sprite background
         noStroke()
-        textSize(10)
-        rectText(displayName, rx, ry + sprSz, sprSz, nameH)
+        fill(C_CARD[0], C_CARD[1], C_CARD[2])
+        rect(rx + 1, ry + 1, sprSz - 2, sprSz - 2, CORNER_SM)
+        if (RusImages[sid]) {
+          image(RusImages[sid], rx + 1, ry + 1, sprSz - 2, sprSz - 2)
+        }
+        fill(C_DIM[0], C_DIM[1], C_DIM[2])
+        textSize(9)
+        rectText(getDisplayName(sid), rx, ry + sprSz, sprSz, nameH)
         textSize(12)
       }
     }
