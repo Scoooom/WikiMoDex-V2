@@ -1,5 +1,5 @@
 /* =============================================
-   WikiMoDex — ScumsCyborg.css
+   WikiMoDex - ScumsCyborg.css
    Design: deep void purple, Outfit + Space Mono
    ============================================= */
 
@@ -7,7 +7,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-    --bg:       #13102200;
+    --bg:       #131022;
     --bg-solid: #131022;
     --surface:  #1a1530;
     --card:     #221940;
