@@ -454,11 +454,14 @@ function draw() {
     fill(237, 230, 255)
     noStroke()
     rectText("Pokérus", X, Y2, W, 16)
-    // Draw rus sprites in a grid
-    var sprSz = (W - 8) / 3
+    // Draw rus sprites in a grid with names
+    var cols = 3
+    var sprSz = (W - 8) / cols
+    var nameH = 14
+    var cellH = sprSz + nameH
     for (var ri = 0; ri < 5; ri++) {
-      var rx = X + 4 + (ri % 3) * sprSz
-      var ry = Y2 + 20 + floor(ri / 3) * sprSz
+      var rx = X + 4 + (ri % cols) * sprSz
+      var ry = Y2 + 20 + floor(ri / cols) * cellH
       var sid = sidebar_rus[ri]
       if (sid != undefined) {
         pullRusImage(sid)
@@ -470,6 +473,13 @@ function draw() {
           rect(rx + 2, ry + 2, sprSz - 4, sprSz - 4)
           noStroke()
         }
+        // Pretty name: replace hyphens, title case
+        var displayName = sid.replace(/-/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase() })
+        fill(157, 143, 192)
+        noStroke()
+        textSize(10)
+        rectText(displayName, rx, ry + sprSz, sprSz, nameH)
+        textSize(12)
       }
     }
     pop()
