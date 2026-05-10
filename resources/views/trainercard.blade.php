@@ -21,7 +21,7 @@
 .tc-mon-item { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 10px 8px; text-align: center; transition: border-color .15s; }
 .tc-mon-item:hover { border-color: var(--accent); }
 .tc-mon-item a { display: block; }
-.tc-mon-item a img { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; display: block; margin: 0 auto; }
+.tc-mon-item a img { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; display: block; margin: 0 auto; background: var(--surface); border-radius: 50%; padding: 4px; border: 1px solid var(--border); }
 .tc-mon-item span { font-size: 11px; color: var(--accent2); display: block; margin-top: 5px; }
 .rival-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
 .rival-item { text-align: center; }
