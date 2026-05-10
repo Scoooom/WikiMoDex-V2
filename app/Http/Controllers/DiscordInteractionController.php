@@ -338,28 +338,28 @@ class DiscordInteractionController extends Controller
 
             $fields[] = ['name' => 'Types', 'value' => $typesStr, 'inline' => true];
 
-            $fields[] = ['name' => 'Ability 1', 'value' => "**{$ab1Name}**\n||{$ab1Desc}||", 'inline' => true];
-            $fields[] = ['name' => 'Ability 2', 'value' => "**{$ab2Name}**\n||{$ab2Desc}||", 'inline' => true];
-            $fields[] = ['name' => 'Hidden Ability', 'value' => "**{$haName}**\n||{$haDesc}||", 'inline' => true];
+            $fields[] = ['name' => 'Ability 1', 'value' => "**{$ab1Name}**\n{$ab1Desc}", 'inline' => true];
+            $fields[] = ['name' => 'Ability 2', 'value' => "**{$ab2Name}**\n{$ab2Desc}", 'inline' => true];
+            $fields[] = ['name' => 'Hidden Ability', 'value' => "**{$haName}**\n{$haDesc}", 'inline' => true];
 
             if ($smittyItemsStr) {
                 $fields[] = ['name' => 'SMITTY Items', 'value' => $smittyItemsStr, 'inline' => false];
             }
 
-            $statsStr = "||```\n";
+            $statsStr = "```\n";
             $statsStr .= "HP:      " . $this->statBar((int)floor(($hp   / 255) * 100)) . " {$hp}\n";
             $statsStr .= "Atk:     " . $this->statBar((int)floor(($atk  / 255) * 100)) . " {$atk}\n";
             $statsStr .= "Def:     " . $this->statBar((int)floor(($def  / 255) * 100)) . " {$def}\n";
             $statsStr .= "Sp.Atk:  " . $this->statBar((int)floor(($spa  / 255) * 100)) . " {$spa}\n";
             $statsStr .= "Sp.Def:  " . $this->statBar((int)floor(($spd2 / 255) * 100)) . " {$spd2}\n";
             $statsStr .= "Speed:   " . $this->statBar((int)floor(($spe  / 255) * 100)) . " {$spe}\n";
-            $statsStr .= "BST:     {$bst}\n```||";
+            $statsStr .= "BST:     {$bst}\n```";
             $fields[] = ['name' => 'Stats', 'value' => $statsStr, 'inline' => false];
 
             if ($custom) {
                 $rivals = $form->getRivals(true);
                 if ($rivals) {
-                    $fields[] = ['name' => 'Rivals', 'value' => "||{$rivals}||", 'inline' => false];
+                    $fields[] = ['name' => 'Rivals', 'value' => $rivals, 'inline' => false];
                 }
             }
 
