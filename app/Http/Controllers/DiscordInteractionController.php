@@ -242,7 +242,7 @@ class DiscordInteractionController extends Controller
 
         // Fetch base stats from PokéAPI and apply stat focus algorithm
         if ($build->dex_number) {
-            $pokemon = \App\Services\PokemonService::getPokemon($build->dex_number);
+            $pokemon = \App\Services\PokemonService::getMon($build->dex_number);
             if ($pokemon && isset($pokemon->stats)) {
                 $statOrder = ['hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed'];
                 $baseStats = [];

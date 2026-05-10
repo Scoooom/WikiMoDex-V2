@@ -82,7 +82,7 @@ Route::get('/alt-build-stats/{buildId}.json', function ($buildId) {
     $build = \App\Models\AltBuild::where('build_id', $buildId)->first();
     if (!$build || !$build->dex_number) abort(404);
 
-    $pokemon = \App\Services\PokemonService::getPokemon($build->dex_number);
+    $pokemon = \App\Services\PokemonService::getMon($build->dex_number);
     if (!$pokemon || !isset($pokemon->stats)) abort(404);
 
     $baseStats = array_map(fn($s) => $s->base_stat, $pokemon->stats);
