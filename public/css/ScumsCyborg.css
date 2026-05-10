@@ -1134,7 +1134,37 @@ img { max-width: 100%; display: block; }
     max-width: 800px;
 }
 
-.wiki-prose h1 {
+.wiki-prose h1,
+.wiki-prose h2,
+.wiki-prose h3,
+.wiki-prose h4 {
+    scroll-margin-top: 1.5rem;
+}
+
+.wiki-heading-anchor {
+    display: inline-block;
+    margin-left: 0.45em;
+    color: var(--accent);
+    font-size: 0.75em;
+    font-family: var(--font-mono);
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.wiki-prose h1:hover .wiki-heading-anchor,
+.wiki-prose h2:hover .wiki-heading-anchor,
+.wiki-prose h3:hover .wiki-heading-anchor,
+.wiki-prose h4:hover .wiki-heading-anchor,
+.wiki-heading-anchor:focus {
+    opacity: 1;
+}
+
+.wiki-heading-anchor:hover {
+    color: var(--accent3);
+}
     font-size: 1.9rem;
     font-weight: 800;
     color: var(--accent3);

@@ -15,10 +15,21 @@ class WikiController extends Controller
         $environment = new \League\CommonMark\Environment\Environment([
             'html_input'         => 'strip',
             'allow_unsafe_links' => false,
+            'heading_permalink'  => [
+                'html_class'        => 'wiki-heading-anchor',
+                'id_prefix'         => '',
+                'fragment_prefix'   => '',
+                'insert'            => 'after',
+                'min_heading_level' => 1,
+                'max_heading_level' => 4,
+                'symbol'            => '#',
+                'title'             => 'Link to this section',
+            ],
         ]);
         $environment->addExtension(new \League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension());
         $environment->addExtension(new \League\CommonMark\Extension\Table\TableExtension());
         $environment->addExtension(new \League\CommonMark\Extension\Strikethrough\StrikethroughExtension());
+        $environment->addExtension(new \League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension());
 
         $converter = new \League\CommonMark\MarkdownConverter($environment);
         return $converter->convert($content)->getContent();
