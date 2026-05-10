@@ -85,6 +85,7 @@ class WikiController extends Controller
                 ['url' => '/wiki:apollo.html',          'icon' => '☀️', 'label' => 'Apollo / Diana',    'sub' => 'Champions of Sun & Moon'],
                 ['url' => '/wiki:brock.html',           'icon' => '🪨', 'label' => 'Brock',             'sub' => 'Rock / Ground'],
                 ['url' => '/wiki:misty.html',           'icon' => '💧', 'label' => 'Misty',             'sub' => 'Water'],
+                ['url' => '/wiki:alt-builds.html',      'icon' => '✨', 'label' => 'Alt Builds',        'sub' => 'All signature alt forms'],
             ],
             'glitch-system' => [
                 ['url' => '/gallery.html',     'icon' => '👾', 'label' => 'Mod Glitch Forms',  'sub' => 'Community-made forms'],
@@ -195,7 +196,22 @@ class WikiController extends Controller
             ->with('success', 'Article deleted.');
     }
 
-    public function changelog()
+    public function altBuilds()
+    {
+        $builds = \App\Models\AltBuild::orderBy('champion')->orderBy('species')->orderBy('rank')->get();
+
+        $grouped = $builds->groupBy('champion');
+
+        $categoryOrder = WikiArticle::categoryOrder();
+        $allArticles = WikiArticle::orderBy('order')->orderBy('title')->get();
+        $sidebarGrouped = collect($categoryOrder)
+            ->mapWithKeys(fn($cat) => [
+                $cat => $allArticles->where('category', $cat)->values()
+            ])
+            ->filter(fn($group) => $group->isNotEmpty());
+
+        return view('wiki-alt-builds', compact('builds', 'grouped', 'sidebarGrouped'));
+    }
     {
         $entries = \App\Models\ChangelogEntry::orderBy('committed_at', 'desc')
             ->get()

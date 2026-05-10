@@ -32,6 +32,7 @@
         <div class="wiki-category-card">
             <h2 class="wiki-cat-title">Meta</h2>
             <ul class="wiki-cat-list">
+                <li><a href="{{ route('wiki.altbuilds') }}" class="wiki-cat-link">Alt Builds</a></li>
                 <li><a href="{{ route('wiki.changelog') }}" class="wiki-cat-link">Changelog</a></li>
             </ul>
         </div>
