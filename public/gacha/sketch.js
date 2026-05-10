@@ -23,12 +23,25 @@ function reply(r) {
   console.log(r)
 }
 LegendaryImages = []
+RusImages = {}
 
 function pullImage(i) {
   P.getPokemon(LEGENDARY_IDS[i]).then(function(r) {
     console.log(i, r.sprites.front_default)
     LegendaryImages[i] = loadImage(r.sprites.front_default)
   })
+}
+
+function pullRusImage(speciesId) {
+  if (RusImages[speciesId] !== undefined) return
+  RusImages[speciesId] = null
+  if (pokeapi_loaded) {
+    P.getPokemon(speciesId).then(function(r) {
+      if (r.sprites.front_default) {
+        RusImages[speciesId] = loadImage(r.sprites.front_default)
+      }
+    }).catch(function() {})
+  }
 }
 
 function scanDays(c) {
@@ -325,6 +338,7 @@ function draw() {
           sidebarDisplaySubtitle = "(" + (m[i].date.getMonth() + 1) + "/" + m[i].date.getDate() + "/" + m[i].date.getFullYear() + " @ " + (m[i].date.getHours() > 12 ? m[i].date.getHours() - 12 : m[i].date.getHours()) + ":00 " + (m[i].date.getHours() >= 12 ? "PM" : "AM") + ")"
           sidebar_leg = m[i].mon
           sidebar_rus = m[i].rus
+          sidebar_rus.forEach(function(id) { pullRusImage(id) })
         } else if (isCurrent(m[i])) {
           // Sidebar is showing this day already; close it
           toggleSidebar()
@@ -337,6 +351,7 @@ function draw() {
           sidebarDisplaySubtitle = "(" + (m[i].date.getMonth() + 1) + "/" + m[i].date.getDate() + "/" + m[i].date.getFullYear() + " @ " + (m[i].date.getHours() > 12 ? m[i].date.getHours() - 12 : m[i].date.getHours()) + ":00 " + (m[i].date.getHours() >= 12 ? "PM" : "AM") + ")"
           sidebar_leg = m[i].mon
           sidebar_rus = m[i].rus
+          sidebar_rus.forEach(function(id) { pullRusImage(id) })
         }
       }
     } else {
@@ -436,14 +451,27 @@ function draw() {
     line(X, Y2, X + W, Y2)
     noStroke()
     // Draw sidebar's text here
-    rectText("Today's Pokemon", X, Y2, W, 16)
-    text(sidebar_leg == "" ? "[Legendary]" : sidebar_leg, X + 4, Y2 + 26 + 14*0)
-    //text("Pokérus will return Soon™", X + 4, Y2 + 60)
-    text(sidebar_rus[0] == undefined ? "[Rus 1]" : sidebar_rus[0], X + 4, Y2 + 30 + 14*1)
-    text(sidebar_rus[1] == undefined ? "[Rus 2]" : sidebar_rus[1], X + 4, Y2 + 30 + 14*2)
-    text(sidebar_rus[2] == undefined ? "[Rus 3]" : sidebar_rus[2], X + 4, Y2 + 30 + 14*3)
-    text(sidebar_rus[3] == undefined ? "[Rus 4]" : sidebar_rus[3], X + 4, Y2 + 30 + 14*4)
-    text(sidebar_rus[4] == undefined ? "[Rus 5]" : sidebar_rus[4], X + 4, Y2 + 30 + 14*5)
+    fill(237, 230, 255)
+    noStroke()
+    rectText("Pokérus", X, Y2, W, 16)
+    // Draw rus sprites in a grid
+    var sprSz = (W - 8) / 3
+    for (var ri = 0; ri < 5; ri++) {
+      var rx = X + 4 + (ri % 3) * sprSz
+      var ry = Y2 + 20 + floor(ri / 3) * sprSz
+      var sid = sidebar_rus[ri]
+      if (sid != undefined) {
+        pullRusImage(sid)
+        if (RusImages[sid]) {
+          image(RusImages[sid], rx, ry, sprSz, sprSz)
+        } else {
+          fill(53, 40, 96)
+          stroke(53, 40, 96)
+          rect(rx + 2, ry + 2, sprSz - 4, sprSz - 4)
+          noStroke()
+        }
+      }
+    }
     pop()
   }
   click = false
