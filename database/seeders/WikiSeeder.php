@@ -1103,9 +1103,8 @@ MD,
         ]);
 
         $this->command->info('WikiSeeder: unlockables article added.');
-    }
-}
-// ── Champions Index ────────────────────────────────────────────────────────
+
+        // ── Champions Index ────────────────────────────────────────────────────────
 WikiArticle::updateOrCreate(['slug' => 'champions-index'], [
     'title'    => 'Champions',
     'category' => 'Champions',
@@ -1450,8 +1449,8 @@ Misty's Skill Tree runs to **90 levels**.
 | 83 | Cloyster Present Quest | Glitch Form |
 | 90 | Misty Surge | Bond Ability |
 MD,
-]);
+        ]);
 
-$this->command->info('WikiSeeder: champion articles added (index, Apollo, Diana, Brock, Misty).');
+        $this->command->info('WikiSeeder: champion articles added (index, Apollo, Diana, Brock, Misty).');
     }
 }
