@@ -1717,3 +1717,633 @@ img { max-width: 100%; display: block; }
 @media (max-width: 768px) {
     .items-condition { display: none; }
 }
+
+/* ═══════════════════════════════════════════════
+   WIKI SEARCH MODAL
+   ═══════════════════════════════════════════════ */
+
+.nav-search-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    white-space: nowrap;
+}
+
+.nav-search-btn:hover {
+    color: var(--accent2);
+    border-color: var(--accent2);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.wiki-search-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 900;
+    backdrop-filter: blur(2px);
+}
+
+.wiki-search-backdrop.open { display: block; }
+
+.wiki-search-modal {
+    display: none;
+    position: fixed;
+    top: 15vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(620px, 92vw);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    z-index: 901;
+    overflow: hidden;
+    flex-direction: column;
+}
+
+.wiki-search-modal.open { display: flex; }
+
+.wiki-search-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.wiki-search-icon {
+    color: var(--dim);
+    flex-shrink: 0;
+}
+
+.wiki-search-field {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    outline: none;
+}
+
+.wiki-search-field::placeholder { color: var(--dim); }
+
+.wiki-search-esc {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--dim);
+    background: var(--card2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 0.15rem 0.4rem;
+    flex-shrink: 0;
+}
+
+.wiki-search-results {
+    max-height: 420px;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+}
+
+.wiki-search-hint {
+    color: var(--dim);
+    font-size: 0.85rem;
+    padding: 1rem 1.25rem;
+    text-align: center;
+}
+
+.wiki-search-error { color: #e57373; }
+
+.wiki-search-group-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--dim);
+    padding: 0.6rem 1rem 0.25rem;
+}
+
+.wiki-search-result-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+    text-decoration: none;
+    transition: background 0.1s;
+    cursor: pointer;
+    outline: none;
+}
+
+.wiki-search-result-item:hover,
+.wiki-search-result-item:focus {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.wiki-search-result-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.wiki-search-result-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.wiki-search-result-title {
+    color: var(--text);
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wiki-search-result-sub {
+    color: var(--dim);
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+}
+
+.wiki-search-result-excerpt {
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.wiki-search-result-badge {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    opacity: 0.7;
+}
+
+.wiki-search-mark {
+    background: color-mix(in srgb, var(--accent) 35%, transparent);
+    color: var(--accent3);
+    border-radius: 2px;
+    padding: 0 0.1em;
+}
+
+/* ── Gacha page ──────────────────────────────── */
+.gacha-credit {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--dim);
+    font-family: var(--font-mono);
+}
+
+.gacha-credit a {
+    color: var(--accent2);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent2) 40%, transparent);
+}
+
+.gacha-credit a:hover { color: var(--accent3); }
+
+.wiki-article-updated {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    color: var(--dim);
+}
+
+/* ── Wiki gallery cross-links ────────────────── */
+.wiki-gallery-links {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border2);
+}
+
+.wiki-gallery-links-title {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--dim);
+    margin: 0 0 0.85rem;
+}
+
+.wiki-gallery-links-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.wiki-gallery-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+    min-width: 180px;
+}
+
+.wiki-gallery-link:hover {
+    border-color: var(--accent2);
+    background: var(--card2);
+}
+
+.wiki-gallery-link-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+.wiki-gallery-link-label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.wiki-gallery-link-sub {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+}
+
+/* ── Changelog ───────────────────────────────── */
+.changelog-list {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.changelog-entry {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border2);
+    position: relative;
+}
+
+.changelog-entry--major {
+    border-bottom-color: var(--border);
+}
+
+.changelog-entry--major::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--accent);
+    border-radius: 2px;
+}
+
+.changelog-entry-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.changelog-entry-left {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.changelog-version {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+    color: var(--accent2);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: 4px;
+    padding: 0.1rem 0.45rem;
+    flex-shrink: 0;
+}
+
+.changelog-version--hotfix {
+    background: color-mix(in srgb, #f5a623 15%, transparent);
+    color: #f5a623;
+    border-color: color-mix(in srgb, #f5a623 35%, transparent);
+}
+
+.changelog-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.changelog-date {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--dim);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.changelog-body {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    white-space: pre-line;
+    line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════
+   ALT BUILDS PAGE
+   ═══════════════════════════════════════════════ */
+
+.altbuild-champion-section {
+    margin-top: 2.5rem;
+    scroll-margin-top: 80px;
+}
+
+.altbuild-champion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border2);
+    margin-bottom: 1rem;
+}
+
+.altbuild-champion-link {
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+.altbuild-champion-link:hover { color: var(--accent2); }
+
+.altbuild-count {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--dim);
+    flex-shrink: 0;
+}
+
+.altbuild-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.altbuild-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+}
+
+.altbuild-card:hover { border-color: var(--accent2); }
+
+.altbuild-card-header {
+    padding: 0.85rem 1rem 0.7rem;
+    border-bottom: 1px solid var(--border2);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.altbuild-card-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.altbuild-species {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.altbuild-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.altbuild-badges {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
+.altbuild-type {
+    font-size: 0.68rem;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 0.15rem 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--card2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+}
+
+/* Type colours */
+.type-fire     { background: #7d2d0055; color: #ff7043; border-color: #ff704355; }
+.type-water    { background: #003d6655; color: #4fc3f7; border-color: #4fc3f755; }
+.type-grass    { background: #1b4d2055; color: #66bb6a; border-color: #66bb6a55; }
+.type-electric { background: #5d4d0055; color: #ffee58; border-color: #ffee5855; }
+.type-ice      { background: #003d5055; color: #80deea; border-color: #80deea55; }
+.type-fighting { background: #5c1a0055; color: #ef9a9a; border-color: #ef9a9a55; }
+.type-poison   { background: #3d0d5055; color: #ce93d8; border-color: #ce93d855; }
+.type-ground   { background: #5d3d0055; color: #ffcc80; border-color: #ffcc8055; }
+.type-flying   { background: #1a2d5055; color: #90caf9; border-color: #90caf955; }
+.type-psychic  { background: #5d0d3055; color: #f48fb1; border-color: #f48fb155; }
+.type-bug      { background: #2d4d0055; color: #aed581; border-color: #aed58155; }
+.type-rock     { background: #4d3d0055; color: #bcaaa4; border-color: #bcaaa455; }
+.type-ghost    { background: #1a0d4055; color: #b39ddb; border-color: #b39ddb55; }
+.type-dragon   { background: #0d0d6055; color: #7986cb; border-color: #7986cb55; }
+.type-dark     { background: #1a1a2555; color: #a1887f; border-color: #a1887f55; }
+.type-steel    { background: #2d3d4055; color: #b0bec5; border-color: #b0bec555; }
+.type-fairy    { background: #5d0d4055; color: #f8bbd0; border-color: #f8bbd055; }
+.type-normal   { background: #3d3d3d55; color: #eeeeee; border-color: #eeeeee55; }
+
+.altbuild-type-unchanged {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    color: var(--dim);
+    font-style: italic;
+}
+
+.altbuild-card-body {
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.altbuild-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+}
+
+.altbuild-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--dim);
+    flex-shrink: 0;
+    width: 75px;
+}
+
+.altbuild-val {
+    font-size: 0.83rem;
+    color: var(--text);
+    line-height: 1.4;
+}
+
+.altbuild-row--moves { align-items: flex-start; }
+
+.altbuild-moves {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.altbuild-move {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    background: var(--card2);
+    border: 1px solid var(--border2);
+    border-radius: 3px;
+    padding: 0.1rem 0.4rem;
+    color: var(--muted);
+}
+
+.altbuild-noevo {
+    color: #ffcc80;
+    font-size: 0.78rem;
+}
+
+/* ── Alt build sprite canvas ─────────────────── */
+.altbuild-sprite-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 0 0.5rem;
+    background: color-mix(in srgb, var(--surface) 50%, transparent);
+    border-bottom: 1px solid var(--border2);
+}
+
+.altbuild-canvas {
+    width: 128px;
+    height: 128px;
+    image-rendering: pixelated;
+}
+
+/* ── Alt build stat block ────────────────────── */
+.altbuild-stats-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border2);
+    color: var(--dim);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: color 0.15s, background 0.15s;
+}
+
+.altbuild-stats-toggle:hover {
+    color: var(--accent2);
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.altbuild-stats-toggle .chevron {
+    transition: transform 0.2s;
+    font-size: 0.65rem;
+}
+
+.altbuild-stats-block {
+    display: none;
+    padding: 0.6rem 1rem 0.75rem;
+    border-top: 1px solid var(--border2);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+}
+
+.altbuild-stats-block.open { display: block; }
+
+.altbuild-stat-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.2rem;
+}
+
+.altbuild-stat-label {
+    width: 52px;
+    color: var(--dim);
+    flex-shrink: 0;
+}
+
+.altbuild-stat-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--card2);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.altbuild-stat-bar {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--accent2);
+    transition: width 0.3s ease;
+}
+
+.altbuild-stat-val {
+    width: 28px;
+    text-align: right;
+    color: var(--muted);
+}
+
+.altbuild-bst {
+    margin-top: 0.4rem;
+    color: var(--dim);
+    font-size: 0.68rem;
+    text-align: right;
+}
+
+.altbuild-card[id] {
+    scroll-margin-top: 80px;
+}

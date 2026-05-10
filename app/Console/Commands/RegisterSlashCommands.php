@@ -46,6 +46,32 @@ class RegisterSlashCommands extends Command
                     ]
                 ]
             ],
+            [
+                'name'        => 'alt-build',
+                'description' => 'Look up a Champion Alt Build with recoloured sprite',
+                'options'     => [
+                    [
+                        'type'         => 3,
+                        'name'         => 'name',
+                        'description'  => 'The name of the alt build (e.g. Onix Crystal Leviathan)',
+                        'required'     => true,
+                        'autocomplete' => true,
+                    ]
+                ]
+            ],
+            [
+                'name'        => 'wiki-search',
+                'description' => 'Search the PokéVoid wiki and get a summary with a link',
+                'options'     => [
+                    [
+                        'type'         => 3,
+                        'name'         => 'query',
+                        'description'  => 'What to search for',
+                        'required'     => true,
+                        'autocomplete' => true,
+                    ]
+                ]
+            ],
         ];
 
         $response = Http::withHeaders([

@@ -22,7 +22,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js" crossorigin="anonymous"></script>
 <script src="/gacha/pokerogue_data/pokemonData.js"></script>
 <script src="/gacha/phaser-rand.js"></script>
-<link rel="stylesheet" href="/gacha/gacha.css">
+<link rel="stylesheet" href="/gacha/gacha.css?v={{ filemtime(public_path('gacha/gacha.css')) }}">
 @endpush
 
 @section('content')
@@ -59,4 +59,8 @@
 </div>
 
 <script src="/gacha/gacha.js"></script>
+
+<div class="gacha-credit">
+    Original <a href="https://editor.p5js.org/RedstonewolfX/full/jF3kUNbY8" target="_blank" rel="noopener">Gacha Calendar Code</a> by redstonewolf
+</div>
 @endsection

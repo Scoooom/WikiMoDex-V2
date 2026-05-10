@@ -85,6 +85,14 @@ class DiscordInteractionController extends Controller
             return $this->autocompleteAbility($query);
         }
 
+        if ($commandName === 'alt-build') {
+            return $this->autocompleteAltBuild($query);
+        }
+
+        if ($commandName === 'wiki-search') {
+            return $this->autocompleteWikiSearch($query);
+        }
+
         return $this->autocompleteForm($query);
     }
 
@@ -158,12 +166,21 @@ class DiscordInteractionController extends Controller
             return response()->json([
                 'type' => self::CHANNEL_MESSAGE,
                 'data' => [
-                    'content' =>
-                        "The WikiMoDex can be found [here](<https://void.scooom.xyz/>)! " .
-                        "You can use it to look up [Core Glitches](<https://void.scooom.xyz/galleryCore.html>) " .
-                        "and [Mod Glitches](<https://void.scooom.xyz/gallery.html>).\n" .
-                        "Additionally, you may find the [FAQ](<https://void.scooom.xyz/faq.html>) " .
-                        "and the [Legendary Up And PokeRus Calendar](<https://void.scooom.xyz/gacha.html>)!"
+                    'embeds' => [[
+                        'title'       => 'WikiMoDex',
+                        'description' => 'The PokéVoid community wiki and Pokémon form database.',
+                        'color'       => 0x7c5cbf,
+                        'fields'      => [
+                            ['name' => '📖 Wiki',          'value' => "[Game mechanics, champions, items & more](<https://void.scooom.xyz/wiki.html>)",                   'inline' => false],
+                            ['name' => '🎒 Items',         'value' => "[Full item reference by tier](<https://void.scooom.xyz/wiki:items.html>)",                         'inline' => true],
+                            ['name' => '✨ Alt Builds',    'value' => "[Champion alt build gallery](<https://void.scooom.xyz/wiki:alt-builds.html>)",                     'inline' => true],
+                            ['name' => '👾 Mod Glitches',  'value' => "[Community-made glitch forms](<https://void.scooom.xyz/gallery.html>)",                           'inline' => true],
+                            ['name' => '⚡ Core Glitches', 'value' => "[Official glitch forms](<https://void.scooom.xyz/galleryCore.html>)",                             'inline' => true],
+                            ['name' => '📅 Gacha',         'value' => "[Today\'s legendary & Pokérus calendar](<https://void.scooom.xyz/gacha.html>)",                   'inline' => true],
+                            ['name' => '❓ FAQ',           'value' => "[Frequently asked questions](<https://void.scooom.xyz/faq.html>)",                                 'inline' => true],
+                        ],
+                        'footer' => ['text' => 'WikiMoDex • Use /form, /ability, or /alt-build for specific lookups'],
+                    ]]
                 ]
             ]);
         }
@@ -179,10 +196,317 @@ class DiscordInteractionController extends Controller
             return $this->handleAbility($enumName);
         }
 
+        if ($commandName === 'alt-build') {
+            $buildId = '';
+            foreach ($data['data']['options'] ?? [] as $option) {
+                if ($option['name'] === 'name') {
+                    $buildId = $option['value'];
+                    break;
+                }
+            }
+            return $this->handleAltBuild($buildId);
+        }
+
+        if ($commandName === 'wiki-search') {
+            $query = '';
+            foreach ($data['data']['options'] ?? [] as $option) {
+                if ($option['name'] === 'query') { $query = $option['value']; break; }
+            }
+            return $this->handleWikiSearch($query);
+        }
+
         return response()->json([
             'type' => self::CHANNEL_MESSAGE,
             'data' => ['content' => 'Unknown command.']
         ]);
+    }
+
+    private function autocompleteWikiSearch(string $query): \Illuminate\Http\JsonResponse
+    {
+        $choices = [];
+
+        if (strlen($query) >= 2) {
+            // Articles
+            $articles = \App\Models\WikiArticle::where('title', 'like', "%{$query}%")
+                ->orWhere('content', 'like', "%{$query}%")
+                ->orderByRaw("CASE WHEN title LIKE ? THEN 0 ELSE 1 END", ["%{$query}%"])
+                ->limit(8)
+                ->get(['slug', 'title', 'category']);
+
+            foreach ($articles as $a) {
+                $choices[] = ['name' => "📄 {$a->title} ({$a->category})", 'value' => "article:{$a->slug}"];
+            }
+
+            // Items
+            $items = \App\Models\GameItem::where('name', 'like', "%{$query}%")
+                ->limit(5)
+                ->get(['name', 'tier']);
+
+            foreach ($items as $item) {
+                $choices[] = ['name' => "🎒 {$item->name} (" . ucfirst(strtolower($item->tier)) . ")", 'value' => "item:{$item->name}"];
+            }
+
+            // Alt builds
+            $builds = \App\Models\AltBuild::where('name', 'like', "%{$query}%")
+                ->orWhere('species', 'like', "%{$query}%")
+                ->limit(5)
+                ->get(['build_id', 'name', 'species']);
+
+            foreach ($builds as $b) {
+                $choices[] = ['name' => "✨ {$b->species} — {$b->name}", 'value' => "altbuild:{$b->build_id}"];
+            }
+        }
+
+        return response()->json([
+            'type' => self::AUTOCOMPLETE_RESULT,
+            'data' => ['choices' => array_slice($choices, 0, 25)],
+        ]);
+    }
+
+    private function handleWikiSearch(string $query): \Illuminate\Http\JsonResponse
+    {
+        // Query format: "type:identifier" from autocomplete
+        [$type, $id] = array_pad(explode(':', $query, 2), 2, '');
+
+        if ($type === 'article') {
+            $article = \App\Models\WikiArticle::where('slug', $id)->first();
+            if (!$article) goto not_found;
+
+            $plain   = preg_replace('/[#*`\[\]_>|~]/u', '', $article->content);
+            $plain   = preg_replace('/\s+/', ' ', trim($plain));
+            $excerpt = substr($plain, 0, 300) . (strlen($plain) > 300 ? '…' : '');
+            $url     = "https://void.scooom.xyz/wiki:{$article->slug}.html";
+
+            return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
+                'title'       => $article->title,
+                'description' => $excerpt,
+                'color'       => 0x7c5cbf,
+                'fields'      => [['name' => 'Category', 'value' => $article->category, 'inline' => true]],
+                'url'         => $url,
+                'footer'      => ['text' => 'WikiMoDex • Wiki'],
+            ]]]]);
+        }
+
+        if ($type === 'item') {
+            $item = \App\Models\GameItem::where('name', $id)->first();
+            if (!$item) goto not_found;
+
+            $fields = [];
+            $fields[] = ['name' => 'Tier',       'value' => ucfirst(strtolower($item->tier)), 'inline' => true];
+            if ($item->spawn_condition) $fields[] = ['name' => 'Condition', 'value' => $item->spawn_condition, 'inline' => true];
+
+            return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
+                'title'       => $item->name,
+                'description' => $item->description ?: 'No description available.',
+                'color'       => 0x7c5cbf,
+                'fields'      => $fields,
+                'url'         => "https://void.scooom.xyz/wiki:items.html",
+                'footer'      => ['text' => 'WikiMoDex • Items Reference'],
+            ]]]]);
+        }
+
+        if ($type === 'altbuild') {
+            return $this->handleAltBuild($id);
+        }
+
+        not_found:
+        return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => [
+            'content' => "No result found. Try searching on the [wiki](<https://void.scooom.xyz/wiki.html>)."
+        ]]);
+    }
+
+    private function autocompleteAltBuild(string $query): \Illuminate\Http\JsonResponse
+    {
+        $builds = \App\Models\AltBuild::where('name', 'like', "%{$query}%")
+            ->orWhere('species', 'like', "%{$query}%")
+            ->orderByRaw("CASE WHEN species LIKE ? THEN 0 ELSE 1 END", ["%{$query}%"])
+            ->limit(25)
+            ->get(['build_id', 'name', 'species', 'champion']);
+
+        $choices = $builds->map(fn($b) => [
+            'name'  => "{$b->species} — {$b->name}",
+            'value' => $b->build_id,
+        ])->values()->toArray();
+
+        return response()->json([
+            'type' => self::AUTOCOMPLETE_RESULT,
+            'data' => ['choices' => $choices],
+        ]);
+    }
+
+    private function handleAltBuild(string $buildId): \Illuminate\Http\JsonResponse
+    {
+        $build = \App\Models\AltBuild::where('build_id', $buildId)->first();
+
+        if (!$build) {
+            return response()->json([
+                'type' => self::CHANNEL_MESSAGE,
+                'data' => ['content' => "Alt Build `{$buildId}` not found!"]
+            ]);
+        }
+
+        $types     = collect([$build->type1, $build->type2])->filter()->join(' / ');
+        $abilities = collect([$build->ability1, $build->ability2, $build->ability3])->filter()->join(' / ');
+
+        $fields = [];
+        if ($types)                  $fields[] = ['name' => 'Types',      'value' => $types,                  'inline' => true];
+        if ($build->stat_focus)      $fields[] = ['name' => 'Stat Focus', 'value' => $build->stat_focus,      'inline' => true];
+        if ($abilities)              $fields[] = ['name' => 'Abilities',  'value' => $abilities,               'inline' => false];
+        if ($build->passive_ability) $fields[] = ['name' => 'Passive',    'value' => $build->passive_ability, 'inline' => true];
+        if ($build->prevents_evolution) $fields[] = ['name' => 'Note',    'value' => '⚠ Prevents evolution', 'inline' => true];
+
+        // Fetch base stats from PokéAPI and apply stat focus algorithm
+        if ($build->dex_number) {
+            $pokemon = \App\Services\PokemonService::getMon($build->dex_number);
+            if ($pokemon && isset($pokemon->stats)) {
+                $statOrder = ['hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed'];
+                $baseStats = [];
+                foreach ($pokemon->stats as $stat) {
+                    $baseStats[] = $stat->base_stat;
+                }
+
+                // Parse stat focus string to indices [HP=0, ATK=1, DEF=2, SPATK=3, SPDEF=4, SPD=5]
+                $statMap = ['HP' => 0, 'ATK' => 1, 'DEF' => 2, 'SP.ATK' => 3, 'SP.DEF' => 4, 'SPD' => 5];
+                $focusParts = array_map('trim', explode('/', $build->stat_focus ?? ''));
+                $focusIndices = array_values(array_filter(array_map(fn($s) => $statMap[$s] ?? null, $focusParts), fn($v) => $v !== null));
+
+                $calculated = $this->calculateAltBuildStats($baseStats, $focusIndices, $build->rank ?? 1);
+                [$hp, $atk, $def, $spa, $spd2, $spe] = $calculated;
+                $bst = array_sum($calculated);
+
+                $statsStr  = "```\n";
+                $statsStr .= "HP:      " . $this->statBar((int)floor(($hp   / 255) * 100)) . " {$hp}\n";
+                $statsStr .= "Atk:     " . $this->statBar((int)floor(($atk  / 255) * 100)) . " {$atk}\n";
+                $statsStr .= "Def:     " . $this->statBar((int)floor(($def  / 255) * 100)) . " {$def}\n";
+                $statsStr .= "Sp.Atk:  " . $this->statBar((int)floor(($spa  / 255) * 100)) . " {$spa}\n";
+                $statsStr .= "Sp.Def:  " . $this->statBar((int)floor(($spd2 / 255) * 100)) . " {$spd2}\n";
+                $statsStr .= "Speed:   " . $this->statBar((int)floor(($spe  / 255) * 100)) . " {$spe}\n";
+                $statsStr .= "BST:     {$bst}\n```";
+
+                $fields[] = ['name' => 'Stats', 'value' => $statsStr, 'inline' => false];
+            }
+        }
+
+        $championLabels = \App\Models\AltBuild::championLabel();
+        $champion = $championLabels[$build->champion] ?? ucfirst($build->champion ?? 'Unknown');
+        $spriteUrl = "https://void.scooom.xyz/alt-build-sprite:{$build->build_id}.png?v=2";
+
+        $embed = [
+            'title'       => "{$build->species} — {$build->name}",
+            'description' => "Champion: **{$champion}**",
+            'color'       => 0x7c5cbf,
+            'thumbnail'   => ['url' => $spriteUrl],
+            'fields'      => $fields,
+            'footer'      => ['text' => 'WikiMoDex • Alt Builds'],
+            'url'         => 'https://void.scooom.xyz/wiki:alt-builds.html#champion-' . ($build->champion ?? ''),
+        ];
+
+        return response()->json([
+            'type' => self::CHANNEL_MESSAGE,
+            'data' => ['embeds' => [$embed]],
+        ]);
+    }
+
+    private function calculateAltBuildStats(array $stats, array $focusIndices, int $rank): array
+    {
+        // Step 1: swap focus stats to highest positions (mirrors TypeScript algorithm)
+        $newStats = $stats;
+        foreach ($focusIndices as $rankIdx => $focusStat) {
+            $ranked = [];
+            for ($s = 0; $s <= 5; $s++) {
+                $ranked[] = ['stat' => $s, 'value' => $newStats[$s]];
+            }
+            usort($ranked, fn($a, $b) => $b['value'] - $a['value']);
+            $highestAtRank = $ranked[$rankIdx];
+            if ($focusStat !== $highestAtRank['stat']) {
+                $temp = $newStats[$focusStat];
+                $newStats[$focusStat] = $newStats[$highestAtRank['stat']];
+                $newStats[$highestAtRank['stat']] = $temp;
+            }
+        }
+
+        // Step 2: scale BST to target
+        $rankClamped = min($rank, 9);
+        $targetBST   = 425 + ($rankClamped * 25);
+        $currentBST  = array_sum($newStats);
+
+        if ($currentBST >= $targetBST) return $newStats;
+
+        $nonFocusIndices = array_values(array_filter([0,1,2,3,4,5], fn($i) => !in_array($i, $focusIndices)));
+        $allocated = $newStats;
+        $difference = $targetBST - $currentBST;
+
+        if ($difference <= 30) {
+            $focusTotal = array_sum(array_map(fn($i) => $newStats[$i], $focusIndices));
+            foreach ($focusIndices as $i) {
+                $proportion = $focusTotal > 0 ? $newStats[$i] / $focusTotal : 1 / count($focusIndices);
+                $allocated[$i] = $newStats[$i] + (int)floor($difference * $proportion);
+            }
+            $scaledTotal = array_sum($allocated);
+            $diff = $targetBST - $scaledTotal;
+            $idx = 0;
+            while ($diff !== 0 && $idx < 100) {
+                $t = $focusIndices[$idx % count($focusIndices)];
+                if ($diff > 0) { $allocated[$t]++; $diff--; }
+                else           { $allocated[$t]--; $diff++; }
+                $idx++;
+            }
+            return $allocated;
+        }
+
+        $statCap    = (int)floor($targetBST * 0.30);
+        $focusTarget = (int)floor($statCap * 0.80);
+        $focusBudget = count($focusIndices) * $focusTarget;
+        $nonFocusBudget = $targetBST - $focusBudget;
+
+        $nonFocusRanked = array_map(fn($i) => ['index' => $i, 'value' => $newStats[$i]], $nonFocusIndices);
+        usort($nonFocusRanked, fn($a, $b) => $b['value'] - $a['value']);
+
+        $weights = [];
+        foreach ($nonFocusRanked as $r => $stat) {
+            $pct = 0.50 - ($r / max(1, count($nonFocusRanked) - 1)) * 0.15;
+            $weights[] = array_merge($stat, ['weight' => pow($pct, 1.5)]);
+        }
+        $totalWeight = array_sum(array_column($weights, 'weight'));
+        foreach ($weights as $w) {
+            $allocated[$w['index']] = max($newStats[$w['index']], (int)floor($nonFocusBudget * ($w['weight'] / $totalWeight)));
+        }
+
+        $focusBoost = 50;
+        $focusWeights = array_map(fn($i) => $newStats[$i] + $focusBoost, $focusIndices);
+        $totalFocusWeight = array_sum($focusWeights);
+        foreach ($focusIndices as $k => $i) {
+            $allocated[$i] = $totalFocusWeight > 0
+                ? (int)floor($focusBudget * ($focusWeights[$k] / $totalFocusWeight))
+                : (int)floor($focusBudget / count($focusIndices));
+        }
+
+        $capped = array_map(fn($s) => min($s, $statCap), $allocated);
+        $diff = $targetBST - array_sum($capped);
+        $allIndices = array_merge($focusIndices, $nonFocusIndices);
+        $adjustIdx = 0;
+        while ($diff !== 0 && $adjustIdx < 1000) {
+            $t = $allIndices[$adjustIdx % count($allIndices)];
+            if ($diff > 0 && $capped[$t] < $statCap)  { $capped[$t]++; $diff--; }
+            elseif ($diff < 0 && $capped[$t] > 1)     { $capped[$t]--; $diff++; }
+            $adjustIdx++;
+        }
+        return $capped;
+    }
+
+    private function generateAltBuildSprite(\App\Models\AltBuild $build): ?string
+    {
+        $script    = base_path('scripts/render_alt_build_sprite.py');
+        $srcSprite = base_path("pokevoid/public/images/pokemon/{$build->dex_number}.png");
+        $outPath   = storage_path("app/alt-build-sprites/{$build->build_id}.png");
+
+        if (!file_exists($script) || !file_exists($srcSprite)) return null;
+        if (!is_dir(dirname($outPath))) mkdir(dirname($outPath), 0755, true);
+
+        $palette = escapeshellarg(json_encode($build->target_palette));
+        shell_exec("python3 {$script} " . escapeshellarg($srcSprite) . " {$palette} " . escapeshellarg($outPath) . " 2>/dev/null");
+
+        return file_exists($outPath) ? $outPath : null;
     }
 
     private function handleAbility(string $enumName): \Illuminate\Http\JsonResponse

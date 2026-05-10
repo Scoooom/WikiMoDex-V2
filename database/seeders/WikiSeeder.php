@@ -1103,5 +1103,325 @@ MD,
         ]);
 
         $this->command->info('WikiSeeder: unlockables article added.');
+
+        // ── Champions Index ────────────────────────────────────────────────────────
+WikiArticle::updateOrCreate(['slug' => 'champions-index'], [
+    'title'    => 'Champions',
+    'category' => 'Champions',
+    'order'    => 0,
+    'content'  => <<<'MD'
+# Champions
+
+Champions are the playable characters of PokéVoid. Each Champion has a unique type specialisation, signature Pokémon, a personal Skill Tree, and their own lore within the story of the Void. Choosing the right Champion shapes your entire playstyle.
+
+## Available Champions
+
+| Champion | Types | Signature Pokémon | Unlock |
+|----------|-------|-------------------|--------|
+| [Apollo / Diana](/wiki:apollo.html) | Random (changes each run) | Solrock, Lunatone | Available from start |
+| [Brock](/wiki:brock.html) | Rock / Ground | Onix | 75 Ground + 75 Rock Essences |
+| [Misty](/wiki:misty.html) | Water | Staryu | 200 Water Essences |
+| Lt. Surge | Electric | Voltorb | *Coming soon* |
+| Blaine | Fire | *TBA* | *Coming soon* |
+| Sabrina | Psychic | *TBA* | *Coming soon* |
+| Roxie | Poison | *TBA* | *Coming soon* |
+| Allister | Ghost | *TBA* | *Coming soon* |
+| Norman | Normal | *TBA* | *Coming soon* |
+| Wallace | Water | *TBA* | *Coming soon* |
+
+## How Champions Work
+
+Each Champion has:
+
+- **Type Specialisation** — most Champions can only use Pokémon matching their type affinity. Apollo and Diana are the exception — they receive two random types at the start of every run.
+- **Signature Pokémon** — special starters unique to that Champion. They can develop unique Alt Builds — alternate forms with different stats, abilities, and types.
+- **Skill Tree** — a deep branching tree of upgrades unlocked by levelling up the Champion. Each level unlocks a new node: Mega Stones, abilities, legendary Pokémon, Glitch Form quests, and more.
+- **Unlock Requirements** — most Champions are locked inside the Void and must be freed by collecting specific Essences. Once freed they start with an empty Pokémon collection.
+
+## Champion XP & Levelling
+
+Champions gain XP through play. Each level reveals a new Skill Tree node. Nodes cost **Skill Points (SP)** to activate and some require **Skill Tree Tokens (TK)** to unlock deeper levels.
+
+Type-specific Champions gain extra XP from battles involving their type affinity.
+
+## See Also
+
+- [Skill Trees](/wiki:skill-trees.html)
+- [Essences](/wiki:essences.html)
+MD,
+]);
+
+// ── Apollo & Diana ─────────────────────────────────────────────────────────
+WikiArticle::updateOrCreate(['slug' => 'apollo'], [
+    'title'    => 'Apollo & Diana',
+    'category' => 'Champions',
+    'order'    => 1,
+    'content'  => <<<'MD'
+# Apollo & Diana — Champions of Sun and Moon
+
+Apollo and Diana are the two default Champions and the canonical guardians of light in PokéVoid. They are mechanically identical — **Apollo is the male variant, Diana is the female variant**. Your choice is purely cosmetic.
+
+> *"Apollo channels radiant power as one of the last lights pushing back the void's endless night."*
+> *"Diana weaves moonlit threads to track the void's movements and guide others to safety."*
+
+## Overview
+
+| Attribute | Value |
+|-----------|-------|
+| **Types** | 2 random types (assigned at run start) |
+| **Signature Legendary** | Lunala |
+| **Unlock** | Available from the start — no Essence required |
+| **Starting Smitty Ability** | Sun and Moon |
+| **Starting Mega Stone** | Lucarionite |
+| **Starting Glitch Form** | Wispeeon (Eevee Ghost Quest) |
+| **Starting Move Upgrade** | Power +1 |
+
+## Type System
+
+Apollo and Diana receive **two random types** at the start of every run. Their Skill Tree, item pool, and type bonuses all reflect these randomly assigned types — meaning each run is a completely fresh strategic puzzle.
+
+This makes them the most flexible Champions, but also the most unpredictable. You cannot build a fixed team strategy between runs.
+
+## Signature Pokémon
+
+Their signature Pokémon are **Solrock** and **Lunatone**, with Alt Builds available:
+
+- **Solrock** → *Void Constellation* (unlocked at start)
+- **Lunatone** → *Dream Weaver* (unlocked at Skill Tree level 7)
+
+Additional signature Pokémon unlock through the Skill Tree: Eevee (level 10), Litwick (level 18), Sunkern (level 33), Swablu (level 25), Cleffa (level 41), Larvesta (level 48), Riolu (level 54), Castform (level 61), Teddiursa (level 68).
+
+## Skill Tree Highlights
+
+Apollo/Diana share one Skill Tree running to **111 levels** — the longest in the game.
+
+| Level | Reward | Type |
+|-------|--------|------|
+| 2 | Charizardite Y | Mega Stone |
+| 3 | Flame Body | Bond Ability |
+| 4 | Intimidate | Bond Ability |
+| 5 | Regenerator Plus | Smitty Ability |
+| 6 | Xerneas | Legendary |
+| 7 | Lunatone Dream Weaver | Alt Build |
+| 10 | Eevee | Signature Pokémon |
+| 15 | Magical Pikachu Quest | Glitch Form |
+| 22 | Jirachi | Legendary |
+| 29 | Necrozma | Legendary |
+| 30 | Eevee Steel Quest | Glitch Form |
+| 37 | Reshiram | Legendary |
+| 38 | Charmander Undertale Quest | Glitch Form |
+| 45 | Gouging Fire | Legendary |
+| 51 | Victini | Legendary |
+| 57 | Cresselia | Legendary |
+| 64 | Tapu Lele | Legendary |
+| 65 | Charizard Hellflame Quest | Glitch Form |
+| 71 | Iron Valiant | Legendary |
+| 77 | Ho-Oh | Legendary |
+| 83 | Solgaleo | Legendary |
+| 93 | Giratina | Legendary |
+| 98 | Flutter Mane | Legendary |
+| 100 | Yin Yang | Smitty Ability |
+| 103 | Enamorus | Legendary |
+| 107 | Entei | Legendary |
+MD,
+]);
+
+WikiArticle::updateOrCreate(['slug' => 'diana'], [
+    'title'    => 'Diana',
+    'category' => 'Champions',
+    'order'    => 2,
+    'content'  => <<<'MD'
+# Diana
+
+Diana is the female variant of Apollo. They are mechanically identical — same Skill Tree, same Signature Pokémon, same unlock requirements.
+
+See the **[Apollo & Diana](/wiki:apollo.html)** article for full details.
+MD,
+]);
+
+// ── Brock ─────────────────────────────────────────────────────────────────
+WikiArticle::updateOrCreate(['slug' => 'brock'], [
+    'title'    => 'Brock',
+    'category' => 'Champions',
+    'order'    => 3,
+    'content'  => <<<'MD'
+# Brock — Rock Specialist
+
+Brock is the first locked Champion and a master of Ground and Rock types. He brings raw defensive power and earth-shaking offensive capability to every run.
+
+> *"Master of Ground and Rock types"*
+
+## Overview
+
+| Attribute | Value |
+|-----------|-------|
+| **Types** | Rock / Ground |
+| **Signature Pokémon** | Onix |
+| **Signature Legendary** | Regirock |
+| **Unlock** | 75 Ground Essences + 75 Rock Essences (150 total) |
+| **Starting Smitty Ability** | Alien Rock |
+| **Starting Mega Stone** | Steelixite |
+| **Starting Glitch Form** | Sudolem (Sudowoodo Wood Hammer Quest) |
+| **Starting Move Upgrade** | Power +1 |
+| **Starting Stat Boost** | Defense boost for Rock/Ground Pokémon |
+| **Starting Alt Build** | Onix Crystal Leviathan |
+| **Starting Conditional Ability** | Battle Armor |
+
+## Unlocking Brock
+
+Brock is trapped in the Void. To free him, collect and spend:
+- **75 Ground Essences** — dropped by defeating Ground-type Pokémon
+- **75 Rock Essences** — dropped by defeating Rock-type Pokémon
+
+Once unlocked, Brock starts with an empty Pokémon collection limited to Ground and Rock types, and only those you catch while playing as him.
+
+## Playstyle
+
+Brock rewards defensive, attrition-based play. His stat boosts and starting Defense bonus make his Pokémon significantly harder to knock out. His type restriction (Rock/Ground only) means you'll be building around a fairly narrow but deep pool — Geodude line, Onix line, Larvitar line, Sandaconda, Garchomp, and more.
+
+Ground types give Brock excellent coverage against Electric, Fire, Poison, Rock, and Steel — and immunity to Electric entirely.
+
+## Signature Pokémon
+
+Brock's signature starter is **Onix**, which has a unique **Crystal Leviathan** Alt Build available immediately. Additional signature Pokémon unlock through the Skill Tree:
+
+Comfey (level 9), Vulpix (level 17), Croagunk (level 25), Happiny (level 41), Mudkip (level 33), Geodude (level 49), Bonsly (level 56), Pineco (level 77), Zubat (level 63), Lotad (level 70).
+
+## Skill Tree Highlights
+
+Brock's Skill Tree runs to **91 levels**.
+
+| Level | Reward | Type |
+|-------|--------|------|
+| 1 | Aerodactylite | Mega Stone |
+| 2 | Rock Head | Bond Ability |
+| 3 | Sturdy | Bond Ability |
+| 4 | Counter Coat | Smitty Ability |
+| 5 | Diancie | Legendary |
+| 6 | Eevee Ground Quest | Glitch Form |
+| 8 | Rock Solid Meme | Smitty Ability |
+| 10 | Excadrillite | Mega Stone |
+| 12 | Rock Roll | Smitty Ability |
+| 13 | Terrakion | Legendary |
+| 14 | Gliscor Dark Move Knockout Quest | Glitch Form |
+| 18 | Swampertite | Mega Stone |
+| 20 | Rock Control | Smitty Ability |
+| 21 | Ting-Lu | Legendary |
+| 22 | Regirock Nightmare Quest | Glitch Form |
+| 26 | Barbaraclite | Mega Stone |
+| 29 | Iron Thorns | Legendary |
+| 30 | Eiscue Rock Knockout Quest | Glitch Form |
+| 34 | Tyranitarite | Mega Stone |
+| 37 | Landorus | Legendary |
+| 38 | Ninetales Stored Power Quest | Glitch Form |
+| 44 | Champion | Smitty Ability |
+| 45 | Groudon | Legendary |
+| 46 | Shuckle Defeat Quest | Glitch Form |
+| 52 | Iron Treads | Legendary |
+| 53 | Charizard Ground Quest | Glitch Form |
+| 60 | Golem Fire Quest | Glitch Form |
+| 66 | Great Tusk | Legendary |
+| 67 | Mimikyu Regirock Knockout Quest | Glitch Form |
+| 73 | Stakataka | Legendary |
+| 74 | Feraligatr Rock Move Quest | Glitch Form |
+| 80 | Iron Boulder | Legendary |
+| 81 | Claydol Poison Quest | Glitch Form |
+| 83 | Golem Plus | Smitty Ability |
+| 91 | Made to Last | Smitty Ability |
+MD,
+]);
+
+// ── Misty ──────────────────────────────────────────────────────────────────
+WikiArticle::updateOrCreate(['slug' => 'misty'], [
+    'title'    => 'Misty',
+    'category' => 'Champions',
+    'order'    => 4,
+    'content'  => <<<'MD'
+# Misty — Water Specialist
+
+Misty is the second locked Champion and master of Water types. She brings speed, adaptability, and surprisingly broad coverage to runs.
+
+> *"Master of Water types"*
+
+## Overview
+
+| Attribute | Value |
+|-----------|-------|
+| **Types** | Water |
+| **Signature Pokémon** | Staryu |
+| **Signature Legendary** | Suicune |
+| **Unlock** | 200 Water Essences |
+| **Starting Smitty Ability** | Magical Water |
+| **Starting Mega Stone** | Gyaradosite |
+| **Starting Glitch Form** | Lavaras (Lapras Fire Move Quest) |
+| **Starting Move Upgrade** | Accuracy +1 |
+| **Starting Stat Boost** | Speed boost for Water Pokémon |
+| **Starting Alt Build** | Staryu Chronos Gear |
+| **Starting Conditional Ability** | Torrent |
+
+## Unlocking Misty
+
+Misty requires **200 Water Essences** — the highest single-type essence cost of any currently available Champion. Water Essences drop from defeating any Water-type Pokémon.
+
+The higher cost reflects Misty's broader power ceiling — Water has excellent offensive coverage and a massive species pool.
+
+## Playstyle
+
+Misty rewards aggressive, fast-paced play. Her Speed stat boost and Accuracy +1 starting move upgrade mean her Pokémon hit first and hit reliably. Water covers Fire, Ground, and Rock — three of the most common defensive types — making her team easy to build around.
+
+Her Signature Pokémon pool is the widest of any Champion, giving significant flexibility in starter selection.
+
+## Signature Pokémon
+
+Misty's signature starter is **Staryu**, with the **Chronos Gear** Alt Build available from the start. Additional signatures unlock through the Skill Tree:
+
+Horsea (level 8), Corsola (level 16), Luvdisc (level 24), Psyduck (level 32), Poliwag (level 40), Goldeen (level 47), Azurill (level 54), Togepi (level 61), Magikarp (level 68), Clauncher (level 75).
+
+## Skill Tree Highlights
+
+Misty's Skill Tree runs to **90 levels**.
+
+| Level | Reward | Type |
+|-------|--------|------|
+| 1 | Slowbronite | Mega Stone |
+| 2 | Rain Dish | Bond Ability |
+| 3 | Water Absorb | Bond Ability |
+| 4 | Abyssal Lure | Smitty Ability |
+| 5 | Volcanion | Legendary |
+| 6 | Swift Swim | Bond Ability |
+| 7 | Acid Water | Smitty Ability |
+| 9 | Starmite | Mega Stone |
+| 10 | Drizzle | Bond Ability |
+| 11 | Water Powered | Smitty Ability |
+| 12 | Lugia | Legendary |
+| 13 | Mimikyu Greninja Knockout Quest | Glitch Form |
+| 15 | Deep Sea Virus | Smitty Ability |
+| 17 | Blastoisinite | Mega Stone |
+| 20 | Kyogre | Legendary |
+| 21 | Magikarp Defeat Quest | Glitch Form |
+| 22 | Water Bubble | Bond Ability |
+| 25 | Feraligatrite | Mega Stone |
+| 28 | Walking Wake | Legendary |
+| 29 | Octillery Nightmare Quest | Glitch Form |
+| 33 | Sharpedonite | Mega Stone |
+| 36 | Iron Bundle | Legendary |
+| 37 | Squirtle Torment Quest | Glitch Form |
+| 41 | Greninjite | Mega Stone |
+| 44 | Keldeo | Legendary |
+| 50 | Manaphy | Legendary |
+| 51 | Greninja Trio Win Quest | Glitch Form |
+| 57 | Tapu Fini | Legendary |
+| 58 | Lanturn Nightmare Quest | Glitch Form |
+| 64 | Phione | Legendary |
+| 65 | Greninja Yokai Wave Quest | Glitch Form |
+| 71 | Palkia | Legendary |
+| 72 | Feraligatr Dragon Defeat Quest | Glitch Form |
+| 78 | Blastoise Fairy Defeat Quest | Glitch Form |
+| 83 | Cloyster Present Quest | Glitch Form |
+| 90 | Misty Surge | Bond Ability |
+MD,
+        ]);
+
+        $this->command->info('WikiSeeder: champion articles added (index, Apollo, Diana, Brock, Misty).');
     }
 }

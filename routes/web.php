@@ -77,12 +77,109 @@ Route::get('/smittyForm:{form}.html', [GlitchController::class, 'smittyFormMon']
 // Bot
 Route::post('/discord/interactions', [App\Http\Controllers\DiscordInteractionController::class, 'handle'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
+// ── Pokevoid sprites ──────────────────────────────────────────────────────
+Route::get('/alt-build-stats/{buildId}.json', function ($buildId) {
+    $build = \App\Models\AltBuild::where('build_id', $buildId)->first();
+    if (!$build || !$build->dex_number) abort(404);
+
+    $pokemon = \App\Services\PokemonService::getMon($build->dex_number);
+    if (!$pokemon || !isset($pokemon->stats)) abort(404);
+
+    $baseStats = array_map(fn($s) => $s->base_stat, $pokemon->stats);
+
+    $statMap = ['HP' => 0, 'ATK' => 1, 'DEF' => 2, 'SP.ATK' => 3, 'SP.DEF' => 4, 'SPD' => 5];
+    $focusParts = array_map('trim', explode('/', $build->stat_focus ?? ''));
+    $focusIndices = array_values(array_filter(array_map(fn($s) => $statMap[$s] ?? null, $focusParts), fn($v) => $v !== null));
+
+    // Port of calculateAltBuildStatsWithSwapping
+    $controller = app(\App\Http\Controllers\DiscordInteractionController::class);
+    $calculated = (new class($baseStats, $focusIndices, $build->rank ?? 1) {
+        public function calc($stats, $focus, $rank) {
+            $new = $stats;
+            foreach ($focus as $ri => $fi) {
+                $ranked = [];
+                for ($s = 0; $s <= 5; $s++) $ranked[] = [$s, $new[$s]];
+                usort($ranked, fn($a,$b) => $b[1]-$a[1]);
+                $hi = $ranked[$ri][0];
+                if ($fi !== $hi) { $t=$new[$fi]; $new[$fi]=$new[$hi]; $new[$hi]=$t; }
+            }
+            $target = 425 + min($rank,9)*25;
+            $cur = array_sum($new);
+            if ($cur >= $target) return $new;
+            $nf = array_values(array_filter([0,1,2,3,4,5], fn($i)=>!in_array($i,$focus)));
+            $alloc = $new; $diff = $target - $cur;
+            if ($diff <= 30) {
+                $ft = array_sum(array_map(fn($i)=>$new[$i],$focus));
+                foreach ($focus as $i) $alloc[$i]=$new[$i]+(int)floor($diff*($ft>0?$new[$i]/$ft:1/count($focus)));
+                $d=$target-array_sum($alloc); $ix=0;
+                while($d&&$ix<100){$t=$focus[$ix%count($focus)];$d>0?$alloc[$t]++:$alloc[$t]--;$d>0?$d--:$d++;$ix++;}
+                return $alloc;
+            }
+            $cap=(int)floor($target*0.30); $fb=count($focus)*(int)floor($cap*0.80); $nfb=$target-$fb;
+            $nfr=array_map(fn($i)=>['i'=>$i,'v'=>$new[$i]],$nf);
+            usort($nfr,fn($a,$b)=>$b['v']-$a['v']);
+            $ws=[];foreach($nfr as $r=>$s){$p=0.50-($r/max(1,count($nfr)-1))*0.15;$ws[]=[$s['i'],pow($p,1.5)];}
+            $tw=array_sum(array_column($ws,1));
+            foreach($ws as[$i,$w])$alloc[$i]=max($new[$i],(int)floor($nfb*$w/$tw));
+            $fw=array_map(fn($i)=>$new[$i]+50,$focus);$tfw=array_sum($fw);
+            foreach($focus as $k=>$i)$alloc[$i]=$tfw>0?(int)floor($fb*$fw[$k]/$tfw):(int)floor($fb/count($focus));
+            $c=array_map(fn($s)=>min($s,$cap),$alloc);
+            $d=$target-array_sum($c);$ai=array_merge($focus,$nf);$ai2=0;
+            while($d&&$ai2<1000){$t=$ai[$ai2%count($ai)];
+                if($d>0&&$c[$t]<$cap){$c[$t]++;$d--;}elseif($d<0&&$c[$t]>1){$c[$t]--;$d++;}$ai2++;}
+            return $c;
+        }
+    })->calc($baseStats, $focusIndices, $build->rank ?? 1);
+
+    $labels = ['HP', 'ATK', 'DEF', 'SP.ATK', 'SP.DEF', 'SPD'];
+    $result = [];
+    foreach ($calculated as $i => $val) {
+        $result[] = ['label' => $labels[$i], 'value' => $val, 'focus' => in_array($i, $focusIndices)];
+    }
+
+    return response()->json(['stats' => $result, 'bst' => array_sum($calculated)])
+        ->header('Cache-Control', 'public, max-age=3600');
+});
+
+Route::get('/pokevoid-atlas/{dex}.json', function ($dex) {
+    if (!preg_match('/^\d+$/', $dex)) abort(404);
+    $path = base_path("pokevoid/public/images/pokemon/{$dex}.png");
+    if (!file_exists($path)) abort(404);
+    $out = shell_exec("python3 " . escapeshellarg(base_path('scripts/extract_atlas.py')) . " " . escapeshellarg($path) . " 2>/dev/null");
+    if (!$out) abort(404);
+    return response($out)->header('Content-Type', 'application/json')
+                          ->header('Access-Control-Allow-Origin', '*')
+                          ->header('Cache-Control', 'public, max-age=86400');
+})->where('dex', '\d+');
+
+Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {
+    $build = \App\Models\AltBuild::where('build_id', $buildId)->first();
+    if (!$build || !$build->dex_number || !$build->target_palette) abort(404);
+
+    $outPath = storage_path("app/alt-build-sprites/{$buildId}.png");
+
+    if (!file_exists($outPath)) {
+        $script    = base_path('scripts/render_alt_build_sprite.py');
+        $srcSprite = base_path("pokevoid/public/images/pokemon/{$build->dex_number}.png");
+        if (!file_exists($script) || !file_exists($srcSprite)) abort(404);
+        if (!is_dir(dirname($outPath))) mkdir(dirname($outPath), 0755, true);
+        $palette = escapeshellarg(json_encode($build->target_palette));
+        shell_exec("python3 {$script} " . escapeshellarg($srcSprite) . " {$palette} " . escapeshellarg($outPath) . " 2>/dev/null");
+        if (!file_exists($outPath)) abort(404);
+    }
+
+    return response()->file($outPath, ['Content-Type' => 'image/png', 'Cache-Control' => 'public, max-age=3600']);
+});
+
 // ── Wiki ──────────────────────────────────────────────────────────
 use App\Http\Controllers\WikiController;
 
 Route::get('/wiki.html',               [WikiController::class, 'index'])->name('wiki.index');
 Route::get('/wiki:items.html',         [WikiController::class, 'items'])->name('wiki.items');
+Route::get('/wiki:alt-builds.html',    [WikiController::class, 'altBuilds'])->name('wiki.altbuilds');
+Route::get('/wiki:changelog.html',     [WikiController::class, 'changelog'])->name('wiki.changelog');
 Route::get('/wiki:{slug}.html',        [WikiController::class, 'show'])->name('wiki.show');
+Route::get('/wiki-search.json',        [\App\Http\Controllers\WikiSearchController::class, 'search'])->name('wiki.search');
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin/wiki.html',           [WikiController::class, 'adminIndex'])->name('wiki.admin.index');

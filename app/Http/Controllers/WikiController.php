@@ -70,7 +70,6 @@ class WikiController extends Controller
         $article = WikiArticle::where('slug', $slug)->firstOrFail();
         $html = $this->markdown($article->content);
 
-        // Sidebar: all articles grouped
         $categoryOrder = WikiArticle::categoryOrder();
         $allArticles = WikiArticle::orderBy('order')->orderBy('title')->get();
         $grouped = collect($categoryOrder)
@@ -79,7 +78,37 @@ class WikiController extends Controller
             ])
             ->filter(fn($group) => $group->isNotEmpty());
 
-        return view('wiki-article', compact('article', 'html', 'grouped'));
+        // Cross-links to gallery pages based on article slug
+        $galleryMap = [
+            'champions-overview' => [
+                ['url' => '/wiki:champions-index.html', 'icon' => '🏆', 'label' => 'All Champions',     'sub' => 'Full champion roster'],
+                ['url' => '/wiki:apollo.html',          'icon' => '☀️', 'label' => 'Apollo / Diana',    'sub' => 'Champions of Sun & Moon'],
+                ['url' => '/wiki:brock.html',           'icon' => '🪨', 'label' => 'Brock',             'sub' => 'Rock / Ground'],
+                ['url' => '/wiki:misty.html',           'icon' => '💧', 'label' => 'Misty',             'sub' => 'Water'],
+                ['url' => '/wiki:alt-builds.html',      'icon' => '✨', 'label' => 'Alt Builds',        'sub' => 'All signature alt forms'],
+            ],
+            'glitch-system' => [
+                ['url' => '/gallery.html',     'icon' => '👾', 'label' => 'Mod Glitch Forms',  'sub' => 'Community-made forms'],
+                ['url' => '/galleryCore.html',  'icon' => '✨', 'label' => 'Core Glitches',     'sub' => 'Official glitch forms'],
+            ],
+            'smitty-forms' => [
+                ['url' => '/gallerySmitty.html',     'icon' => '⚡', 'label' => 'SMITTY Pokémon',   'sub' => 'All SMITTY forms'],
+                ['url' => '/gallerySmittyForm.html', 'icon' => '🌀', 'label' => 'SMITTY Forms',      'sub' => 'SMITTY alt forms'],
+            ],
+            'rivals' => [
+                ['url' => '/gallery.html', 'icon' => '👾', 'label' => 'Mod Glitch Forms', 'sub' => 'Browse uploaded forms'],
+            ],
+            'items-overview' => [
+                ['url' => '/wiki:items.html', 'icon' => '🎒', 'label' => 'Items Reference', 'sub' => 'Full item list by tier'],
+            ],
+            'eggs-gacha' => [
+                ['url' => '/gacha.html', 'icon' => '📅', 'label' => 'Gacha Calendar', 'sub' => 'Today\'s legendary & Pokérus'],
+            ],
+        ];
+
+        $galleryLinks = $galleryMap[$slug] ?? [];
+
+        return view('wiki-article', compact('article', 'html', 'grouped', 'galleryLinks'));
     }
 
     // ── Admin routes ───────────────────────────────────────────────
@@ -165,6 +194,32 @@ class WikiController extends Controller
         WikiArticle::where('slug', $slug)->firstOrFail()->delete();
         return redirect()->route('wiki.admin.index')
             ->with('success', 'Article deleted.');
+    }
+
+    public function altBuilds()
+    {
+        $builds = \App\Models\AltBuild::orderBy('champion')->orderBy('species')->orderBy('rank')->get();
+
+        $grouped = $builds->groupBy('champion');
+
+        $categoryOrder = WikiArticle::categoryOrder();
+        $allArticles = WikiArticle::orderBy('order')->orderBy('title')->get();
+        $sidebarGrouped = collect($categoryOrder)
+            ->mapWithKeys(fn($cat) => [
+                $cat => $allArticles->where('category', $cat)->values()
+            ])
+            ->filter(fn($group) => $group->isNotEmpty());
+
+        return view('wiki-alt-builds', compact('builds', 'grouped', 'sidebarGrouped'));
+    }
+
+    public function changelog()
+    {
+        $entries = \App\Models\ChangelogEntry::orderBy('committed_at', 'desc')
+            ->get()
+            ->unique('title')
+            ->values();
+        return view('wiki-changelog', compact('entries'));
     }
 
     public function items()
