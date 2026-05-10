@@ -374,7 +374,7 @@ var C_BG       = [13,  10,  22]
 var C_CARD     = [38,  28,  70]
 var C_CARD2    = [50,  38,  88]
 var C_HOVER    = [65,  50,  108]
-var C_BORDER   = [75,  58,  118]
+var C_BORDER   = [100, 75,  160]
 var C_ACCENT   = [124, 92,  191]
 var C_TEXT     = [237, 230, 255]
 var C_MUTED    = [157, 143, 192]
@@ -514,11 +514,13 @@ function draw() {
     var Y = scalar(r2, rows, TOP + PAD, height - BOT, PAD)
     var W = scalarSize(7, PAD, width - PAD - SB, PAD)
     var H = scalarSize(rows, TOP + PAD, height - BOT, PAD)
+    var isToday2 = m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()
     noFill()
-    strokeWeight(1)
-    stroke(C_BORDER[0], C_BORDER[1], C_BORDER[2])
+    strokeWeight(isToday2 ? 2 : 1)
+    stroke(isToday2 ? C_ACCENT[0] : C_BORDER[0], isToday2 ? C_ACCENT[1] : C_BORDER[1], isToday2 ? C_ACCENT[2] : C_BORDER[2])
     rect(X, Y, W, H, CORNER)
     noStroke()
+    strokeWeight(1)
   }
   for (var i = 0; i < 7; i++) {
     var X = scalar(i, 7, PAD, width - PAD - SB, PAD)
