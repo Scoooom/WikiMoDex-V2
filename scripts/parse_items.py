@@ -271,6 +271,35 @@ FALLBACK_DESCRIPTIONS = {
     'MOVE_UPGRADE':         'Randomly upgrades one of your party\'s moves — power, priority, effect, chance, multi-hit, and more.',
     'SKILL_POINTS':         'Gain Skill Points to unlock nodes in your Champion\'s Skill Tree.',
     'SKILL_TOKENS':         'Gain Skill Tree Tokens to level up your Champion\'s Skill Tree.',
+    'MOVE_SACRIFICE':       'Release a Pokémon to have another inherit its moves.',
+    'ABILITY_SACRIFICE':    'Release a Pokémon to have another adopt its ability.',
+    'PASSIVE_ABILITY_SACRIFICE': 'Release a Pokémon to assign its primary ability as a passive ability for another.',
+    'TYPE_SACRIFICE':       'Release a Pokémon to have another inherit its types.',
+    'STAT_SACRIFICE':       'Release a Pokémon to boost another Pokémon\'s chosen stat by 15%.',
+    'PLAYER_BASE_STAT_BOOSTER': 'Increases the holder\'s base stat by 1%.',
+    'ADD_POKEMON':          'Adds a random Pokémon to your party.',
+    'DRAFT_POKEMON':        'Adds a drafted Pokémon to your party.',
+    'COLLECTED_TYPE':       'Use 4 Essences instead of releasing a Pokémon for Release Items, or exchange with the Collector.',
+    'LOW_TIER_MOVE_UPGRADE':'Applies a lower-tier upgrade to one of your party\'s moves.',
+    'EVOLUTION_ITEM':       'Causes certain Pokémon to evolve.',
+    'RARE_EVOLUTION_ITEM':  'Causes certain Pokémon to evolve via rare evolution methods.',
+    'FORM_CHANGE_ITEM':     'Causes certain Pokémon to change form.',
+    'SMITTY_FORM_CHANGE_ITEM': 'A forbidden combination of 4 Smitty Items that transforms a Pokémon into a Smitty Form.',
+    'STAT_SWITCHER':        'Swap two of a Pokémon\'s base stats (e.g. ATK ↔ DEF). Costs 1 Glitch Piece.',
+    'TYPE_SWITCHER':        'Changes a Pokémon\'s primary and secondary types. Costs 1 Glitch Piece.',
+    'PRIMARY_TYPE_SWITCHER':'Changes a Pokémon\'s primary type. Costs 1 Glitch Piece.',
+    'SECONDARY_TYPE_SWITCHER':'Changes a Pokémon\'s secondary type. Costs 1 Glitch Piece.',
+    'ANYTM_MEH':            'Teach a low-tier move to any Pokémon, ignoring compatibility.',
+    'ANYTM_COMMON':         'Teach a Common-tier move to any Pokémon, ignoring compatibility.',
+    'ANYTM_GREAT':          'Teach a Great-tier move to any Pokémon, ignoring compatibility.',
+    'ANYTM_ULTRA':          'Teach an Ultra-tier move to any Pokémon, ignoring compatibility.',
+    'ANYTM_MASTER':         'Teach a Master-tier move to any Pokémon, ignoring compatibility.',
+    'ANYTM_LUXURY':         'Teach a Luxury-tier move to any Pokémon, ignoring compatibility.',
+    'ANY_ABILITY':          'Give any ability to any Pokémon. Costs 1 Glitch Piece.',
+    'ANY_SMITTY_ABILITY':   'Give a Smitty-exclusive ability to any Pokémon. Costs 1 Glitch Piece.',
+    'ANY_PASSIVE_ABILITY':  'Set any ability as a passive on any Pokémon. Costs 1 Glitch Piece.',
+    'ANY_SMITTY_PASSIVE_ABILITY': 'Set a Smitty-exclusive ability as a passive on any Pokémon. Costs 1 Glitch Piece.',
+    'PERMA_PARTY_ABILITY':  'Give a selected ability to all Pokémon in your current party for the run.',
 }
 
 def key_to_name(key):
@@ -282,18 +311,30 @@ def get_item_info(key, i18n, key_to_class_map):
     name = info.get('name', '')
     desc = info.get('description', '')
 
-    # Class-based fallback for missing description
-    if not desc:
-        cls = key_to_class_map.get(key, '')
-        if cls:
-            cls_info = i18n.get(cls, {})
-            desc = re.sub(r'\{\{[^}]+\}\}', '…', cls_info.get('description', ''))
+    # Strip template vars
+    name = re.sub(r'\{\{[^}]+\}\}', '…', name).strip()
+    desc = re.sub(r'\{\{[^}]+\}\}', '…', desc)
 
-    # Hardcoded fallback
+    cls = key_to_class_map.get(key, '')
+
+    # Strategy 2: class name lookup
+    if not desc and cls:
+        cls_info = i18n.get(cls, {})
+        desc = re.sub(r'\{\{[^}]+\}\}', '…', cls_info.get('description', ''))
+
+    # Strategy 3: strip 'Generator' suffix from class name
+    if not desc and cls and cls.endswith('Generator'):
+        base_cls = cls[:-len('Generator')]
+        base_info = i18n.get(base_cls, {})
+        desc = re.sub(r'\{\{[^}]+\}\}', '…', base_info.get('description', ''))
+
+    # Strategy 4: hardcoded fallback
     if not desc:
         desc = FALLBACK_DESCRIPTIONS.get(key, '')
 
-    if not name:
+    # Fix names that are misleading internal labels (e.g. 'Cheap') — use key as name
+    BAD_NAMES = {'Cheap', 'ModifierType', ''}
+    if not name or name in BAD_NAMES:
         name = key_to_name(key)
 
     return name, desc
