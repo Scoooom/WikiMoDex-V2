@@ -124,6 +124,7 @@ function initWikiSearch() {
     function open() {
         modal.classList.add('open');
         backdrop.classList.add('open');
+        document.body.style.overflow = 'hidden';
         input.focus();
         input.select();
     }
@@ -131,7 +132,11 @@ function initWikiSearch() {
     function close() {
         modal.classList.remove('open');
         backdrop.classList.remove('open');
+        document.body.style.overflow = '';
     }
+
+    // Ensure closed on init
+    close();
 
     btn.addEventListener('click', open);
     backdrop.addEventListener('click', close);
