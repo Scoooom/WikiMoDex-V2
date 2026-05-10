@@ -243,7 +243,7 @@ class DiscordInteractionController extends Controller
         $championLabels = \App\Models\AltBuild::championLabel();
         $champion = $championLabels[$build->champion] ?? ucfirst($build->champion ?? 'Unknown');
 
-        $spriteUrl = "https://void.scooom.xyz/alt-build-sprite:{$build->build_id}.png";
+        $spriteUrl = "https://void.scooom.xyz/alt-build-sprite:{$build->build_id}.png?v=2";
 
         $embed = [
             'title'       => "{$build->species} — {$build->name}",
