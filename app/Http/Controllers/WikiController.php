@@ -191,7 +191,10 @@ class WikiController extends Controller
 
     public function changelog()
     {
-        $entries = \App\Models\ChangelogEntry::orderBy('committed_at', 'desc')->get();
+        $entries = \App\Models\ChangelogEntry::orderBy('committed_at', 'desc')
+            ->get()
+            ->unique('title')
+            ->values();
         return view('wiki-changelog', compact('entries'));
     }
 
