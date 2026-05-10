@@ -20,14 +20,17 @@
 .tc-mon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
 .tc-mon-item { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 10px 8px; text-align: center; transition: border-color .15s; }
 .tc-mon-item:hover { border-color: var(--accent); }
-.tc-mon-item img { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; border-radius: 50%; background: var(--surface); }
-.tc-mon-item a { font-size: 11px; color: var(--accent2); display: block; margin-top: 5px; }
+.tc-mon-item a { display: block; }
+.tc-mon-item a img { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; display: block; margin: 0 auto; }
+.tc-mon-item span { font-size: 11px; color: var(--accent2); display: block; margin-top: 5px; }
 .rival-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
 .rival-item { text-align: center; }
 .rival-wrap { position: relative; width: 72px; height: 72px; margin: 0 auto 5px; }
 .rival-wrap img.rival-sprite { width: 72px; height: 72px; border-radius: 50%; background: var(--surface); object-fit: cover; }
 .rival-wrap img.rival-sprite.gray { filter: grayscale(1); opacity: .5; }
-.rival-wrap img.rival-overlay { position: absolute; bottom: 0; right: 0; width: 22px; height: 22px; }
+.rival-status { position: absolute; bottom: 2px; right: 2px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--card); }
+.rival-status.defeated { background: #4caf7d; }
+.rival-status.not-defeated { background: var(--dim); }
 .rival-name { font-size: 10px; color: var(--muted); }
 </style>
 
@@ -56,14 +59,13 @@
                         @foreach($defeatedRivals as $i => $rival)
                             @if(!is_string($i))
                             @php
-                                $gray = $rival['defeated'] === 'true' ? '' : ' gray';
-                                $imgURL = $rival['defeated'] === 'true' ? '/img/green.png' : '/img/red.png';
+                                $defeated = $rival['defeated'] === 'true';
                                 $rivalImg = strtolower(str_replace(' ', '_', $rival['name']));
                             @endphp
                             <div class="rival-item">
                                 <div class="rival-wrap">
-                                    <img class="rival-sprite{{ $gray }}" src="/rivals/{{ $rivalImg }}.png" alt="{{ $rival['name'] }}">
-                                    <img class="rival-overlay" src="{{ $imgURL }}" alt="">
+                                    <img class="rival-sprite{{ $defeated ? '' : ' gray' }}" src="/rivals/{{ $rivalImg }}.png" alt="{{ $rival['name'] }}">
+                                    <span class="rival-status {{ $defeated ? 'defeated' : 'not-defeated' }}"></span>
                                 </div>
                                 <div class="rival-name">{{ $rival['name'] }}</div>
                             </div>
@@ -81,8 +83,10 @@
                     <div class="tc-mon-grid">
                         @foreach($glitchUnlocks as $un)
                         <div class="tc-mon-item">
-                            <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
-                            <a href="/core:{{ urlencode($un->name) }}.html">{{ ucwords($un->name) }}</a>
+                            <a href="/core:{{ urlencode($un->name) }}.html">
+                                <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
+                                <span>{{ ucwords($un->name) }}</span>
+                            </a>
                         </div>
                         @endforeach
                     </div>
@@ -105,8 +109,10 @@
                     <div class="tc-mon-grid">
                         @foreach($modForms as $un)
                         <div class="tc-mon-item">
-                            <img src="/front:{{ $un->id }}.png" alt="{{ $un->name }}">
-                            <a href="/g:{{ urlencode($un->name) }}:{{ $un->id }}.html">{{ $un->name }}</a>
+                            <a href="/g:{{ urlencode($un->name) }}:{{ $un->id }}.html">
+                                <img src="/front:{{ $un->id }}.png" alt="{{ $un->name }}">
+                                <span>{{ $un->name }}</span>
+                            </a>
                         </div>
                         @endforeach
                     </div>
@@ -122,8 +128,10 @@
                     <div class="tc-mon-grid">
                         @foreach($smittyUnlocks as $un)
                         <div class="tc-mon-item">
-                            <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
-                            <a href="/smittyForm:{{ urlencode($un->name) }}.html">{{ ucwords($un->name) }}</a>
+                            <a href="/smittyForm:{{ urlencode($un->name) }}.html">
+                                <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
+                                <span>{{ ucwords($un->name) }}</span>
+                            </a>
                         </div>
                         @endforeach
                     </div>
@@ -146,8 +154,10 @@
                     <div class="tc-mon-grid">
                         @foreach($uniSmitty as $un)
                         <div class="tc-mon-item">
-                            <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
-                            <a href="/smitty:{{ urlencode($un->name) }}.html">{{ ucwords($un->name) }}</a>
+                            <a href="/smitty:{{ urlencode($un->name) }}.html">
+                                <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
+                                <span>{{ ucwords($un->name) }}</span>
+                            </a>
                         </div>
                         @endforeach
                     </div>
