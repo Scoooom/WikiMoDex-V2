@@ -212,6 +212,8 @@ class WikiController extends Controller
 
         return view('wiki-alt-builds', compact('builds', 'grouped', 'sidebarGrouped'));
     }
+
+    public function changelog()
     {
         $entries = \App\Models\ChangelogEntry::orderBy('committed_at', 'desc')
             ->get()
