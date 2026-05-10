@@ -111,6 +111,12 @@ def load_i18n():
         name = re.sub(r'\{\{[^}]+\}\}', '…', v.get('name', '')).strip('+ ').strip()
         desc = re.sub(r'\{\{[^}]+\}\}', '…', v.get('description', ''))
         result[k] = {'name': name, 'description': desc}
+        # Also index nested dicts (e.g. PermaModifierType contains PERMA_* keys)
+        for inner_k, inner_v in v.items():
+            if isinstance(inner_v, dict) and ('name' in inner_v or 'description' in inner_v):
+                inner_name = re.sub(r'\{\{[^}]+\}\}', '…', inner_v.get('name', '')).strip()
+                inner_desc = re.sub(r'\{\{[^}]+\}\}', '…', inner_v.get('description', ''))
+                result[inner_k] = {'name': inner_name, 'description': inner_desc}
 
     for k, v in data.items():
         if isinstance(v, dict) and 'name' in v:
