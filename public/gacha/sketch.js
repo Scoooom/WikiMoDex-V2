@@ -374,7 +374,7 @@ var C_BG       = [13,  10,  22]
 var C_CARD     = [38,  28,  70]
 var C_CARD2    = [50,  38,  88]
 var C_HOVER    = [65,  50,  108]
-var C_BORDER   = [100, 75,  160]
+var C_BORDER   = [124, 92,  191]
 var C_ACCENT   = [124, 92,  191]
 var C_TEXT     = [237, 230, 255]
 var C_MUTED    = [157, 143, 192]
@@ -514,9 +514,9 @@ function draw() {
     var H = cellPositions[i][3]
     var isToday2 = m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()
     noFill()
-    strokeWeight(4)
-    stroke(255, 0, 0)
-    rect(X, Y, W, H)
+    strokeWeight(isToday2 ? 2 : 1)
+    stroke(isToday2 ? C_ACCENT[0] : C_BORDER[0], isToday2 ? C_ACCENT[1] : C_BORDER[1], isToday2 ? C_ACCENT[2] : C_BORDER[2])
+    rect(X, Y, W, H, CORNER)
     noStroke()
     strokeWeight(1)
   }
