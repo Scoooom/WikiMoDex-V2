@@ -514,10 +514,16 @@ function draw() {
     var H = cellPositions[i][3]
     var isToday2 = m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()
     noFill()
+    var bc = isToday2 ? C_ACCENT : C_BORDER
     strokeWeight(isToday2 ? 2 : 1)
-    stroke(isToday2 ? C_ACCENT[0] : C_BORDER[0], isToday2 ? C_ACCENT[1] : C_BORDER[1], isToday2 ? C_ACCENT[2] : C_BORDER[2])
-    fill(0, 0, 0, 0)
-    rect(X, Y, W, H, CORNER)
+    stroke(bc[0], bc[1], bc[2])
+    noFill()
+    line(X,     Y,     X + W, Y    )
+    line(X + W, Y,     X + W, Y + H)
+    line(X + W, Y + H, X,     Y + H)
+    line(X,     Y + H, X,     Y    )
+    noStroke()
+    strokeWeight(1)
     noStroke()
     strokeWeight(1)
   }
