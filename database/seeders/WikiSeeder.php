@@ -1118,8 +1118,7 @@ Champions are the playable characters of PokéVoid. Each Champion has a unique t
 
 | Champion | Types | Signature Pokémon | Unlock |
 |----------|-------|-------------------|--------|
-| [Apollo](apollo) | Random (changes each run) | Solrock, Lunatone | Available from start |
-| [Diana](diana) | Random (changes each run) | Solrock, Lunatone | Available from start |
+| [Apollo / Diana](apollo) | Random (changes each run) | Solrock, Lunatone | Available from start |
 | [Brock](brock) | Rock / Ground | Onix | 75 Ground + 75 Rock Essences |
 | [Misty](misty) | Water | Staryu | 200 Water Essences |
 | Lt. Surge | Electric | Voltorb | *Coming soon* |
@@ -1154,15 +1153,16 @@ MD,
 
 // ── Apollo & Diana ─────────────────────────────────────────────────────────
 WikiArticle::updateOrCreate(['slug' => 'apollo'], [
-    'title'    => 'Apollo',
+    'title'    => 'Apollo & Diana',
     'category' => 'Champions',
     'order'    => 1,
     'content'  => <<<'MD'
-# Apollo — Champion of Sun
+# Apollo & Diana — Champions of Sun and Moon
 
-Apollo is one of the two default Champions and the canonical "light" of PokéVoid. He channels radiant solar power as one of the last forces pushing back the Void's endless night.
+Apollo and Diana are the two default Champions and the canonical guardians of light in PokéVoid. They are mechanically identical — **Apollo is the male variant, Diana is the female variant**. Your choice is purely cosmetic.
 
 > *"Apollo channels radiant power as one of the last lights pushing back the void's endless night."*
+> *"Diana weaves moonlit threads to track the void's movements and guide others to safety."*
 
 ## Overview
 
@@ -1178,22 +1178,22 @@ Apollo is one of the two default Champions and the canonical "light" of PokéVoi
 
 ## Type System
 
-Apollo (and Diana) receive **two random types** at the start of every run. Their Skill Tree, item pool, and type bonuses all reflect these randomly assigned types — meaning each run is a completely fresh strategic puzzle.
+Apollo and Diana receive **two random types** at the start of every run. Their Skill Tree, item pool, and type bonuses all reflect these randomly assigned types — meaning each run is a completely fresh strategic puzzle.
 
-This makes Apollo the most flexible Champion, but also the most unpredictable. You cannot build a fixed team strategy between runs.
+This makes them the most flexible Champions, but also the most unpredictable. You cannot build a fixed team strategy between runs.
 
 ## Signature Pokémon
 
-Apollo's signature Pokémon are **Solrock** and **Lunatone**. These appear as special starter options unique to Apollo and Diana. Each has an Alt Build available:
+Their signature Pokémon are **Solrock** and **Lunatone**, with Alt Builds available:
 
-- **Solrock** → *Void Constellation* (Alt Build)
+- **Solrock** → *Void Constellation* (unlocked at start)
 - **Lunatone** → *Dream Weaver* (unlocked at Skill Tree level 7)
 
-Additional signature Pokémon unlock through the Skill Tree as you level up: Eevee (level 10), Litwick (level 18), Swablu (level 25), Cleffa (level 41), Sunkern (level 33), Riolu (level 54), Castform (level 61), Teddiursa (level 68), and Larvesta (level 48).
+Additional signature Pokémon unlock through the Skill Tree: Eevee (level 10), Litwick (level 18), Sunkern (level 33), Swablu (level 25), Cleffa (level 41), Larvesta (level 48), Riolu (level 54), Castform (level 61), Teddiursa (level 68).
 
 ## Skill Tree Highlights
 
-Apollo's Skill Tree runs to **111 levels**. Key milestones:
+Apollo/Diana share one Skill Tree running to **111 levels** — the longest in the game.
 
 | Level | Reward | Type |
 |-------|--------|------|
@@ -1223,48 +1223,19 @@ Apollo's Skill Tree runs to **111 levels**. Key milestones:
 | 100 | Yin Yang | Smitty Ability |
 | 103 | Enamorus | Legendary |
 | 107 | Entei | Legendary |
-
-## Notes
-
-- Apollo and Diana share the same Skill Tree definition (`apollo_diana`) — their trees are identical except for minor UI offset differences.
-- Apollo's tree is the longest in the game at 111 levels.
-- The random type system means Apollo works well with any playstyle but excels with players who adapt quickly.
 MD,
 ]);
 
-// ── Diana ─────────────────────────────────────────────────────────────────
 WikiArticle::updateOrCreate(['slug' => 'diana'], [
     'title'    => 'Diana',
     'category' => 'Champions',
     'order'    => 2,
     'content'  => <<<'MD'
-# Diana — Champion of Moon
+# Diana
 
-Diana is the second of the two default Champions and Apollo's counterpart. She weaves moonlit threads to track the Void's movements and guide others to safety.
+Diana is the female variant of Apollo. They are mechanically identical — same Skill Tree, same Signature Pokémon, same unlock requirements.
 
-> *"Diana weaves moonlit threads to track the void's movements and guide others to safety."*
-
-## Overview
-
-| Attribute | Value |
-|-----------|-------|
-| **Types** | 2 random types (assigned at run start) |
-| **Signature Legendary** | Lunala |
-| **Unlock** | Available from the start — no Essence required |
-| **Starting Smitty Ability** | Sun and Moon |
-| **Starting Mega Stone** | Lucarionite |
-| **Starting Glitch Form** | Wispeeon (Eevee Ghost Quest) |
-| **Starting Move Upgrade** | Power +1 |
-
-## Relationship with Apollo
-
-Diana and Apollo share the same underlying champion definition — their Skill Trees, signature Pokémon, unlock requirements, and item pools are identical. The differences are purely cosmetic (different trainer sprites, different UI offsets in the Skill Tree view).
-
-Choose Apollo or Diana based on which character resonates with you. Mechanically they play identically.
-
-## See Also
-
-See the [Apollo](/wiki:apollo.html) article for full Skill Tree details, signature Pokémon, and gameplay notes — everything applies equally to Diana.
+See the **[Apollo & Diana](/wiki:apollo.html)** article for full details.
 MD,
 ]);
 
