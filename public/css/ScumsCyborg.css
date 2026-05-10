@@ -1904,3 +1904,20 @@ img { max-width: 100%; display: block; }
     border-radius: 2px;
     padding: 0 0.1em;
 }
+
+/* ── Gacha page ──────────────────────────────── */
+.gacha-credit {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--dim);
+    font-family: var(--font-mono);
+}
+
+.gacha-credit a {
+    color: var(--accent2);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent2) 40%, transparent);
+}
+
+.gacha-credit a:hover { color: var(--accent3); }

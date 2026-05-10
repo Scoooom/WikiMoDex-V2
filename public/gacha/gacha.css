@@ -31,6 +31,7 @@
 
 #gacha-body {
     display: flex;
+    flex-direction: column;
     gap: 12px;
     min-height: 70vh;
 }
@@ -121,7 +122,7 @@
 }
 
 #sidebar {
-    width: 220px;
+    width: 100%;
     flex-shrink: 0;
     background: var(--card2);
     border: 1px solid var(--border);
@@ -148,7 +149,7 @@
 #sidebar-legend-name { font-size: 12px; font-weight: 600; color: var(--text); text-align: center; }
 #sidebar-divider { height: 1px; background: var(--border); }
 #sidebar-rus-label { font-size: 11px; font-weight: 600; color: var(--muted); text-align: center; }
-#sidebar-rus-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+#sidebar-rus-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 4px; }
 .rus-cell {
     background: var(--card);
     border: 1px solid var(--border);

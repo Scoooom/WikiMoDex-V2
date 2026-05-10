@@ -59,4 +59,8 @@
 </div>
 
 <script src="/gacha/gacha.js"></script>
+
+<div class="gacha-credit">
+    Original <a href="https://editor.p5js.org/RedstonewolfX/full/jF3kUNbY8" target="_blank" rel="noopener">Gacha Calendar Code</a> by redstonewolf
+</div>
 @endsection
