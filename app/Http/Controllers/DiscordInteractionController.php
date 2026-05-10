@@ -250,15 +250,19 @@ class DiscordInteractionController extends Controller
             if ($custom) {
                 $pageUrl   = 'https://void.scooom.xyz/g:' . urlencode(trim($form->name)) . ':' . $form->id . '.html';
                 $frontUrl  = "https://void.scooom.xyz/front:{$form->id}.png";
+                $backUrl   = "https://void.scooom.xyz/back:{$form->id}.png";
             } elseif ($coreForm) {
                 $pageUrl  = "https://void.scooom.xyz/core:{$form->name}.html";
                 $frontUrl = "https://void.scooom.xyz/cFront:{$form->name}.png";
+                $backUrl  = "https://void.scooom.xyz/cBack:{$form->name}.png";
             } elseif ($smittyMon) {
                 $pageUrl  = "https://void.scooom.xyz/smitty:{$form->name}.html";
                 $frontUrl = "https://void.scooom.xyz/cFront:{$form->name}.png";
+                $backUrl  = "https://void.scooom.xyz/cBack:{$form->name}.png";
             } else {
                 $pageUrl  = "https://void.scooom.xyz/smittyForm:{$form->name}.html";
                 $frontUrl = "https://void.scooom.xyz/cFront:{$form->name}.png";
+                $backUrl  = "https://void.scooom.xyz/cBack:{$form->name}.png";
             }
 
             // Title
@@ -381,6 +385,7 @@ class DiscordInteractionController extends Controller
                         'url'       => $pageUrl,
                         'color'     => 0x7c5cbf,
                         'thumbnail' => ['url' => $frontUrl],
+                    'image'     => ['url' => $backUrl],
                         'fields'    => $fields,
                         'footer'    => ['text' => $footerLabel],
                     ]]
