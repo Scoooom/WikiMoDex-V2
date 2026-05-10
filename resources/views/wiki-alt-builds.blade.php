@@ -165,7 +165,46 @@
 </div>
 
 <script>
-// ── Grayscale Overlay shader (matches game's GLSL blend mode 3) ───────────
+// ── Extract first frame from embedded atlas PNG ───────────────────────────
+async function extractFirstFrame(src) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            // Draw full sheet to a temp canvas to read pixel data
+            const tmp = document.createElement('canvas');
+            tmp.width = img.naturalWidth;
+            tmp.height = img.naturalHeight;
+            const tctx = tmp.getContext('2d', { willReadFrequently: true });
+            tctx.drawImage(img, 0, 0);
+
+            // Try to fetch the atlas JSON from the same URL with ?atlas=1
+            fetch(src + '&atlas=1')
+                .then(r => r.json())
+                .then(atlas => {
+                    const frame = atlas.textures[0].frames[0];
+                    const { x, y, w, h } = frame.frame;
+                    const { x: sx, y: sy } = frame.spriteSourceSize;
+                    const { w: sw, h: sh } = frame.sourceSize;
+
+                    const out = document.createElement('canvas');
+                    out.width = sw;
+                    out.height = sh;
+                    const octx = out.getContext('2d');
+                    octx.drawImage(tmp, x, y, w, h, sx, sy, w, h);
+                    resolve(out);
+                })
+                .catch(() => {
+                    // No atlas available — use the full image
+                    resolve(tmp);
+                });
+        };
+        img.onerror = () => resolve(null);
+        img.src = src;
+    });
+}
+
+// ── Grayscale Overlay shader ──────────────────────────────────────────────
 function softLight(bg, fg) {
     // GLSL: mix(1-2*(1-bg)*(1-fg), 2*bg*fg, step(bg, 0.5))
     if (bg <= 0.5) {
@@ -216,37 +255,26 @@ document.querySelectorAll('.altbuild-card').forEach(card => {
     const canvas  = card.querySelector('.altbuild-canvas');
     const ctx     = canvas.getContext('2d', { willReadFrequently: true });
 
-    if (!dex || !palette.length) {
-        canvas.style.display = 'none';
-        return;
-    }
+    if (!dex || !palette.length) { canvas.style.display = 'none'; return; }
 
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = `/pokevoid-sprites/${dex}.png?v=1`;
+    extractFirstFrame(`/pokevoid-sprites/${dex}.png`).then(frameCanvas => {
+        if (!frameCanvas) { canvas.style.display = 'none'; return; }
 
-    img.onload = () => {
-        // Draw at canvas size centred, preserving aspect ratio
         const size = 160;
-        const scale = Math.min(size / img.naturalWidth, size / img.naturalHeight) * 0.85;
-        const w = Math.round(img.naturalWidth * scale);
-        const h = Math.round(img.naturalHeight * scale);
+        const scale = Math.min(size / frameCanvas.width, size / frameCanvas.height) * 0.85;
+        const w = Math.round(frameCanvas.width * scale);
+        const h = Math.round(frameCanvas.height * scale);
         const x = Math.round((size - w) / 2);
         const y = Math.round((size - h) / 2);
 
         ctx.clearRect(0, 0, size, size);
         ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, x, y, w, h);
+        ctx.drawImage(frameCanvas, 0, 0, frameCanvas.width, frameCanvas.height, x, y, w, h);
 
-        // Apply recolour
-        const imageData = ctx.getImageData(0, 0, 160, 160);
+        const imageData = ctx.getImageData(0, 0, size, size);
         applyGrayscaleOverlay(imageData, palette);
         ctx.putImageData(imageData, 0, 0);
-    };
-
-    img.onerror = () => {
-        canvas.style.display = 'none';
-    };
+    });
 });
 
 // ── Sidebar init ──────────────────────────────────────────────────────────

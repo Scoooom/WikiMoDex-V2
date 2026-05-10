@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 """
 render_alt_build_sprite.py
-Applies grayscale_overlay recolouring to a Pokémon sprite.
-Usage: python3 render_alt_build_sprite.py <src.png> <palette_json> <out.png>
+Extracts the first animation frame from a pokevoid embedded-atlas sprite sheet,
+then applies grayscale_overlay recolouring.
 
-Implements the game's GLSL grayscale_overlay blend mode (mode 3):
-  gray = (r+g+b)/3
-  result = softLight(gray, targetColor)
-  where softLight = mix(1-2*(1-bg)*(1-fg), 2*bg*fg, step(bg, 0.5))
+Usage: python3 render_alt_build_sprite.py <src.png> <palette_json> <out.png>
 """
 import sys
 import json
+import base64
+import zlib
 
 try:
     from PIL import Image
@@ -18,8 +17,39 @@ try:
 except ImportError:
     sys.exit(1)
 
+def extract_first_frame(img):
+    """Extract the first frame using the embedded atlas JSON."""
+    info = img.info
+    compressed_b64 = info.get('jsonData', '')
+
+    if not compressed_b64:
+        # No atlas — return as-is (already a single sprite)
+        return img.convert('RGBA')
+
+    try:
+        decompressed = zlib.decompress(base64.b64decode(compressed_b64))
+        atlas = json.loads(decompressed)
+        frames = atlas['textures'][0]['frames']
+    except Exception:
+        return img.convert('RGBA')
+
+    if not frames:
+        return img.convert('RGBA')
+
+    rgba = img.convert('RGBA')
+    f = frames[0]
+    fx, fy = f['frame']['x'], f['frame']['y']
+    fw, fh = f['frame']['w'], f['frame']['h']
+    sx, sy = f['spriteSourceSize']['x'], f['spriteSourceSize']['y']
+    sw, sh = f['sourceSize']['w'], f['sourceSize']['h']
+
+    # Crop frame from sheet and place on full-size canvas
+    frame_crop = rgba.crop((fx, fy, fx + fw, fy + fh))
+    canvas = Image.new('RGBA', (sw, sh), (0, 0, 0, 0))
+    canvas.paste(frame_crop, (sx, sy))
+    return canvas
+
 def soft_light(bg, fg):
-    """Vectorised soft-light blend matching the GLSL shader."""
     dark = 2 * bg * fg
     lite = 1 - 2 * (1 - bg) * (1 - fg)
     return np.where(bg <= 0.5, dark, lite)
@@ -29,23 +59,14 @@ def hex_to_rgb(hex_str):
     return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
 
 def apply_grayscale_overlay(img, palette_hex):
-    """Apply grayscale_overlay recolour using the target palette."""
-    img = img.convert('RGBA')
     data = np.array(img, dtype=np.float32) / 255.0
-
     r, g, b, a = data[...,0], data[...,1], data[...,2], data[...,3]
-
-    # Per-pixel luminance
     lum = (r + g + b) / 3.0
 
-    # Build palette as float array
     palette = [tuple(c/255.0 for c in hex_to_rgb(h)) for h in palette_hex]
     n = len(palette)
-
-    # Map luminance → palette index
     idx = np.clip((lum * n).astype(int), 0, n - 1)
 
-    # Build target colour arrays
     tr = np.zeros_like(lum)
     tg = np.zeros_like(lum)
     tb = np.zeros_like(lum)
@@ -55,7 +76,6 @@ def apply_grayscale_overlay(img, palette_hex):
         tg[mask] = pg
         tb[mask] = pb
 
-    # Apply soft-light blend: grayscale bg × target colour fg
     out_r = soft_light(lum, tr)
     out_g = soft_light(lum, tg)
     out_b = soft_light(lum, tb)
@@ -78,12 +98,17 @@ def main():
         sys.exit(1)
 
     img = Image.open(src_path)
-    result = apply_grayscale_overlay(img, palette)
+    frame = extract_first_frame(img)
+    result = apply_grayscale_overlay(frame, palette)
 
-    # Output at 256×256 for Discord
-    result = result.resize((256, 256), Image.NEAREST)
-    result.save(out_path, 'PNG')
-    print(f"Saved: {out_path}")
+    # Scale up to 256×256 preserving aspect ratio with padding
+    result.thumbnail((256, 256), Image.NEAREST)
+    canvas = Image.new('RGBA', (256, 256), (0, 0, 0, 0))
+    x = (256 - result.width) // 2
+    y = (256 - result.height) // 2
+    canvas.paste(result, (x, y))
+    canvas.save(out_path, 'PNG')
+    print(f"Saved: {out_path} ({result.width}x{result.height} frame)")
 
 if __name__ == '__main__':
     main()

@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::dropIfExists('alt_builds');
         Schema::create('alt_builds', function (Blueprint $table) {
             $table->id();
             $table->string('build_id')->unique();        // e.g. onix_crystal_leviathan
