@@ -64,10 +64,11 @@ class RegisterSlashCommands extends Command
                 'description' => 'Search the PokéVoid wiki and get a summary with a link',
                 'options'     => [
                     [
-                        'type'        => 3,
-                        'name'        => 'query',
-                        'description' => 'What to search for',
-                        'required'    => true,
+                        'type'         => 3,
+                        'name'         => 'query',
+                        'description'  => 'What to search for',
+                        'required'     => true,
+                        'autocomplete' => true,
                     ]
                 ]
             ],

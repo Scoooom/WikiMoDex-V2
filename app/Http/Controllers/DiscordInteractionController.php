@@ -89,6 +89,10 @@ class DiscordInteractionController extends Controller
             return $this->autocompleteAltBuild($query);
         }
 
+        if ($commandName === 'wiki-search') {
+            return $this->autocompleteWikiSearch($query);
+        }
+
         return $this->autocompleteForm($query);
     }
 
@@ -217,104 +221,98 @@ class DiscordInteractionController extends Controller
         ]);
     }
 
-    private function handleWikiSearch(string $query): \Illuminate\Http\JsonResponse
+    private function autocompleteWikiSearch(string $query): \Illuminate\Http\JsonResponse
     {
-        if (strlen(trim($query)) < 2) {
-            return response()->json([
-                'type' => self::CHANNEL_MESSAGE,
-                'data' => ['content' => 'Please provide a search term of at least 2 characters.']
-            ]);
-        }
+        $choices = [];
 
-        $q = trim($query);
+        if (strlen($query) >= 2) {
+            // Articles
+            $articles = \App\Models\WikiArticle::where('title', 'like', "%{$query}%")
+                ->orWhere('content', 'like', "%{$query}%")
+                ->orderByRaw("CASE WHEN title LIKE ? THEN 0 ELSE 1 END", ["%{$query}%"])
+                ->limit(8)
+                ->get(['slug', 'title', 'category']);
 
-        // Search wiki articles
-        $articles = \App\Models\WikiArticle::where('title', 'like', "%{$q}%")
-            ->orWhere('content', 'like', "%{$q}%")
-            ->orderByRaw("CASE WHEN title LIKE ? THEN 0 ELSE 1 END", ["%{$q}%"])
-            ->limit(3)
-            ->get(['slug', 'title', 'category', 'content']);
-
-        // Search items
-        $items = \App\Models\GameItem::where('name', 'like', "%{$q}%")
-            ->orWhere('description', 'like', "%{$q}%")
-            ->limit(2)
-            ->get(['name', 'description', 'tier']);
-
-        // Search alt builds
-        $builds = \App\Models\AltBuild::where('name', 'like', "%{$q}%")
-            ->orWhere('species', 'like', "%{$q}%")
-            ->limit(2)
-            ->get(['build_id', 'name', 'species', 'type1', 'type2']);
-
-        $totalResults = $articles->count() + $items->count() + $builds->count();
-
-        if ($totalResults === 0) {
-            return response()->json([
-                'type' => self::CHANNEL_MESSAGE,
-                'data' => ['embeds' => [[
-                    'title'       => "No results for \"{$q}\"",
-                    'description' => "Try searching on the [full wiki](<https://void.scooom.xyz/wiki.html>) for broader results.",
-                    'color'       => 0x7c5cbf,
-                    'footer'      => ['text' => 'WikiMoDex • Search'],
-                ]]]
-            ]);
-        }
-
-        $fields = [];
-
-        foreach ($articles as $article) {
-            // Extract excerpt around the match
-            $plain = preg_replace('/[#*`\[\]_>|~]/u', '', $article->content);
-            $plain = preg_replace('/\s+/', ' ', $plain);
-            $pos   = stripos($plain, $q);
-            if ($pos !== false) {
-                $start   = max(0, $pos - 40);
-                $excerpt = ($start > 0 ? '…' : '') . substr($plain, $start, 120) . '…';
-            } else {
-                $excerpt = substr($plain, 0, 120) . '…';
+            foreach ($articles as $a) {
+                $choices[] = ['name' => "📄 {$a->title} ({$a->category})", 'value' => "article:{$a->slug}"];
             }
 
-            $url = "https://void.scooom.xyz/wiki:{$article->slug}.html";
-            $fields[] = [
-                'name'   => "📄 {$article->title}",
-                'value'  => "{$excerpt}\n[Read more](<{$url}>)",
-                'inline' => false,
-            ];
-        }
+            // Items
+            $items = \App\Models\GameItem::where('name', 'like', "%{$query}%")
+                ->limit(5)
+                ->get(['name', 'tier']);
 
-        foreach ($items as $item) {
-            $tierLabel = ucfirst(strtolower($item->tier));
-            $desc = $item->description ? substr($item->description, 0, 100) . (strlen($item->description) > 100 ? '…' : '') : 'No description.';
-            $fields[] = [
-                'name'   => "🎒 {$item->name} ({$tierLabel})",
-                'value'  => "{$desc}\n[Items Reference](<https://void.scooom.xyz/wiki:items.html>)",
-                'inline' => false,
-            ];
-        }
+            foreach ($items as $item) {
+                $choices[] = ['name' => "🎒 {$item->name} (" . ucfirst(strtolower($item->tier)) . ")", 'value' => "item:{$item->name}"];
+            }
 
-        foreach ($builds as $build) {
-            $types = collect([$build->type1, $build->type2])->filter()->join(' / ');
-            $url   = "https://void.scooom.xyz/wiki:alt-builds.html#build-{$build->build_id}";
-            $fields[] = [
-                'name'   => "✨ {$build->species} — {$build->name}",
-                'value'  => ($types ? "Types: {$types}\n" : '') . "[View Alt Build](<{$url}>)",
-                'inline' => false,
-            ];
-        }
+            // Alt builds
+            $builds = \App\Models\AltBuild::where('name', 'like', "%{$query}%")
+                ->orWhere('species', 'like', "%{$query}%")
+                ->limit(5)
+                ->get(['build_id', 'name', 'species']);
 
-        $wikiUrl = "https://void.scooom.xyz/wiki.html";
+            foreach ($builds as $b) {
+                $choices[] = ['name' => "✨ {$b->species} — {$b->name}", 'value' => "altbuild:{$b->build_id}"];
+            }
+        }
 
         return response()->json([
-            'type' => self::CHANNEL_MESSAGE,
-            'data' => ['embeds' => [[
-                'title'       => "Wiki Search: \"{$q}\"",
-                'description' => "{$totalResults} result" . ($totalResults !== 1 ? 's' : '') . " · [Search on wiki](<https://void.scooom.xyz/wiki.html>)",
-                'color'       => 0x7c5cbf,
-                'fields'      => array_slice($fields, 0, 5),
-                'footer'      => ['text' => 'WikiMoDex • Use /form, /ability, or /alt-build for specific lookups'],
-            ]]]
+            'type' => self::AUTOCOMPLETE_RESULT,
+            'data' => ['choices' => array_slice($choices, 0, 25)],
         ]);
+    }
+
+    private function handleWikiSearch(string $query): \Illuminate\Http\JsonResponse
+    {
+        // Query format: "type:identifier" from autocomplete
+        [$type, $id] = array_pad(explode(':', $query, 2), 2, '');
+
+        if ($type === 'article') {
+            $article = \App\Models\WikiArticle::where('slug', $id)->first();
+            if (!$article) goto not_found;
+
+            $plain   = preg_replace('/[#*`\[\]_>|~]/u', '', $article->content);
+            $plain   = preg_replace('/\s+/', ' ', trim($plain));
+            $excerpt = substr($plain, 0, 300) . (strlen($plain) > 300 ? '…' : '');
+            $url     = "https://void.scooom.xyz/wiki:{$article->slug}.html";
+
+            return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
+                'title'       => $article->title,
+                'description' => $excerpt,
+                'color'       => 0x7c5cbf,
+                'fields'      => [['name' => 'Category', 'value' => $article->category, 'inline' => true]],
+                'url'         => $url,
+                'footer'      => ['text' => 'WikiMoDex • Wiki'],
+            ]]]]);
+        }
+
+        if ($type === 'item') {
+            $item = \App\Models\GameItem::where('name', $id)->first();
+            if (!$item) goto not_found;
+
+            $fields = [];
+            $fields[] = ['name' => 'Tier',       'value' => ucfirst(strtolower($item->tier)), 'inline' => true];
+            if ($item->spawn_condition) $fields[] = ['name' => 'Condition', 'value' => $item->spawn_condition, 'inline' => true];
+
+            return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
+                'title'       => $item->name,
+                'description' => $item->description ?: 'No description available.',
+                'color'       => 0x7c5cbf,
+                'fields'      => $fields,
+                'url'         => "https://void.scooom.xyz/wiki:items.html",
+                'footer'      => ['text' => 'WikiMoDex • Items Reference'],
+            ]]]]);
+        }
+
+        if ($type === 'altbuild') {
+            return $this->handleAltBuild($id);
+        }
+
+        not_found:
+        return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => [
+            'content' => "No result found. Try searching on the [wiki](<https://void.scooom.xyz/wiki.html>)."
+        ]]);
     }
 
     private function autocompleteAltBuild(string $query): \Illuminate\Http\JsonResponse
