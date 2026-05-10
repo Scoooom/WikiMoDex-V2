@@ -156,6 +156,19 @@
                         </div>
                         @endif
                     </div>
+
+                    @if($build->dex_number)
+                    <button class="altbuild-stats-toggle" data-target="stats-{{ $build->build_id }}">
+                        <span>Base Stats</span>
+                        <span class="chevron">▾</span>
+                    </button>
+                    <div class="altbuild-stats-block" id="stats-{{ $build->build_id }}"
+                         data-dex="{{ $build->dex_number }}"
+                         data-focus="{{ $build->stat_focus }}"
+                         data-rank="{{ $build->rank }}">
+                        <div class="altbuild-stat-loading" style="color:var(--dim);font-size:0.72rem;font-family:var(--font-mono);padding:0.25rem 0">Loading…</div>
+                    </div>
+                    @endif
                 </div>
                 @endforeach
             </div>
@@ -277,7 +290,45 @@ document.querySelectorAll('.altbuild-card').forEach(card => {
     });
 });
 
-// ── Sidebar init ──────────────────────────────────────────────────────────
+// ── Stat block toggles ────────────────────────────────────────────────────
+document.querySelectorAll('.altbuild-stats-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const block = document.getElementById(btn.dataset.target);
+        const chevron = btn.querySelector('.chevron');
+        const isOpen = block.classList.contains('open');
+
+        block.classList.toggle('open', !isOpen);
+        chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+
+        // Load stats on first open
+        if (!isOpen && block.dataset.loaded !== 'true') {
+            block.dataset.loaded = 'true';
+            const buildId = btn.dataset.target.replace('stats-', '');
+
+            fetch(`/alt-build-stats/${buildId}.json`)
+                .then(r => r.json())
+                .then(data => {
+                    let html = '';
+                    data.stats.forEach(s => {
+                        const pct = Math.min(100, Math.round((s.value / 255) * 100));
+                        const color = s.focus ? 'var(--accent3)' : 'var(--accent)';
+                        html += `<div class="altbuild-stat-row">
+                            <span class="altbuild-stat-label">${s.label}</span>
+                            <div class="altbuild-stat-bar-wrap">
+                                <div class="altbuild-stat-bar" style="width:${pct}%;background:${color}"></div>
+                            </div>
+                            <span class="altbuild-stat-val">${s.value}</span>
+                        </div>`;
+                    });
+                    html += `<div class="altbuild-bst">BST: ${data.bst}</div>`;
+                    block.innerHTML = html;
+                })
+                .catch(() => {
+                    block.innerHTML = '<div style="color:var(--dim);font-size:0.72rem;font-family:var(--font-mono)">Stats unavailable</div>';
+                });
+        }
+    });
+});
 (function() {
     const sidebar  = document.getElementById('wikiSidebar');
     const toggle   = document.getElementById('wikiSidebarToggle');

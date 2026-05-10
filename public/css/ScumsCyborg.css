@@ -2263,3 +2263,83 @@ img { max-width: 100%; display: block; }
     height: 128px;
     image-rendering: pixelated;
 }
+
+/* ── Alt build stat block ────────────────────── */
+.altbuild-stats-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border2);
+    color: var(--dim);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: color 0.15s, background 0.15s;
+}
+
+.altbuild-stats-toggle:hover {
+    color: var(--accent2);
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+
+.altbuild-stats-toggle .chevron {
+    transition: transform 0.2s;
+    font-size: 0.65rem;
+}
+
+.altbuild-stats-block {
+    display: none;
+    padding: 0.6rem 1rem 0.75rem;
+    border-top: 1px solid var(--border2);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+}
+
+.altbuild-stats-block.open { display: block; }
+
+.altbuild-stat-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.2rem;
+}
+
+.altbuild-stat-label {
+    width: 52px;
+    color: var(--dim);
+    flex-shrink: 0;
+}
+
+.altbuild-stat-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--card2);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.altbuild-stat-bar {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--accent2);
+    transition: width 0.3s ease;
+}
+
+.altbuild-stat-val {
+    width: 28px;
+    text-align: right;
+    color: var(--muted);
+}
+
+.altbuild-bst {
+    margin-top: 0.4rem;
+    color: var(--dim);
+    font-size: 0.68rem;
+    text-align: right;
+}
