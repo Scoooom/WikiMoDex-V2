@@ -443,6 +443,12 @@ function draw() {
       fill(C_CARD[0], C_CARD[1], C_CARD[2])
       rect(X, Y, W, H, CORNER)
     }
+    // Subtle border
+    noFill()
+    stroke(C_BORDER[0], C_BORDER[1], C_BORDER[2])
+    strokeWeight(0.5)
+    rect(X, Y, W, H, CORNER)
+    noStroke()
 
     // Click handler
     if (isHover && click) {
