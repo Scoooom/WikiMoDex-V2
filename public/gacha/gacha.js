@@ -47,6 +47,7 @@ function normaliseSpeciesId(sid) {
   var overrides = {
     'nidoran-f':    'nidoran-f',
     'nidoran-m':    'nidoran-m',
+    'zygarde':      'zygarde-50',
     'farfetchd':'farfetch-d','sirfetchd':'sirfetch-d','oricorio':'oricorio-baile',
     'indeedee':'indeedee-male','pumpkaboo':'pumpkaboo-average','gourgeist':'gourgeist-average',
     'basculin':'basculin-red-striped','meowstic':'meowstic-male','aegislash':'aegislash-shield',
