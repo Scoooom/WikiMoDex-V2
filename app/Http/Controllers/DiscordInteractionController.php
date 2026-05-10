@@ -234,15 +234,46 @@ class DiscordInteractionController extends Controller
         $abilities = collect([$build->ability1, $build->ability2, $build->ability3])->filter()->join(' / ');
 
         $fields = [];
-        if ($types)                  $fields[] = ['name' => 'Types',      'value' => $types,                    'inline' => true];
-        if ($build->stat_focus)      $fields[] = ['name' => 'Stat Focus', 'value' => $build->stat_focus,        'inline' => true];
-        if ($abilities)              $fields[] = ['name' => 'Abilities',  'value' => $abilities,                 'inline' => false];
-        if ($build->passive_ability) $fields[] = ['name' => 'Passive',    'value' => $build->passive_ability,   'inline' => true];
-        if ($build->prevents_evolution) $fields[] = ['name' => 'Note',    'value' => '⚠ Prevents evolution',   'inline' => true];
+        if ($types)                  $fields[] = ['name' => 'Types',      'value' => $types,                  'inline' => true];
+        if ($build->stat_focus)      $fields[] = ['name' => 'Stat Focus', 'value' => $build->stat_focus,      'inline' => true];
+        if ($abilities)              $fields[] = ['name' => 'Abilities',  'value' => $abilities,               'inline' => false];
+        if ($build->passive_ability) $fields[] = ['name' => 'Passive',    'value' => $build->passive_ability, 'inline' => true];
+        if ($build->prevents_evolution) $fields[] = ['name' => 'Note',    'value' => '⚠ Prevents evolution', 'inline' => true];
+
+        // Fetch base stats from PokéAPI and apply stat focus algorithm
+        if ($build->dex_number) {
+            $pokemon = \App\Services\PokemonService::getPokemon($build->dex_number);
+            if ($pokemon && isset($pokemon->stats)) {
+                $statOrder = ['hp', 'attack', 'defense', 'special-attack', 'special-defense', 'speed'];
+                $baseStats = [];
+                foreach ($pokemon->stats as $stat) {
+                    $baseStats[] = $stat->base_stat;
+                }
+
+                // Parse stat focus string to indices [HP=0, ATK=1, DEF=2, SPATK=3, SPDEF=4, SPD=5]
+                $statMap = ['HP' => 0, 'ATK' => 1, 'DEF' => 2, 'SP.ATK' => 3, 'SP.DEF' => 4, 'SPD' => 5];
+                $focusParts = array_map('trim', explode('/', $build->stat_focus ?? ''));
+                $focusIndices = array_values(array_filter(array_map(fn($s) => $statMap[$s] ?? null, $focusParts), fn($v) => $v !== null));
+
+                $calculated = $this->calculateAltBuildStats($baseStats, $focusIndices, $build->rank ?? 1);
+                [$hp, $atk, $def, $spa, $spd2, $spe] = $calculated;
+                $bst = array_sum($calculated);
+
+                $statsStr  = "```\n";
+                $statsStr .= "HP:      " . $this->statBar((int)floor(($hp   / 255) * 100)) . " {$hp}\n";
+                $statsStr .= "Atk:     " . $this->statBar((int)floor(($atk  / 255) * 100)) . " {$atk}\n";
+                $statsStr .= "Def:     " . $this->statBar((int)floor(($def  / 255) * 100)) . " {$def}\n";
+                $statsStr .= "Sp.Atk:  " . $this->statBar((int)floor(($spa  / 255) * 100)) . " {$spa}\n";
+                $statsStr .= "Sp.Def:  " . $this->statBar((int)floor(($spd2 / 255) * 100)) . " {$spd2}\n";
+                $statsStr .= "Speed:   " . $this->statBar((int)floor(($spe  / 255) * 100)) . " {$spe}\n";
+                $statsStr .= "BST:     {$bst}\n```";
+
+                $fields[] = ['name' => 'Stats', 'value' => $statsStr, 'inline' => false];
+            }
+        }
 
         $championLabels = \App\Models\AltBuild::championLabel();
         $champion = $championLabels[$build->champion] ?? ucfirst($build->champion ?? 'Unknown');
-
         $spriteUrl = "https://void.scooom.xyz/alt-build-sprite:{$build->build_id}.png?v=2";
 
         $embed = [
@@ -261,7 +292,92 @@ class DiscordInteractionController extends Controller
         ]);
     }
 
-    private function generateAltBuildSprite(\App\Models\AltBuild $build): ?string
+    private function calculateAltBuildStats(array $stats, array $focusIndices, int $rank): array
+    {
+        // Step 1: swap focus stats to highest positions (mirrors TypeScript algorithm)
+        $newStats = $stats;
+        foreach ($focusIndices as $rankIdx => $focusStat) {
+            $ranked = [];
+            for ($s = 0; $s <= 5; $s++) {
+                $ranked[] = ['stat' => $s, 'value' => $newStats[$s]];
+            }
+            usort($ranked, fn($a, $b) => $b['value'] - $a['value']);
+            $highestAtRank = $ranked[$rankIdx];
+            if ($focusStat !== $highestAtRank['stat']) {
+                $temp = $newStats[$focusStat];
+                $newStats[$focusStat] = $newStats[$highestAtRank['stat']];
+                $newStats[$highestAtRank['stat']] = $temp;
+            }
+        }
+
+        // Step 2: scale BST to target
+        $rankClamped = min($rank, 9);
+        $targetBST   = 425 + ($rankClamped * 25);
+        $currentBST  = array_sum($newStats);
+
+        if ($currentBST >= $targetBST) return $newStats;
+
+        $nonFocusIndices = array_values(array_filter([0,1,2,3,4,5], fn($i) => !in_array($i, $focusIndices)));
+        $allocated = $newStats;
+        $difference = $targetBST - $currentBST;
+
+        if ($difference <= 30) {
+            $focusTotal = array_sum(array_map(fn($i) => $newStats[$i], $focusIndices));
+            foreach ($focusIndices as $i) {
+                $proportion = $focusTotal > 0 ? $newStats[$i] / $focusTotal : 1 / count($focusIndices);
+                $allocated[$i] = $newStats[$i] + (int)floor($difference * $proportion);
+            }
+            $scaledTotal = array_sum($allocated);
+            $diff = $targetBST - $scaledTotal;
+            $idx = 0;
+            while ($diff !== 0 && $idx < 100) {
+                $t = $focusIndices[$idx % count($focusIndices)];
+                if ($diff > 0) { $allocated[$t]++; $diff--; }
+                else           { $allocated[$t]--; $diff++; }
+                $idx++;
+            }
+            return $allocated;
+        }
+
+        $statCap    = (int)floor($targetBST * 0.30);
+        $focusTarget = (int)floor($statCap * 0.80);
+        $focusBudget = count($focusIndices) * $focusTarget;
+        $nonFocusBudget = $targetBST - $focusBudget;
+
+        $nonFocusRanked = array_map(fn($i) => ['index' => $i, 'value' => $newStats[$i]], $nonFocusIndices);
+        usort($nonFocusRanked, fn($a, $b) => $b['value'] - $a['value']);
+
+        $weights = [];
+        foreach ($nonFocusRanked as $r => $stat) {
+            $pct = 0.50 - ($r / max(1, count($nonFocusRanked) - 1)) * 0.15;
+            $weights[] = array_merge($stat, ['weight' => pow($pct, 1.5)]);
+        }
+        $totalWeight = array_sum(array_column($weights, 'weight'));
+        foreach ($weights as $w) {
+            $allocated[$w['index']] = max($newStats[$w['index']], (int)floor($nonFocusBudget * ($w['weight'] / $totalWeight)));
+        }
+
+        $focusBoost = 50;
+        $focusWeights = array_map(fn($i) => $newStats[$i] + $focusBoost, $focusIndices);
+        $totalFocusWeight = array_sum($focusWeights);
+        foreach ($focusIndices as $k => $i) {
+            $allocated[$i] = $totalFocusWeight > 0
+                ? (int)floor($focusBudget * ($focusWeights[$k] / $totalFocusWeight))
+                : (int)floor($focusBudget / count($focusIndices));
+        }
+
+        $capped = array_map(fn($s) => min($s, $statCap), $allocated);
+        $diff = $targetBST - array_sum($capped);
+        $allIndices = array_merge($focusIndices, $nonFocusIndices);
+        $adjustIdx = 0;
+        while ($diff !== 0 && $adjustIdx < 1000) {
+            $t = $allIndices[$adjustIdx % count($allIndices)];
+            if ($diff > 0 && $capped[$t] < $statCap)  { $capped[$t]++; $diff--; }
+            elseif ($diff < 0 && $capped[$t] > 1)     { $capped[$t]--; $diff++; }
+            $adjustIdx++;
+        }
+        return $capped;
+    }
     {
         $script    = base_path('scripts/render_alt_build_sprite.py');
         $srcSprite = base_path("pokevoid/public/images/pokemon/{$build->dex_number}.png");

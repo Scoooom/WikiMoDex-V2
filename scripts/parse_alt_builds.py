@@ -12,6 +12,7 @@ import sys
 POKEVOID       = '/var/www/void.scooom.com/pokevoid/src'
 ALT_BUILD_TS   = f'{POKEVOID}/data/pokemon-alt-buid.ts'
 SPECIES_TS     = f'{POKEVOID}/enums/species.ts'
+POKEMON_TS     = f'{POKEVOID}/data/pokemon-species.ts'
 
 DB_NAME = 'pokevoid'
 DB_USER = 'void'
@@ -47,6 +48,30 @@ def build_species_map(content):
             current += 1
             species_map[m.group(1)] = current
     return species_map
+
+def build_base_stats_map(content):
+    """Parse PokemonSpecies constructor calls to extract base stats.
+    Format: new PokemonSpecies(Species.X, ..., BST, HP, ATK, DEF, SPATK, SPDEF, SPD, ...)
+    The BST and stats are positional — BST at index 13, then HP,ATK,DEF,SPATK,SPDEF,SPD at 14-19.
+    """
+    stats_map = {}
+    # Match: new PokemonSpecies(Species.NAME, ...numbers...)
+    pattern = re.compile(
+        r'new PokemonSpecies\(Species\.(\w+),\s*'  # species name
+        r'(\d+),\s*'   # generation
+        r'(?:true|false),\s*' * 3 +               # legendary/sublegendary/mythical
+        r'"[^"]*",\s*' +                           # name
+        r'Type\.\w+,\s*(?:Type\.\w+|null),\s*' +  # type1, type2
+        r'[\d.]+,\s*[\d.]+,\s*' +                 # height, weight
+        r'Abilities\.\w+,\s*Abilities\.\w+,\s*Abilities\.\w+,\s*' +  # abilities
+        r'(\d+),\s*'  +                            # BST
+        r'(\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*'  # HP ATK DEF SPATK SPDEF SPD
+    )
+    for m in pattern.finditer(content):
+        species = m.group(1)
+        hp, atk, def_, spatk, spdef, spd = int(m.group(4)), int(m.group(5)), int(m.group(6)), int(m.group(7)), int(m.group(8)), int(m.group(9))
+        stats_map[species] = [hp, atk, def_, spatk, spdef, spd]
+    return stats_map
 
 # ── Name humanisers ────────────────────────────────────────────────────────
 def enum_to_name(val):
