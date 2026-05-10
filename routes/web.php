@@ -78,7 +78,16 @@ Route::get('/smittyForm:{form}.html', [GlitchController::class, 'smittyFormMon']
 Route::post('/discord/interactions', [App\Http\Controllers\DiscordInteractionController::class, 'handle'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
 // ── Pokevoid sprites ──────────────────────────────────────────────────────
-Route::get('/pokevoid-sprites/{filename}', function ($filename, \Illuminate\Http\Request $request) {
+Route::get('/pokevoid-atlas/{dex}.json', function ($dex) {
+    if (!preg_match('/^\d+$/', $dex)) abort(404);
+    $path = base_path("pokevoid/public/images/pokemon/{$dex}.png");
+    if (!file_exists($path)) abort(404);
+    $out = shell_exec("python3 " . escapeshellarg(base_path('scripts/extract_atlas.py')) . " " . escapeshellarg($path) . " 2>/dev/null");
+    if (!$out) abort(404);
+    return response($out)->header('Content-Type', 'application/json')
+                          ->header('Access-Control-Allow-Origin', '*')
+                          ->header('Cache-Control', 'public, max-age=86400');
+})->where('dex', '\d+');
     if (!preg_match('/^[\w\-]+\.png$/', $filename)) abort(404);
     $path = base_path("pokevoid/public/images/pokemon/{$filename}");
     if (!file_exists($path)) abort(404);

@@ -179,7 +179,7 @@ async function extractFirstFrame(src) {
             tctx.drawImage(img, 0, 0);
 
             // Try to fetch the atlas JSON from the same URL with ?atlas=1
-            fetch(src + '&atlas=1')
+            fetch(`/pokevoid-atlas/${src.split('/').pop().replace('.png','')}.json`)
                 .then(r => r.json())
                 .then(atlas => {
                     const frame = atlas.textures[0].frames[0];
