@@ -98,6 +98,26 @@ class WikiSearchController extends Controller
             ];
         }
 
+        // ── Alt Builds ────────────────────────────────────────────────
+        $altBuilds = \App\Models\AltBuild::where('name', 'like', "%{$q}%")
+            ->orWhere('species', 'like', "%{$q}%")
+            ->orderByRaw("CASE WHEN name LIKE ? THEN 0 ELSE 1 END", ["%{$q}%"])
+            ->limit(4)
+            ->get(['build_id', 'name', 'species', 'champion', 'type1', 'type2']);
+
+        $championLabels = \App\Models\AltBuild::championLabel();
+        foreach ($altBuilds as $build) {
+            $types = collect([$build->type1, $build->type2])->filter()->join(' / ');
+            $results[] = [
+                'type'     => 'altbuild',
+                'label'    => 'Alt Build',
+                'title'    => "{$build->species} — {$build->name}",
+                'subtitle' => ($championLabels[$build->champion] ?? ucfirst($build->champion ?? '')) . ($types ? " · {$types}" : ''),
+                'excerpt'  => null,
+                'url'      => route('wiki.altbuilds') . '#champion-' . ($build->champion ?? ''),
+            ];
+        }
+
         return response()->json(['query' => $q, 'results' => $results]);
     }
 

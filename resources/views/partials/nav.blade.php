@@ -108,18 +108,23 @@ function initWikiSearch() {
     if (!btn || !modal) return;
 
     const TYPE_ICONS = {
-        article: '📄',
-        item:    '🎒',
-        form:    '✨',
-        glitch:  '👾',
+        article:  '📄',
+        item:     '🎒',
+        form:     '✨',
+        glitch:   '👾',
+        altbuild: '⚡',
     };
 
     const TYPE_COLORS = {
-        article: 'var(--accent2)',
-        item:    '#f5d76e',
-        form:    '#a8e6cf',
-        glitch:  '#ffaaa5',
+        article:  'var(--accent2)',
+        item:     '#f5d76e',
+        form:     '#a8e6cf',
+        glitch:   '#ffaaa5',
+        altbuild: '#c9a8ff',
     };
+
+    const groupLabels = { article: 'Wiki Articles', item: 'Items', form: 'Pokémon Forms', glitch: 'Mod Glitch Forms', altbuild: 'Alt Builds' };
+    const groupOrder  = ['article', 'item', 'form', 'glitch', 'altbuild'];
 
     function open() {
         modal.classList.add('open');
@@ -198,8 +203,6 @@ function initWikiSearch() {
 
         // Group by type
         const groups = {};
-        const groupOrder = ['article', 'item', 'form', 'glitch'];
-        const groupLabels = { article: 'Wiki Articles', item: 'Items', form: 'Pokémon Forms', glitch: 'Mod Glitch Forms' };
         items.forEach(item => { (groups[item.type] = groups[item.type] || []).push(item); });
 
         let html = '';
