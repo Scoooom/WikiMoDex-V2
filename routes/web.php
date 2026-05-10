@@ -76,3 +76,19 @@ Route::get('/smittyForm:{form}.html', [GlitchController::class, 'smittyFormMon']
 
 // Bot
 Route::post('/discord/interactions', [App\Http\Controllers\DiscordInteractionController::class, 'handle'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
+// ── Wiki ──────────────────────────────────────────────────────────
+use App\Http\Controllers\WikiController;
+
+Route::get('/wiki.html',               [WikiController::class, 'index'])->name('wiki.index');
+Route::get('/wiki:items.html',         [WikiController::class, 'items'])->name('wiki.items');
+Route::get('/wiki:{slug}.html',        [WikiController::class, 'show'])->name('wiki.show');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/admin/wiki.html',           [WikiController::class, 'adminIndex'])->name('wiki.admin.index');
+    Route::get('/admin/wiki/new.html',       [WikiController::class, 'adminNew'])->name('wiki.admin.new');
+    Route::post('/admin/wiki/new.html',      [WikiController::class, 'adminCreate'])->name('wiki.admin.create');
+    Route::get('/admin/wiki:{slug}.html',    [WikiController::class, 'adminEdit'])->name('wiki.admin.edit');
+    Route::post('/admin/wiki:{slug}.html',   [WikiController::class, 'adminSave'])->name('wiki.admin.save');
+    Route::delete('/admin/wiki:{slug}.html', [WikiController::class, 'adminDelete'])->name('wiki.admin.delete');
+});

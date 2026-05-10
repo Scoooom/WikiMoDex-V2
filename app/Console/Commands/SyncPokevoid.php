@@ -34,6 +34,7 @@ class SyncPokevoid extends Command
         // Run the parser
         $this->info('Syncing forms and abilities...');
         $this->call('forms:parse', ['--quiet-abilities' => true]);
+        $this->call('items:parse');
 
         $this->info('Sync complete!');
         return 0;
