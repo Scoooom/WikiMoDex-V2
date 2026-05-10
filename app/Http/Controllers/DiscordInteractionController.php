@@ -196,16 +196,203 @@ class DiscordInteractionController extends Controller
             ]);
         }
 
-        $tpl  = "# {$ability->name}\n";
-        $tpl .= $ability->description;
-
         return response()->json([
             'type' => self::CHANNEL_MESSAGE,
-            'data' => ['content' => $tpl]
+            'data' => [
+                'embeds' => [[
+                    'title'       => $ability->name,
+                    'description' => $ability->description,
+                    'color'       => 0x7c5cbf,
+                    'footer'      => ['text' => 'WikiMoDex • Ability']
+                ]]
+            ]
         ]);
     }
 
     private function handleForm(string $msg): \Illuminate\Http\JsonResponse
+    {
+        $msg      = str_replace('Ω', '_omega', $msg);
+        $msgLower = trim(strtolower($msg));
+
+        $form = $custom = $coreForm = $smittyMon = $smittyForm = false;
+
+        $glitch = Glitch::whereRaw('LOWER(name) = ?', [$msgLower])->first();
+        if ($glitch) {
+            $form   = $glitch;
+            $custom = true;
+        } else {
+            $form = BuiltInService::loadCore($msgLower);
+            if ($form) {
+                $coreForm = true;
+            } else {
+                $form = BuiltInService::loadSmitty($msgLower);
+                if ($form) {
+                    $smittyMon = true;
+                } else {
+                    $form = BuiltInService::loadSmittyForm($msgLower);
+                    if ($form) { $smittyForm = true; }
+                }
+            }
+        }
+
+        if (!$form) {
+            return response()->json([
+                'type' => self::CHANNEL_MESSAGE,
+                'data' => ['content' => "The GlitchDex was unable to locate `{$msg}`!"]
+            ]);
+        }
+
+        try {
+            $smitty  = $smittyMon || $smittyForm;
+            $hasBase = $smittyForm || $coreForm;
+
+            // URLs
+            if ($custom) {
+                $pageUrl   = 'https://void.scooom.xyz/g:' . urlencode(trim($form->name)) . ':' . $form->id . '.html';
+                $frontUrl  = "https://void.scooom.xyz/front:{$form->id}.png";
+            } elseif ($coreForm) {
+                $pageUrl  = "https://void.scooom.xyz/core:{$form->name}.html";
+                $frontUrl = "https://void.scooom.xyz/cFront:{$form->name}.png";
+            } elseif ($smittyMon) {
+                $pageUrl  = "https://void.scooom.xyz/smitty:{$form->name}.html";
+                $frontUrl = "https://void.scooom.xyz/cFront:{$form->name}.png";
+            } else {
+                $pageUrl  = "https://void.scooom.xyz/smittyForm:{$form->name}.html";
+                $frontUrl = "https://void.scooom.xyz/cFront:{$form->name}.png";
+            }
+
+            // Title
+            $title = ucwords($form->name);
+            if ($custom) {
+                $title .= ' — Rating: ' . $form->getRating();
+            }
+            if (!empty($form->form_code ?? '')) {
+                $title .= ' (' . $form->form_code . ')';
+            }
+
+            // Types
+            if ($custom) {
+                $data2   = $form->getJsonData();
+                $typeOne = PokemonService::getTypeName($data2->primaryType);
+                $typeTwo = PokemonService::getTypeName($data2->secondaryType);
+            } else {
+                $typeOne = PokemonService::getTypeName($form->type1);
+                $typeTwo = PokemonService::getTypeName($form->type2 ?? -1);
+            }
+            $typesStr = $typeTwo !== 'Unknown' ? "{$typeOne} / {$typeTwo}" : $typeOne;
+
+            // Abilities
+            if ($custom) {
+                $ab1 = $form->getAbilityOne();
+                $ab2 = $form->getAbilityTwo();
+                $ha  = $form->getAbilityHA();
+                [$ab1Name, $ab1Desc] = [$ab1['name'], $ab1['desc']];
+                [$ab2Name, $ab2Desc] = [$ab2['name'], $ab2['desc']];
+                [$haName,  $haDesc]  = [$ha['name'],  $ha['desc']];
+            } else {
+                [$ab1Name, $ab1Desc] = [$form->ab1->name, $form->ab1->description];
+                [$ab2Name, $ab2Desc] = [$form->ab2->name, $form->ab2->description];
+                [$haName,  $haDesc]  = [$form->ha->name,  $form->ha->description];
+            }
+
+            // Stats
+            if ($custom) {
+                $ogStats    = $form->getOGStats();
+                $ogBST      = array_sum(array_column($ogStats, 'value'));
+                $stats      = $form->adjustStats($ogStats, $form->calculateTotalIncrease($ogBST));
+                $bst        = array_sum(array_column($stats, 'value'));
+                $statValues = array_column($stats, 'value');
+            } else {
+                $statValues = [$form->hp, $form->atk, $form->def, $form->spatk, $form->spdef, $form->spd];
+                $bst        = $form->bst;
+            }
+            [$hp, $atk, $def, $spa, $spd2, $spe] = $statValues;
+
+            // Base form
+            $formOfStr = '';
+            if ($hasBase) {
+                $ogIds     = explode(',', $form->og_mon ?? '');
+                $ogMon     = PokemonService::getMon(trim($ogIds[0]));
+                $formOfStr = ucwords(str_replace('-', ' ', $ogMon->name));
+            }
+
+            // SMITTY items
+            $smittyItemsStr = '';
+            if ($smitty) {
+                $items = BuiltInService::getSmittyItems(strtolower($form->name));
+                $smittyItemsStr = $items !== false
+                    ? implode(', ', (array)$items)
+                    : 'Unknown — contact scooom on Discord';
+            }
+
+            // Build embed fields
+            $fields = [];
+
+            if ($formOfStr) {
+                $fields[] = ['name' => 'Form of', 'value' => $formOfStr, 'inline' => true];
+            }
+            if ($custom) {
+                $creator = \App\Models\User::find($form->created_by);
+                $fields[] = ['name' => 'Created by', 'value' => "[{$creator->username}](https://void.scooom.xyz/u:{$creator->username}.html)", 'inline' => true];
+            }
+
+            $fields[] = ['name' => 'Types', 'value' => $typesStr, 'inline' => true];
+
+            $fields[] = ['name' => 'Ability 1', 'value' => "**{$ab1Name}**\n||{$ab1Desc}||", 'inline' => true];
+            $fields[] = ['name' => 'Ability 2', 'value' => "**{$ab2Name}**\n||{$ab2Desc}||", 'inline' => true];
+            $fields[] = ['name' => 'Hidden Ability', 'value' => "**{$haName}**\n||{$haDesc}||", 'inline' => true];
+
+            if ($smittyItemsStr) {
+                $fields[] = ['name' => 'SMITTY Items', 'value' => $smittyItemsStr, 'inline' => false];
+            }
+
+            $statsStr = "||```\n";
+            $statsStr .= "HP:      " . $this->statBar((int)floor(($hp   / 255) * 100)) . " {$hp}\n";
+            $statsStr .= "Atk:     " . $this->statBar((int)floor(($atk  / 255) * 100)) . " {$atk}\n";
+            $statsStr .= "Def:     " . $this->statBar((int)floor(($def  / 255) * 100)) . " {$def}\n";
+            $statsStr .= "Sp.Atk:  " . $this->statBar((int)floor(($spa  / 255) * 100)) . " {$spa}\n";
+            $statsStr .= "Sp.Def:  " . $this->statBar((int)floor(($spd2 / 255) * 100)) . " {$spd2}\n";
+            $statsStr .= "Speed:   " . $this->statBar((int)floor(($spe  / 255) * 100)) . " {$spe}\n";
+            $statsStr .= "BST:     {$bst}\n```||";
+            $fields[] = ['name' => 'Stats', 'value' => $statsStr, 'inline' => false];
+
+            if ($custom) {
+                $rivals = $form->getRivals(true);
+                if ($rivals) {
+                    $fields[] = ['name' => 'Rivals', 'value' => "||{$rivals}||", 'inline' => false];
+                }
+            }
+
+            // Footer label
+            $footerLabel = match(true) {
+                $custom     => 'WikiMoDex • Mod Glitch Form',
+                $coreForm   => 'WikiMoDex • Core Glitch',
+                $smittyMon  => 'WikiMoDex • SMITTY Pokémon',
+                $smittyForm => 'WikiMoDex • SMITTY Form',
+                default     => 'WikiMoDex',
+            };
+
+            return response()->json([
+                'type' => self::CHANNEL_MESSAGE,
+                'data' => [
+                    'embeds' => [[
+                        'title'     => $title,
+                        'url'       => $pageUrl,
+                        'color'     => 0x7c5cbf,
+                        'thumbnail' => ['url' => $frontUrl],
+                        'fields'    => $fields,
+                        'footer'    => ['text' => $footerLabel],
+                    ]]
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'type' => self::CHANNEL_MESSAGE,
+                'data' => ['content' => "The GlitchDex encountered an error looking up `{$msg}`!"]
+            ]);
+        }
+    }
     {
         $msg = str_replace('Ω', '_omega', $msg);
         $msgLower = trim(strtolower($msg));
@@ -237,170 +424,11 @@ class DiscordInteractionController extends Controller
             }
         }
 
-        if (!$form) {
-            return response()->json([
-                'type' => self::CHANNEL_MESSAGE,
-                'data' => ['content' => "The GlitchDex was unable to locate `{$msg}`!"]
-            ]);
-        }
-
-        $smitty  = $smittyMon || $smittyForm;
-        $hasBase = $smittyForm || $coreForm;
-
-        try {
-            if ($custom) {
-                $url      = 'g:' . urlencode(trim($form->name)) . ':' . $form->id;
-                $rating   = $form->getRating();
-                $nameStr  = "[".ucwords($form->name)." (Rating: {$rating})](<https://void.scooom.xyz/{$url}.html>)";
-                $creator  = \App\Models\User::find($form->created_by);
-                $makerStr = "## Created By [{$creator->username}](<https://void.scooom.xyz/u:{$creator->username}.html>)\n";
-                $codeStr  = '';
-                $smittyItemsStr = '';
-                $rivalsStr = "\n-# Rivals: ||" . $form->getRivals(true) . "||";
-            } elseif ($coreForm) {
-                $url      = 'core:' . $form->name;
-                $nameStr  = "[".ucwords($form->name)."](<https://void.scooom.xyz/{$url}.html>)";
-                $makerStr = '';
-                $codeStr  = '';
-                $smittyItemsStr = '';
-                $rivalsStr = '';
-            } elseif ($smittyMon) {
-                $url     = 'smitty:' . $form->name;
-                $code    = $form->form_code ?? '';
-                $codeStr = $code ? " - ||`{$code}`||" : '';
-                $nameStr = "[".ucwords($form->name)."](<https://void.scooom.xyz/{$url}.html>)";
-                $makerStr = '';
-                $items   = BuiltInService::getSmittyItems(strtolower($form->name));
-                $smittyItemsStr = "\nSmitty Items: `" . ($items !== false ? implode(', ', (array)$items) : 'Unknown! Please contact scooom on Discord!') . "`";
-                $rivalsStr = '';
-            } else {
-                $url     = 'smittyForm:' . $form->name;
-                $code    = $form->form_code ?? '';
-                $codeStr = $code ? " - ||`{$code}`||" : '';
-                $nameStr = "[".ucwords($form->name)."](<https://void.scooom.xyz/{$url}.html>)";
-                $makerStr = '';
-                $items   = BuiltInService::getSmittyItems(strtolower($form->name));
-                $smittyItemsStr = "\nSmitty Items: `" . ($items !== false ? implode(', ', (array)$items) : 'Unknown! Please contact scooom on Discord!') . "`";
-                $rivalsStr = '';
-            }
-
-            if ($hasBase) {
-                $ogIds     = explode(',', $form->og_mon ?? '');
-                $ogMon     = PokemonService::getMon(trim($ogIds[0]));
-                $formOfStr = "\nForm Of: " . ucwords($ogMon->name);
-            } else {
-                $formOfStr = '';
-            }
-
-            if ($custom) {
-                $data2   = $form->getJsonData();
-                $typeOne = $this->typeEn($data2->primaryType);
-                $typeTwo = $this->typeEn($data2->secondaryType);
-            } else {
-                $typeOne = $this->typeEn($form->type1);
-                $typeTwo = $this->typeEn($form->type2 ?? -1);
-            }
-
-            if ($custom) {
-                $ab1 = $form->getAbilityOne();
-                $ab2 = $form->getAbilityTwo();
-                $ha  = $form->getAbilityHA();
-                $ab1Name = $ab1['name']; $ab1Desc = $ab1['desc'];
-                $ab2Name = $ab2['name']; $ab2Desc = $ab2['desc'];
-                $haName  = $ha['name'];  $haDesc  = $ha['desc'];
-            } else {
-                $ab1Name = $form->ab1->name; $ab1Desc = $form->ab1->description;
-                $ab2Name = $form->ab2->name; $ab2Desc = $form->ab2->description;
-                $haName  = $form->ha->name;  $haDesc  = $form->ha->description;
-            }
-
-            if ($custom) {
-                $ogStats      = $form->getOGStats();
-                $ogBST        = array_sum(array_column($ogStats, 'value'));
-                $stats        = $form->adjustStats($ogStats, $form->calculateTotalIncrease($ogBST));
-                $bst          = array_sum(array_column($stats, 'value'));
-                $statValues   = array_column($stats, 'value');
-                $statPercents = array_column($stats, 'percent');
-            } else {
-                $statValues   = [$form->hp, $form->atk, $form->def, $form->spatk, $form->spdef, $form->spd];
-                $statPercents = array_map(fn($v) => floor(($v / 255) * 100), $statValues);
-                $bst          = $form->bst;
-            }
-
-            $tpl  = "# {$nameStr}{$codeStr}\n";
-            $tpl .= $makerStr;
-            $tpl .= $formOfStr . "\n";
-            $tpl .= "### Typing: `{$typeOne}` / `{$typeTwo}`\n";
-            $tpl .= "### Abilities\n";
-            $tpl .= "`{$ab1Name}`\n-# ||`{$ab1Desc}`||\n";
-            $tpl .= "`{$ab2Name}`\n-# ||`{$ab2Desc}`||\n";
-            $tpl .= "Hidden: `{$haName}`\n-# ||`{$haDesc}`||";
-            $tpl .= $smittyItemsStr . "\n";
-            $tpl .= "### Stats\n";
-            $tpl .= "||`" . $this->statBar($statPercents[0]) . "` HP: {$statValues[0]}\n";
-            $tpl .= "`" . $this->statBar($statPercents[1]) . "` Attack: {$statValues[1]}\n";
-            $tpl .= "`" . $this->statBar($statPercents[2]) . "` Defense: {$statValues[2]}\n";
-            $tpl .= "`" . $this->statBar($statPercents[3]) . "` Special Attack: {$statValues[3]}\n";
-            $tpl .= "`" . $this->statBar($statPercents[4]) . "` Special Defence: {$statValues[4]}\n";
-            $tpl .= "`" . $this->statBar($statPercents[5]) . "` Speed: {$statValues[5]}\n";
-            $tpl .= "BST: {$bst}||";
-            $tpl .= $rivalsStr;
-
-            // Note: HTTP interactions can't send files directly
-            // We'll send the text response and include sprite URLs
-            if ($custom) {
-                $tpl .= "\n[Front Sprite](<https://void.scooom.xyz/front:{$form->id}.png>) | [Back Sprite](<https://void.scooom.xyz/back:{$form->id}.png>)";
-            } else {
-                $tpl .= "\n[Front Sprite](<https://void.scooom.xyz/cFront:{$form->name}.png>) | [Back Sprite](<https://void.scooom.xyz/cBack:{$form->name}.png>)";
-            }
-
-            return response()->json([
-                'type' => self::CHANNEL_MESSAGE,
-                'data' => [
-                    'content' => $tpl,
-                    'embeds' => [
-                        [
-                            'image' => [
-                                'url' => $custom
-                                    ? "https://void.scooom.xyz/front:{$form->id}.png"
-                                    : "https://void.scooom.xyz/cFront:{$form->name}.png"
-                            ]
-                        ],
-                        [
-                            'image' => [
-                                'url' => $custom
-                                    ? "https://void.scooom.xyz/back:{$form->id}.png"
-                                    : "https://void.scooom.xyz/cBack:{$form->name}.png"
-                            ]
-                        ]
-                    ]
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'type' => self::CHANNEL_MESSAGE,
-                'data' => ['content' => "The GlitchDex encountered an error looking up `{$msg}`!"]
-            ]);
-        }
-    }
-
     private function statBar(int $value): string
     {
         $rounded = round($value / 5) * 5;
         $div5    = (int)($rounded / 5);
         $remain  = 20 - $div5;
-        return str_repeat('=', $div5) . str_repeat('-', $remain);
-    }
-
-    private function typeEn(int $id): string
-    {
-        return [
-            0 => 'Normal', 1 => 'Fighting', 2 => 'Flying', 3 => 'Poison',
-            4 => 'Ground', 5 => 'Rock', 6 => 'Bug', 7 => 'Ghost',
-            8 => 'Steel', 9 => 'Fire', 10 => 'Water', 11 => 'Grass',
-            12 => 'Electric', 13 => 'Psychic', 14 => 'Ice', 15 => 'Dragon',
-            16 => 'Dark', 17 => 'Fairy',
-        ][$id] ?? 'Unknown';
+        return str_repeat('█', $div5) . str_repeat('░', $remain);
     }
 }
