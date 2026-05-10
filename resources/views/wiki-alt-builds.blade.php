@@ -89,6 +89,7 @@
             <div class="altbuild-grid">
                 @foreach($championBuilds as $build)
                 <div class="altbuild-card"
+                     id="build-{{ $build->build_id }}"
                      data-dex="{{ $build->dex_number }}"
                      data-palette='@json($build->target_palette ?? [])'
                      data-dark='@json($build->dark_palette ?? [])'>

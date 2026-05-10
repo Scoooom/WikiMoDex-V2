@@ -134,7 +134,7 @@ class WikiSearchController extends Controller
                 'title'    => "{$build->species} — {$build->name}",
                 'subtitle' => ($championLabels[$build->champion] ?? ucfirst($build->champion ?? '')) . ($types ? " · {$types}" : ''),
                 'excerpt'  => null,
-                'url'      => route('wiki.altbuilds') . '#champion-' . ($build->champion ?? ''),
+                'url'      => route('wiki.altbuilds') . '#build-' . $build->build_id,
             ];
         }
 

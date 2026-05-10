@@ -2343,3 +2343,7 @@ img { max-width: 100%; display: block; }
     font-size: 0.68rem;
     text-align: right;
 }
+
+.altbuild-card[id] {
+    scroll-margin-top: 80px;
+}

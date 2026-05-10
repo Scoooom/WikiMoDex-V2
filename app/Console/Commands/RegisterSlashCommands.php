@@ -59,6 +59,18 @@ class RegisterSlashCommands extends Command
                     ]
                 ]
             ],
+            [
+                'name'        => 'wiki-search',
+                'description' => 'Search the PokéVoid wiki and get a summary with a link',
+                'options'     => [
+                    [
+                        'type'        => 3,
+                        'name'        => 'query',
+                        'description' => 'What to search for',
+                        'required'    => true,
+                    ]
+                ]
+            ],
         ];
 
         $response = Http::withHeaders([
