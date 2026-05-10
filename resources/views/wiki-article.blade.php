@@ -47,7 +47,7 @@
         <div class="wiki-article-meta">
             <span class="wiki-article-category">{{ $article->category }}</span>
             @auth
-                @if(auth()->user()->discord_id === '356260100064673814')
+                @if(auth()->user()->user_id === '356260100064673814')
                 <a href="{{ route('wiki.admin.edit', $article->slug) }}" class="wiki-edit-btn">Edit Article</a>
                 @endif
             @endauth

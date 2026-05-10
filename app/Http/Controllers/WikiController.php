@@ -38,7 +38,7 @@ class WikiController extends Controller
     private function isAdmin(): bool
     {
         $user = auth()->user();
-        return $user && $user->discord_id === self::ADMIN_DISCORD_ID;
+        return $user && $user->user_id === self::ADMIN_DISCORD_ID;
     }
 
     // ── Public routes ──────────────────────────────────────────────

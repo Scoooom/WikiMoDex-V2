@@ -49,7 +49,7 @@
         <div class="wiki-article-meta">
             <span class="wiki-article-category">Items & Shop</span>
             @auth
-                @if(auth()->user()->discord_id === '356260100064673814')
+                @if(auth()->user()->user_id === '356260100064673814')
                 <span class="wiki-edit-btn">Auto-generated · run <code>php artisan items:parse</code> to update</span>
                 @endif
             @endauth
