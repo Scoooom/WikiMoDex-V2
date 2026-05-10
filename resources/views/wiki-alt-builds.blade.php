@@ -120,6 +120,13 @@
                             <span class="altbuild-label">Stat Focus</span>
                             <span class="altbuild-val">{{ $build->stat_focus }}</span>
                         </div>
+                        <div class="altbuild-row">
+                            <span class="altbuild-label">Requires</span>
+                            <span class="altbuild-val">
+                                <strong>{{ $build->species }}</strong>
+                                <span style="color:var(--dim);font-size:0.8em"> (Signature form must be unlocked first)</span>
+                            </span>
+                        </div>
                         @if($build->ability1 || $build->ability2 || $build->ability3)
                         <div class="altbuild-row">
                             <span class="altbuild-label">Abilities</span>
