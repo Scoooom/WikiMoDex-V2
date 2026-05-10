@@ -415,6 +415,7 @@ function draw() {
   // Draw calendar cells
   var lastcol = 0
   var r = 0
+  var cellPositions = []
   for (var i = 0; i < m.length; i++) {
     if (lastcol > m[i].date.getUTCDay()) r++
     lastcol = m[i].date.getUTCDay()
@@ -423,6 +424,7 @@ function draw() {
     var Y = scalar(r, rows, TOP + PAD, height - BOT, PAD)
     var W = scalarSize(7, PAD, width - PAD - SB, PAD)
     var H = scalarSize(rows, TOP + PAD, height - BOT, PAD)
+    cellPositions.push([X, Y, W, H])
 
     var isToday = m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()
     var isHover = inRectArea(mouseX, mouseY, X, Y, W, H)
@@ -504,16 +506,12 @@ function draw() {
     }
   }
 
-  // Second pass: draw borders on top of everything
-  var lastcol2 = 0
-  var r2 = 0
+  // Second pass: draw borders on top of everything using stored positions
   for (var i = 0; i < m.length; i++) {
-    if (lastcol2 > m[i].date.getUTCDay()) r2++
-    lastcol2 = m[i].date.getUTCDay()
-    var X = scalar(lastcol2, 7, PAD, width - PAD - SB, PAD)
-    var Y = scalar(r2, rows, TOP + PAD, height - BOT, PAD)
-    var W = scalarSize(7, PAD, width - PAD - SB, PAD)
-    var H = scalarSize(rows, TOP + PAD, height - BOT, PAD)
+    var X = cellPositions[i][0]
+    var Y = cellPositions[i][1]
+    var W = cellPositions[i][2]
+    var H = cellPositions[i][3]
     var isToday2 = m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()
     noFill()
     strokeWeight(isToday2 ? 2 : 1)
