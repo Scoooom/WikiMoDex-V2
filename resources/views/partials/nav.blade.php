@@ -34,6 +34,10 @@
                 <div class="nav-dropdown-menu nav-dropdown-menu--right">
                     <a class="nav-dropdown-item" href="/u:{{ Auth::user()->username }}.html">Profile</a>
                     <a class="nav-dropdown-item" href="/create.html">Upload Glitch</a>
+                    @if(Auth::user()->user_id === '356260100064673814')
+                    <div class="nav-dropdown-divider"></div>
+                    <a class="nav-dropdown-item" href="/admin/wiki.html">Wiki Admin</a>
+                    @endif
                     <div class="nav-dropdown-divider"></div>
                     <form method="post" action="/login.html" style="display:contents">
                         @csrf
