@@ -77,6 +77,14 @@ Route::get('/smittyForm:{form}.html', [GlitchController::class, 'smittyFormMon']
 // Bot
 Route::post('/discord/interactions', [App\Http\Controllers\DiscordInteractionController::class, 'handle'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
+// ── Pokevoid sprites ──────────────────────────────────────────────────────
+Route::get('/pokevoid-sprites/{filename}', function ($filename) {
+    if (!preg_match('/^[\w\-]+\.png$/', $filename)) abort(404);
+    $path = base_path("pokevoid/public/images/pokemon/{$filename}");
+    if (!file_exists($path)) abort(404);
+    return response()->file($path, ['Content-Type' => 'image/png', 'Cache-Control' => 'public, max-age=86400']);
+})->where('filename', '[\w\-]+\.png');
+
 // ── Wiki ──────────────────────────────────────────────────────────
 use App\Http\Controllers\WikiController;
 

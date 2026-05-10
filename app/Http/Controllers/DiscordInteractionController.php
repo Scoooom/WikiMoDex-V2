@@ -85,6 +85,10 @@ class DiscordInteractionController extends Controller
             return $this->autocompleteAbility($query);
         }
 
+        if ($commandName === 'alt-build') {
+            return $this->autocompleteAltBuild($query);
+        }
+
         return $this->autocompleteForm($query);
     }
 
@@ -179,10 +183,119 @@ class DiscordInteractionController extends Controller
             return $this->handleAbility($enumName);
         }
 
+        if ($commandName === 'alt-build') {
+            $buildId = '';
+            foreach ($data['data']['options'] ?? [] as $option) {
+                if ($option['name'] === 'name') {
+                    $buildId = $option['value'];
+                    break;
+                }
+            }
+            return $this->handleAltBuild($buildId);
+        }
+
         return response()->json([
             'type' => self::CHANNEL_MESSAGE,
             'data' => ['content' => 'Unknown command.']
         ]);
+    }
+
+    private function autocompleteAltBuild(string $query): \Illuminate\Http\JsonResponse
+    {
+        $builds = \App\Models\AltBuild::where('name', 'like', "%{$query}%")
+            ->orWhere('species', 'like', "%{$query}%")
+            ->orderByRaw("CASE WHEN species LIKE ? THEN 0 ELSE 1 END", ["%{$query}%"])
+            ->limit(25)
+            ->get(['build_id', 'name', 'species', 'champion']);
+
+        $choices = $builds->map(fn($b) => [
+            'name'  => "{$b->species} — {$b->name}",
+            'value' => $b->build_id,
+        ])->values()->toArray();
+
+        return response()->json([
+            'type' => self::AUTOCOMPLETE,
+            'data' => ['choices' => $choices],
+        ]);
+    }
+
+    private function handleAltBuild(string $buildId): \Illuminate\Http\JsonResponse
+    {
+        $build = \App\Models\AltBuild::where('build_id', $buildId)->first();
+
+        if (!$build) {
+            return response()->json([
+                'type' => self::CHANNEL_MESSAGE,
+                'data' => ['content' => "Alt Build `{$buildId}` not found!"]
+            ]);
+        }
+
+        // Generate recoloured sprite
+        $spritePath = null;
+        if ($build->dex_number && $build->target_palette) {
+            $spritePath = $this->generateAltBuildSprite($build);
+        }
+
+        // Build embed fields
+        $types = collect([$build->type1, $build->type2])->filter()->join(' / ');
+        $abilities = collect([$build->ability1, $build->ability2, $build->ability3])->filter()->join(' / ');
+
+        $fields = [];
+        if ($types)    $fields[] = ['name' => 'Types',      'value' => $types,             'inline' => true];
+        if ($build->stat_focus) $fields[] = ['name' => 'Stat Focus', 'value' => $build->stat_focus, 'inline' => true];
+        if ($abilities) $fields[] = ['name' => 'Abilities',  'value' => $abilities,          'inline' => false];
+        if ($build->passive_ability) $fields[] = ['name' => 'Passive', 'value' => $build->passive_ability, 'inline' => true];
+        if ($build->prevents_evolution) $fields[] = ['name' => 'Note', 'value' => '⚠ Prevents evolution', 'inline' => true];
+
+        $championLabels = \App\Models\AltBuild::championLabel();
+        $champion = $championLabels[$build->champion] ?? ucfirst($build->champion ?? 'Unknown');
+
+        $embed = [
+            'title'       => "{$build->species} — {$build->name}",
+            'description' => "Champion: **{$champion}**",
+            'color'       => 0x7c5cbf,
+            'fields'      => $fields,
+            'footer'      => ['text' => 'WikiMoDex • Alt Builds'],
+            'url'         => 'https://void.scooom.xyz/wiki:alt-builds.html',
+        ];
+
+        $response = [
+            'type' => self::CHANNEL_MESSAGE,
+            'data' => ['embeds' => [$embed]],
+        ];
+
+        // Attach sprite if generated
+        if ($spritePath && file_exists($spritePath)) {
+            // Discord doesn't support file attachments via interactions JSON directly
+            // Instead we attach image URL via a temporary public path
+            $filename = basename($spritePath);
+            $embed['image'] = ['url' => "attachment://{$filename}"];
+            $response['data']['embeds'] = [$embed];
+            // Store path for multipart response
+            $response['_sprite_path'] = $spritePath;
+            $response['_sprite_filename'] = $filename;
+        }
+
+        return response()->json($response);
+    }
+
+    private function generateAltBuildSprite(\App\Models\AltBuild $build): ?string
+    {
+        $script   = base_path('scripts/render_alt_build_sprite.py');
+        $srcSprite = base_path("pokevoid/public/images/pokemon/{$build->dex_number}.png");
+        $outPath   = storage_path("app/alt-build-sprites/{$build->build_id}.png");
+
+        if (!file_exists($script) || !file_exists($srcSprite)) return null;
+
+        if (!is_dir(dirname($outPath))) mkdir(dirname($outPath), 0755, true);
+
+        $palette = escapeshellarg(json_encode($build->target_palette));
+        $src     = escapeshellarg($srcSprite);
+        $out     = escapeshellarg($outPath);
+
+        shell_exec("python3 {$script} {$src} {$palette} {$out} 2>/dev/null");
+
+        return file_exists($outPath) ? $outPath : null;
     }
 
     private function handleAbility(string $enumName): \Illuminate\Http\JsonResponse

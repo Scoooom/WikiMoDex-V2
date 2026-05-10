@@ -2247,3 +2247,19 @@ img { max-width: 100%; display: block; }
     color: #ffcc80;
     font-size: 0.78rem;
 }
+
+/* ── Alt build sprite canvas ─────────────────── */
+.altbuild-sprite-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 0 0.5rem;
+    background: color-mix(in srgb, var(--surface) 50%, transparent);
+    border-bottom: 1px solid var(--border2);
+}
+
+.altbuild-canvas {
+    width: 128px;
+    height: 128px;
+    image-rendering: pixelated;
+}

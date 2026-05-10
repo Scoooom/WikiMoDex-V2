@@ -46,6 +46,19 @@ class RegisterSlashCommands extends Command
                     ]
                 ]
             ],
+            [
+                'name'        => 'alt-build',
+                'description' => 'Look up a Champion Alt Build with recoloured sprite',
+                'options'     => [
+                    [
+                        'type'         => 3,
+                        'name'         => 'name',
+                        'description'  => 'The name of the alt build (e.g. Onix Crystal Leviathan)',
+                        'required'     => true,
+                        'autocomplete' => true,
+                    ]
+                ]
+            ],
         ];
 
         $response = Http::withHeaders([

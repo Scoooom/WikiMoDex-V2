@@ -16,7 +16,6 @@
         <button class="wiki-sidebar-close" id="wikiSidebarClose">✕</button>
     </div>
     <div class="wiki-sidebar-inner">
-        {{-- Jump to champion section --}}
         <div class="wiki-sidebar-section">
             <button class="wiki-sidebar-cat-toggle" aria-expanded="true">
                 <span>By Champion</span>
@@ -33,15 +32,8 @@
                     </li>
                     @endif
                 @endforeach
-                @foreach($grouped->keys()->diff(array_keys(\App\Models\AltBuild::championLabel())) as $key)
-                <li>
-                    <a href="#champion-{{ $key }}" class="wiki-sidebar-link">{{ ucfirst($key) }}</a>
-                </li>
-                @endforeach
             </ul>
         </div>
-
-        {{-- Wiki articles sidebar --}}
         @foreach($sidebarGrouped as $category => $articles)
         <div class="wiki-sidebar-section">
             <button class="wiki-sidebar-cat-toggle" aria-expanded="false">
@@ -67,8 +59,7 @@
 
         <div class="wiki-prose">
             <h1>Alt Builds</h1>
-            <p>Alt Builds are alternate forms of a Champion's Signature Pokémon — distinct identities with changed types, abilities, stat focuses, and movesets. Each is unlocked progressively through a Champion's Skill Tree.</p>
-            <p>Every Alt Build has a <strong>Rank</strong> (its tier of power), a <strong>Stat Focus</strong> (the stats it prioritises), and optional type changes. They require first unlocking the base Signature version of that Pokémon.</p>
+            <p>Alt Builds are alternate forms of a Champion's Signature Pokémon with changed types, abilities, stat focuses, and movesets. Sprites are recoloured using the game's <code>grayscale_overlay</code> shader applied to the HD source sprites.</p>
         </div>
 
         @php
@@ -97,7 +88,15 @@
 
             <div class="altbuild-grid">
                 @foreach($championBuilds as $build)
-                <div class="altbuild-card">
+                <div class="altbuild-card"
+                     data-dex="{{ $build->dex_number }}"
+                     data-palette='@json($build->target_palette ?? [])'
+                     data-dark='@json($build->dark_palette ?? [])'>
+
+                    <div class="altbuild-sprite-wrap">
+                        <canvas class="altbuild-canvas" width="160" height="160"></canvas>
+                    </div>
+
                     <div class="altbuild-card-header">
                         <div class="altbuild-card-title-wrap">
                             <span class="altbuild-species">{{ $build->species }}</span>
@@ -121,23 +120,18 @@
                             <span class="altbuild-label">Stat Focus</span>
                             <span class="altbuild-val">{{ $build->stat_focus }}</span>
                         </div>
-
                         @if($build->ability1 || $build->ability2 || $build->ability3)
                         <div class="altbuild-row">
                             <span class="altbuild-label">Abilities</span>
-                            <span class="altbuild-val">
-                                {{ collect([$build->ability1, $build->ability2, $build->ability3])->filter()->join(' / ') }}
-                            </span>
+                            <span class="altbuild-val">{{ collect([$build->ability1, $build->ability2, $build->ability3])->filter()->join(' / ') }}</span>
                         </div>
                         @endif
-
                         @if($build->passive_ability)
                         <div class="altbuild-row">
                             <span class="altbuild-label">Passive</span>
                             <span class="altbuild-val">{{ $build->passive_ability }}</span>
                         </div>
                         @endif
-
                         @if($build->key_moves && count($build->key_moves))
                         <div class="altbuild-row altbuild-row--moves">
                             <span class="altbuild-label">Key Moves</span>
@@ -148,7 +142,6 @@
                             </span>
                         </div>
                         @endif
-
                         @if($build->prevents_evolution)
                         <div class="altbuild-row">
                             <span class="altbuild-label">Evolution</span>
@@ -161,11 +154,93 @@
             </div>
         </div>
         @endforeach
-
     </main>
 </div>
 
 <script>
+// ── Grayscale Overlay shader (matches game's GLSL blend mode 3) ───────────
+function softLight(bg, fg) {
+    // GLSL: mix(1-2*(1-bg)*(1-fg), 2*bg*fg, step(bg, 0.5))
+    if (bg <= 0.5) {
+        return 2 * bg * fg;
+    } else {
+        return 1 - 2 * (1 - bg) * (1 - fg);
+    }
+}
+
+function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return [r, g, b];
+}
+
+function applyGrayscaleOverlay(imageData, targetPalette) {
+    const data = imageData.data;
+    const targets = targetPalette.map(hexToRgb);
+
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i+3] === 0) continue; // skip transparent
+
+        const r = data[i] / 255;
+        const g = data[i+1] / 255;
+        const b = data[i+2] / 255;
+
+        // Pick closest target colour based on pixel luminance
+        const lum = (r + g + b) / 3;
+        const idx = Math.min(
+            Math.floor(lum * targets.length),
+            targets.length - 1
+        );
+        const [tr, tg, tb] = targets[idx].map(c => c / 255);
+
+        // Apply soft-light blend: grayscale bg × target colour fg
+        data[i]   = Math.round(softLight(lum, tr) * 255);
+        data[i+1] = Math.round(softLight(lum, tg) * 255);
+        data[i+2] = Math.round(softLight(lum, tb) * 255);
+    }
+    return imageData;
+}
+
+// ── Load and render all sprites ───────────────────────────────────────────
+document.querySelectorAll('.altbuild-card').forEach(card => {
+    const dex     = card.dataset.dex;
+    const palette = JSON.parse(card.dataset.palette || '[]');
+    const canvas  = card.querySelector('.altbuild-canvas');
+    const ctx     = canvas.getContext('2d', { willReadFrequently: true });
+
+    if (!dex || !palette.length) {
+        canvas.style.display = 'none';
+        return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = `/pokevoid-sprites/${dex}.png`;
+
+    img.onload = () => {
+        // Draw at canvas size (160×160), centred with aspect ratio
+        const scale = Math.min(160 / img.width, 160 / img.height);
+        const w = img.width * scale;
+        const h = img.height * scale;
+        const x = (160 - w) / 2;
+        const y = (160 - h) / 2;
+
+        ctx.clearRect(0, 0, 160, 160);
+        ctx.drawImage(img, x, y, w, h);
+
+        // Apply recolour
+        const imageData = ctx.getImageData(0, 0, 160, 160);
+        applyGrayscaleOverlay(imageData, palette);
+        ctx.putImageData(imageData, 0, 0);
+    };
+
+    img.onerror = () => {
+        canvas.style.display = 'none';
+    };
+});
+
+// ── Sidebar init ──────────────────────────────────────────────────────────
 (function() {
     const sidebar  = document.getElementById('wikiSidebar');
     const toggle   = document.getElementById('wikiSidebarToggle');
@@ -178,7 +253,6 @@
     overlay.addEventListener('click', shut);
     if (localStorage.getItem('wikiSidebar') === 'open') open();
     sidebar.addEventListener('transitionend', () => localStorage.setItem('wikiSidebar', sidebar.classList.contains('open') ? 'open' : 'closed'));
-
     document.querySelectorAll('.wiki-sidebar-cat-toggle').forEach(btn => {
         btn.addEventListener('click', () => {
             const list = btn.nextElementSibling;
@@ -188,18 +262,8 @@
             btn.querySelector('.wiki-sidebar-chevron').style.transform = expanded ? 'rotate(-90deg)' : '';
         });
         const list = btn.nextElementSibling;
-        if (btn.getAttribute('aria-expanded') === 'true') {
-            list.style.maxHeight = list.scrollHeight + 'px';
-        }
+        if (btn.getAttribute('aria-expanded') === 'true') list.style.maxHeight = list.scrollHeight + 'px';
     });
-
-    // Anchor scroll fix
-    if (window.location.hash) {
-        setTimeout(() => {
-            const el = document.querySelector(window.location.hash);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-    }
 })();
 </script>
 @endsection

@@ -7,14 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class AltBuild extends Model
 {
     protected $fillable = [
-        'build_id', 'name', 'species', 'champion', 'rank',
+        'build_id', 'name', 'species', 'dex_number', 'champion', 'rank',
         'type1', 'type2', 'stat_focus', 'ability1', 'ability2', 'ability3',
         'passive_ability', 'key_moves', 'prevents_evolution', 'prerequisite_build',
+        'target_palette', 'dark_palette',
     ];
 
     protected $casts = [
         'prevents_evolution' => 'boolean',
         'key_moves'          => 'array',
+        'target_palette'     => 'array',
+        'dark_palette'       => 'array',
     ];
 
     public function getTypesAttribute(): string
