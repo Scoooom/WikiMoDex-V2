@@ -140,6 +140,8 @@ Route::get('/alt-build-stats/{buildId}.json', function ($buildId) {
     return response()->json(['stats' => $result, 'bst' => array_sum($calculated)])
         ->header('Cache-Control', 'public, max-age=3600');
 });
+
+Route::get('/pokevoid-atlas/{dex}.json', function ($dex) {
     if (!preg_match('/^\d+$/', $dex)) abort(404);
     $path = base_path("pokevoid/public/images/pokemon/{$dex}.png");
     if (!file_exists($path)) abort(404);
