@@ -85,6 +85,25 @@ Route::get('/pokevoid-sprites/{filename}', function ($filename) {
     return response()->file($path, ['Content-Type' => 'image/png', 'Cache-Control' => 'public, max-age=86400']);
 })->where('filename', '[\w\-]+\.png');
 
+Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {
+    $build = \App\Models\AltBuild::where('build_id', $buildId)->first();
+    if (!$build || !$build->dex_number || !$build->target_palette) abort(404);
+
+    $outPath = storage_path("app/alt-build-sprites/{$buildId}.png");
+
+    if (!file_exists($outPath)) {
+        $script    = base_path('scripts/render_alt_build_sprite.py');
+        $srcSprite = base_path("pokevoid/public/images/pokemon/{$build->dex_number}.png");
+        if (!file_exists($script) || !file_exists($srcSprite)) abort(404);
+        if (!is_dir(dirname($outPath))) mkdir(dirname($outPath), 0755, true);
+        $palette = escapeshellarg(json_encode($build->target_palette));
+        shell_exec("python3 {$script} " . escapeshellarg($srcSprite) . " {$palette} " . escapeshellarg($outPath) . " 2>/dev/null");
+        if (!file_exists($outPath)) abort(404);
+    }
+
+    return response()->file($outPath, ['Content-Type' => 'image/png', 'Cache-Control' => 'public, max-age=3600']);
+});
+
 // ── Wiki ──────────────────────────────────────────────────────────
 use App\Http\Controllers\WikiController;
 
