@@ -70,7 +70,6 @@ class WikiController extends Controller
         $article = WikiArticle::where('slug', $slug)->firstOrFail();
         $html = $this->markdown($article->content);
 
-        // Sidebar: all articles grouped
         $categoryOrder = WikiArticle::categoryOrder();
         $allArticles = WikiArticle::orderBy('order')->orderBy('title')->get();
         $grouped = collect($categoryOrder)
@@ -79,7 +78,30 @@ class WikiController extends Controller
             ])
             ->filter(fn($group) => $group->isNotEmpty());
 
-        return view('wiki-article', compact('article', 'html', 'grouped'));
+        // Cross-links to gallery pages based on article slug
+        $galleryMap = [
+            'glitch-system' => [
+                ['url' => '/gallery.html',     'icon' => '👾', 'label' => 'Mod Glitch Forms',  'sub' => 'Community-made forms'],
+                ['url' => '/galleryCore.html',  'icon' => '✨', 'label' => 'Core Glitches',     'sub' => 'Official glitch forms'],
+            ],
+            'smitty-forms' => [
+                ['url' => '/gallerySmitty.html',     'icon' => '⚡', 'label' => 'SMITTY Pokémon',   'sub' => 'All SMITTY forms'],
+                ['url' => '/gallerySmittyForm.html', 'icon' => '🌀', 'label' => 'SMITTY Forms',      'sub' => 'SMITTY alt forms'],
+            ],
+            'rivals' => [
+                ['url' => '/gallery.html', 'icon' => '👾', 'label' => 'Mod Glitch Forms', 'sub' => 'Browse uploaded forms'],
+            ],
+            'items-overview' => [
+                ['url' => '/wiki:items.html', 'icon' => '🎒', 'label' => 'Items Reference', 'sub' => 'Full item list by tier'],
+            ],
+            'eggs-gacha' => [
+                ['url' => '/gacha.html', 'icon' => '📅', 'label' => 'Gacha Calendar', 'sub' => 'Today\'s legendary & Pokérus'],
+            ],
+        ];
+
+        $galleryLinks = $galleryMap[$slug] ?? [];
+
+        return view('wiki-article', compact('article', 'html', 'grouped', 'galleryLinks'));
     }
 
     // ── Admin routes ───────────────────────────────────────────────
@@ -167,8 +189,11 @@ class WikiController extends Controller
             ->with('success', 'Article deleted.');
     }
 
-    public function items()
+    public function changelog()
     {
+        $entries = \App\Models\ChangelogEntry::orderBy('committed_at', 'desc')->get();
+        return view('wiki-changelog', compact('entries'));
+    }
         $byTier = \App\Models\GameItem::orderBy('name')
             ->get()
             ->groupBy('tier');

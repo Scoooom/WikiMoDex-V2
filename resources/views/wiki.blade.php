@@ -21,9 +21,20 @@
                     </a>
                 </li>
                 @endforeach
+                @if($category === 'Items & Shop')
+                <li><a href="{{ route('wiki.items') }}" class="wiki-cat-link">Items Reference</a></li>
+                @endif
             </ul>
         </div>
         @endforeach
+
+        {{-- Special pages --}}
+        <div class="wiki-category-card">
+            <h2 class="wiki-cat-title">Meta</h2>
+            <ul class="wiki-cat-list">
+                <li><a href="{{ route('wiki.changelog') }}" class="wiki-cat-link">Changelog</a></li>
+            </ul>
+        </div>
     </div>
 </div>
 @endsection

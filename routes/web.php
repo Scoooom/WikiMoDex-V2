@@ -82,6 +82,7 @@ use App\Http\Controllers\WikiController;
 
 Route::get('/wiki.html',               [WikiController::class, 'index'])->name('wiki.index');
 Route::get('/wiki:items.html',         [WikiController::class, 'items'])->name('wiki.items');
+Route::get('/wiki:changelog.html',     [WikiController::class, 'changelog'])->name('wiki.changelog');
 Route::get('/wiki:{slug}.html',        [WikiController::class, 'show'])->name('wiki.show');
 Route::get('/wiki-search.json',        [\App\Http\Controllers\WikiSearchController::class, 'search'])->name('wiki.search');
 

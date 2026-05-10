@@ -1921,3 +1921,150 @@ img { max-width: 100%; display: block; }
 }
 
 .gacha-credit a:hover { color: var(--accent3); }
+
+.wiki-article-updated {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    color: var(--dim);
+}
+
+/* ── Wiki gallery cross-links ────────────────── */
+.wiki-gallery-links {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border2);
+}
+
+.wiki-gallery-links-title {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--dim);
+    margin: 0 0 0.85rem;
+}
+
+.wiki-gallery-links-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.wiki-gallery-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+    min-width: 180px;
+}
+
+.wiki-gallery-link:hover {
+    border-color: var(--accent2);
+    background: var(--card2);
+}
+
+.wiki-gallery-link-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+.wiki-gallery-link-label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.wiki-gallery-link-sub {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+}
+
+/* ── Changelog ───────────────────────────────── */
+.changelog-list {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.changelog-entry {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border2);
+    position: relative;
+}
+
+.changelog-entry--major {
+    border-bottom-color: var(--border);
+}
+
+.changelog-entry--major::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--accent);
+    border-radius: 2px;
+}
+
+.changelog-entry-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.changelog-entry-left {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.changelog-version {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+    color: var(--accent2);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: 4px;
+    padding: 0.1rem 0.45rem;
+    flex-shrink: 0;
+}
+
+.changelog-version--hotfix {
+    background: color-mix(in srgb, #f5a623 15%, transparent);
+    color: #f5a623;
+    border-color: color-mix(in srgb, #f5a623 35%, transparent);
+}
+
+.changelog-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.changelog-date {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--dim);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.changelog-body {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    white-space: pre-line;
+    line-height: 1.6;
+}
