@@ -514,9 +514,9 @@ function draw() {
     var H = cellPositions[i][3]
     var isToday2 = m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()
     noFill()
-    strokeWeight(isToday2 ? 2 : 1)
-    stroke(isToday2 ? C_ACCENT[0] : C_BORDER[0], isToday2 ? C_ACCENT[1] : C_BORDER[1], isToday2 ? C_ACCENT[2] : C_BORDER[2])
-    rect(X, Y, W, H, CORNER)
+    strokeWeight(4)
+    stroke(255, 0, 0)
+    rect(X, Y, W, H)
     noStroke()
     strokeWeight(1)
   }
