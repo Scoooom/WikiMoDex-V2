@@ -101,11 +101,17 @@ def main():
     frame = extract_first_frame(img)
     result = apply_grayscale_overlay(frame, palette)
 
-    # Scale up to 256×256 preserving aspect ratio with padding
-    result.thumbnail((256, 256), Image.NEAREST)
+    # Scale up to fill 256×256, preserving aspect ratio with nearest-neighbor
+    w, h = result.size
+    scale = min(256 / w, 256 / h)
+    new_w = max(1, int(w * scale))
+    new_h = max(1, int(h * scale))
+    result = result.resize((new_w, new_h), Image.NEAREST)
+
+    # Center on canvas
     canvas = Image.new('RGBA', (256, 256), (0, 0, 0, 0))
-    x = (256 - result.width) // 2
-    y = (256 - result.height) // 2
+    x = (256 - new_w) // 2
+    y = (256 - new_h) // 2
     canvas.paste(result, (x, y))
     canvas.save(out_path, 'PNG')
     print(f"Saved: {out_path} ({result.width}x{result.height} frame)")
