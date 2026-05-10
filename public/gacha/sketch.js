@@ -32,15 +32,54 @@ function pullImage(i) {
   })
 }
 
+function normaliseSpeciesId(sid) {
+  // Game uses underscores; PokeAPI uses hyphens
+  var s = sid.replace(/_/g, '-')
+
+  // Special apostrophe cases
+  s = s.replace(/^farfetchd$/, "farfetch-d")
+  s = s.replace(/^galar-farfetchd$/, "farfetch-d-galar")
+  s = s.replace(/^sirfetchd$/, "sirfetch-d")
+
+  // ho-oh stays as-is after underscore replace
+  // Regional form prefix -> suffix (PokeAPI convention)
+  var regions = ['alola', 'galar', 'hisui', 'paldea']
+  for (var i = 0; i < regions.length; i++) {
+    var prefix = regions[i] + '-'
+    if (s.indexOf(prefix) === 0) {
+      s = s.slice(prefix.length) + '-' + regions[i]
+      break
+    }
+  }
+
+  return s
+}
+
+function getDisplayName(sid) {
+  // Pretty display: underscores/hyphens to spaces, title case
+  return sid.replace(/[-_]/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase() })
+}
+
 function pullRusImage(speciesId) {
   if (RusImages[speciesId] !== undefined) return
   RusImages[speciesId] = null
   if (pokeapi_loaded) {
-    P.getPokemon(speciesId).then(function(r) {
+    var apiId = normaliseSpeciesId(speciesId)
+    P.getPokemon(apiId).then(function(r) {
       if (r.sprites.front_default) {
         RusImages[speciesId] = loadImage(r.sprites.front_default)
       }
-    }).catch(function() {})
+    }).catch(function() {
+      // Try base form as fallback (strip form suffix)
+      var base = apiId.replace(/-[^-]+$/, '')
+      if (base !== apiId) {
+        P.getPokemon(base).then(function(r) {
+          if (r.sprites.front_default) {
+            RusImages[speciesId] = loadImage(r.sprites.front_default)
+          }
+        }).catch(function() {})
+      }
+    })
   }
 }
 
@@ -474,7 +513,7 @@ function draw() {
           noStroke()
         }
         // Pretty name: replace hyphens, title case
-        var displayName = sid.replace(/-/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase() })
+        var displayName = getDisplayName(sid)
         fill(157, 143, 192)
         noStroke()
         textSize(10)
