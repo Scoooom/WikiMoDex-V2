@@ -194,6 +194,9 @@ class WikiController extends Controller
         $entries = \App\Models\ChangelogEntry::orderBy('committed_at', 'desc')->get();
         return view('wiki-changelog', compact('entries'));
     }
+
+    public function items()
+    {
         $byTier = \App\Models\GameItem::orderBy('name')
             ->get()
             ->groupBy('tier');
