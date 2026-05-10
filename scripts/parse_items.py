@@ -222,8 +222,81 @@ def parse_perma_types(content):
     return [name.strip().rstrip(',') for name in match.group(1).splitlines()
             if name.strip() and not name.strip().startswith('//')]
 
+# ── Fallback descriptions for items with no JSON description ──────────────
+FALLBACK_DESCRIPTIONS = {
+    'ATTACK_TYPE_BOOSTER':  'Increases the power of a Pokémon\'s moves of a specific type by 20%.',
+    'DNA_SPLICERS':         'Fuse two Pokémon together, combining their Ability, base stats, types, and move pools.',
+    'GRIP_CLAW':            'Extends the duration of binding and trapping moves.',
+    'LUCKY_EGG':            'Increases the holder\'s EXP gain per battle.',
+    'MULTI_LENS':           'Attacks hit one additional time at reduced power per stack.',
+    'MINI_BLACK_HOLE':      'Every turn, the holder acquires one held item from the opposing Pokémon.',
+    'PP_UP':                'Permanently increases the PP of one move by up to 3 for every 5 maximum PP.',
+    'PP_MAX':               'Maximises the PP of one Pokémon\'s move to its highest possible value.',
+    'NUGGET':               'Sell for a small amount of money.',
+    'BIG_NUGGET':           'Grants a large amount of money when picked up.',
+    'RELIC_GOLD':           'Grants a very large amount of money when picked up.',
+    'COIN_CASE':            'After every 10th battle, receive 10% of your current money as interest.',
+    'LURE':                 'Increases the encounter rate of wild Pokémon for a set number of steps.',
+    'SUPER_LURE':           'Greatly increases the encounter rate of wild Pokémon.',
+    'MAX_LURE':             'Maximises the encounter rate of wild Pokémon.',
+    'SOOTHE_BELL':          'Increases the rate at which a Pokémon\'s friendship grows.',
+    'EXP_CHARM':            'Moderately increases EXP gain for all party members.',
+    'SUPER_EXP_CHARM':      'Greatly increases EXP gain for all party members.',
+    'GOLDEN_EGG':           'Significantly increases EXP gain for all party members.',
+    'GOLDEN_EXP_CHARM':     'Maximises EXP gain for all party members.',
+    'LOCK_CAPSULE':         'Allows you to lock the rarity tier of items when rerolling.',
+    'ETHER':                'Restores 10 PP of one move for one Pokémon.',
+    'MAX_ETHER':            'Fully restores the PP of one move for one Pokémon.',
+    'ELIXIR':               'Restores 10 PP of all moves for one Pokémon.',
+    'MAX_ELIXIR':           'Fully restores the PP of all moves for one Pokémon.',
+    'POTION':               'Restores 20 HP for one Pokémon.',
+    'SUPER_POTION':         'Restores 50 HP or 25% HP for one Pokémon, whichever is higher.',
+    'HYPER_POTION':         'Restores 200 HP or 50% HP for one Pokémon, whichever is higher.',
+    'MAX_POTION':           'Fully restores HP for one Pokémon.',
+    'FULL_RESTORE':         'Fully restores HP and cures all status conditions for one Pokémon.',
+    'FULL_HEAL':            'Cures all status conditions for one Pokémon.',
+    'REVIVE':               'Revives one fainted Pokémon and restores 50% of its HP.',
+    'MAX_REVIVE':           'Revives one fainted Pokémon and fully restores its HP.',
+    'SACRED_ASH':           'Revives all fainted Pokémon and fully restores their HP.',
+    'ABILITY_CHARM':        'Dramatically increases the chance of a wild Pokémon having its Hidden Ability.',
+    'GOLDEN_POKEBALL':      'Adds 1 extra item option at the end of every battle.',
+    'RARE_CANDY':           'Increases a Pokémon\'s level by 1.',
+    'RARER_CANDY':          'Increases all party members\' level by 1.',
+    'VOUCHER':              'Redeem at the Egg Gacha for a standard egg.',
+    'PLAYER_BASE_STAT_BOOSTER': 'Increases the holder\'s base stat by 1%.',
+    'SELECTABLE_PMONEY_1':  'Choose a small ΩGOLD reward.',
+    'SELECTABLE_PMONEY_2':  'Choose a medium ΩGOLD reward.',
+    'SELECTABLE_PMONEY_4OR5': 'Choose a large ΩGOLD reward.',
+    'TEMP_STAT_BOOSTER':    'Raises one stat for all party members by 1 stage for 5 battles.',
+    'MOVE_UPGRADE':         'Randomly upgrades one of your party\'s moves — power, priority, effect, chance, multi-hit, and more.',
+    'SKILL_POINTS':         'Gain Skill Points to unlock nodes in your Champion\'s Skill Tree.',
+    'SKILL_TOKENS':         'Gain Skill Tree Tokens to level up your Champion\'s Skill Tree.',
+}
+
 def key_to_name(key):
     return key.replace('_', ' ').title()
+
+def get_item_info(key, i18n, key_to_class_map):
+    """Get name and description with multiple fallback strategies."""
+    info = i18n.get(key, {})
+    name = info.get('name', '')
+    desc = info.get('description', '')
+
+    # Class-based fallback for missing description
+    if not desc:
+        cls = key_to_class_map.get(key, '')
+        if cls:
+            cls_info = i18n.get(cls, {})
+            desc = re.sub(r'\{\{[^}]+\}\}', '…', cls_info.get('description', ''))
+
+    # Hardcoded fallback
+    if not desc:
+        desc = FALLBACK_DESCRIPTIONS.get(key, '')
+
+    if not name:
+        name = key_to_name(key)
+
+    return name, desc
 
 # ── Main ───────────────────────────────────────────────────────────────────
 def main():
@@ -233,6 +306,11 @@ def main():
     print("Parsing modifier-type.ts pools...")
     with open(MODIFIER_TYPE_TS) as f:
         ts_content = f.read()
+
+    # Build key -> class map from modifierTypes object
+    key_to_class_map = dict(re.findall(
+        r'^\s{4}(\w+):\s*\(\)\s*=>\s*new\s+(\w+)', ts_content, re.MULTILINE
+    ))
 
     pool_data = parse_pools(ts_content)
 
@@ -275,17 +353,9 @@ def main():
         conditional = 1 if data['conditional'] else 0
         condition_text = data.get('condition_text') or ''
 
-        info = (i18n.get(key) or
-                i18n.get(key + 'ModifierType') or
-                i18n.get(key.replace('_', '').title() + 'ModifierType') or
-                {})
-
-        name = info.get('name') or key_to_name(key)
-        desc = info.get('description', '')
+        name, desc = get_item_info(key, i18n, key_to_class_map)
 
         if not name or key.endswith('_QUEST') or key.startswith('ENEMY_'):
-            skipped += 1
-            continue
 
         sql = f"""
             INSERT INTO game_items (`key`, name, description, tier, pool, conditional, spawn_condition, created_at, updated_at)
@@ -308,9 +378,7 @@ def main():
             skipped += 1
 
     for key in perma_keys:
-        info = i18n.get(key, {})
-        name = info.get('name') or key_to_name(key)
-        desc = info.get('description', '')
+        name, desc = get_item_info(key, i18n, key_to_class_map)
 
         if not name:
             skipped += 1
