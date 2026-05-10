@@ -989,5 +989,119 @@ MD,
         ]);
 
         $this->command->info('WikiSeeder: items-reference article added.');
+
+        // Unlockables article
+        WikiArticle::create([
+            'slug'     => 'unlockables',
+            'title'    => 'Unlockables',
+            'category' => 'Getting Started',
+            'order'    => 10,
+            'content'  => <<<'MD'
+# Unlockables
+
+PokéVoid has a deep unlock tree — game modes, items, and secret rewards are all gated behind progression milestones. This page documents everything that can be unlocked, how to unlock it, and what it does.
+
+---
+
+## Game Modes
+
+Modes unlock automatically when their condition is met at the end of a run. A notification screen plays when you earn a new mode.
+
+| Mode | How to Unlock |
+|------|---------------|
+| **Gauntlet Journey** | Available from the start. Unlock the Journey variant by catching 15 Pokémon and completing the Starter Catch Quest from the Shop. |
+| **Gauntlet Nuzlight** | Complete the Nuzlight Quest — given at the start. Fainted Pokémon revive at wave 10 milestones; no healing items in shops. |
+| **Gauntlet Nuzlocke** | Complete the Nuzlocke Quest — given at the start. Fainted Pokémon are permanently lost. |
+| **Gauntlet Rogue** | Available from the start. Draft 2 random Pokémon; reroll with ΩGOLD. |
+| **Gauntlet Nuzlight Rogue** | Win 2 Nuzlight runs (or 2 Chaos Nuzlight runs of any length). |
+| **Gauntlet Nuzlocke Rogue** | Win 2 Nuzlocke runs (or 2 Chaos Nuzlocke runs of any length). |
+| **The Void** (Nightmare) | Defeat every rival trainer type at least once across your runs. A cutscene plays when the final rival falls. |
+| **Chaos Journey** | Complete the Journey Unlock Quest **and** either win a Chaos Rogue run or win 3 total runs. |
+| **Chaos Void** | Unlock The Void **and** win at least 1 Nightmare run. |
+| **Chaos Rogue Void** | Win at least 1 Chaos Void run (any length). |
+| **Chaos Infinite** | Win at least 2 Chaos Rogue Void runs. |
+| **Chaos Infinite Rogue** | Reach wave 5000 or higher in Endless mode. |
+| **Endless** | Available from the start (shown on title screen after first Classic victory). |
+| **Endless (Spliced)** | Available from the start alongside Endless. |
+| **Daily Run** | Available from the start. |
+
+> Unlocking a new game mode also unlocks new items, abilities, and shop options that appear in all future runs.
+
+---
+
+## Items
+
+These items are locked until a specific in-game condition is met. Once unlocked they can appear in the reward pool permanently.
+
+| Item | How to Unlock |
+|------|---------------|
+| **Mini Black Hole** | Win any run (Classic or higher). Awarded automatically on your first victory in `handleUnlocks()`. |
+| **Eviolite** | Win any run while having a Pokémon in your party that can still evolve. |
+| **AnyXM (Luxury tier)** | Unlock **The Void Overtaken** (see Secrets below). Requires Glitch Pieces to appear. |
+
+---
+
+## Glitch Forms (via Rival Quests)
+
+Glitch Forms are unlocked through the Rival Quest system rather than a direct progression gate.
+
+1. **Defeat a Rival** during a run — this unlocks a Glitch Quest for a specific Pokémon.
+2. **Purchase the Quest** from the OmegaShop (it appears randomly; reroll if needed).
+3. **Complete the Quest objective** during a run (e.g. defeating a certain number of Pokémon with a specific move type).
+4. The Glitch Form is **permanently unlocked** for that Pokémon in all future runs.
+
+There are over 60 Glitch Quests, one per Pokémon. Examples:
+
+| Quest | Objective |
+|-------|-----------|
+| Tauros Electric Hit | Have Tauros get hit by 8 Electric-type moves |
+| Kecleon Color Change | Activate Kecleon's Color Change ability 13 times |
+| Charizard Ground KO | Defeat 15 Pokémon with Charizard using Ground-type moves |
+| Gengar Special Wave | Complete 30 waves with Gengar in first slot, no Ghost/Poison moves, at least 1 Electric move |
+| Hitmon Duo Win | Win a run with both Hitmonlee and Hitmonchan in your party |
+| Scyther Trio Win | Complete the final 50 waves with only 3 Pokémon including Scyther |
+
+See the [Quests & Bounties](/wiki:quests.html) article for the full list.
+
+---
+
+## Smitty Forms
+
+Smitty Forms are unlocked differently from Glitch Forms — they require specific combinations of 4 Smitty Items applied to a Pokémon.
+
+- Some forms require a **specific base Pokémon** (e.g. Rotom → Smitom)
+- Others are **Universal** — any Pokémon can be used
+
+When a new Smitty Form is unlocked, you receive a notification. Enter the form's console code to reveal its recipe. The Discord community maintains a list of known combinations.
+
+---
+
+## Secrets
+
+These are high-tier unlocks with special significance — earning them triggers unique cutscenes.
+
+### The Void Overtaken
+**How:** Win a Nightmare (The Void) run for the first time.
+
+**Rewards unlocked simultaneously:**
+- **The Void Overtaken** status — permanent account flag, enables Luxury-tier AnyXMs in the reward pool
+- **Smitty Nugget** — a special move/item
+- **Nugget of Smitty** — a second special reward
+- **Many More Nuggets** — grants the Reward Choices Plus ΩITEM (more items shown per shop visit)
+
+A special story cutscene plays on first Void victory. The rewards above are only granted once.
+
+### Normal Effectiveness
+**How:** Complete the hidden **Normal Effectiveness Quest** — activated via the bounty code `W3K7P2`. This quest involves knocking out Pokémon under specific conditions. Once completed it permanently changes Normal-type effectiveness in your runs.
+
+### Universal Smitty Form Unlocks
+**How:** Rare chance during high-wave Nightmare runs (wave 300+) or upon defeating all Smitty trainer variants. A random Universal Smitty Form is unlocked — forms that can be applied to **any** base Pokémon.
+
+### Champions (Freed from the Void)
+All Champions except Apollo and Diana start locked. Each requires collecting specific Essences to free them from the Void's corruption. Once freed, a Champion is permanently playable — but starts with an empty Pokémon collection and must be built up from scratch.
+MD,
+        ]);
+
+        $this->command->info('WikiSeeder: unlockables article added.');
     }
 }
