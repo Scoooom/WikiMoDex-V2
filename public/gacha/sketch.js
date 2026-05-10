@@ -516,7 +516,8 @@ function draw() {
     noFill()
     strokeWeight(isToday2 ? 2 : 1)
     stroke(isToday2 ? C_ACCENT[0] : C_BORDER[0], isToday2 ? C_ACCENT[1] : C_BORDER[1], isToday2 ? C_ACCENT[2] : C_BORDER[2])
-    rect(X, Y, W, H, 0)
+    fill(0, 0, 0, 0)
+    rect(X, Y, W, H, CORNER)
     noStroke()
     strokeWeight(1)
   }
