@@ -88,6 +88,7 @@
                         <tr>
                             <th>Item</th>
                             <th>Description</th>
+                            <th>Spawn Condition</th>
                             @if($tier !== 'OMEGA')
                             <th>Pool</th>
                             @endif
@@ -95,12 +96,16 @@
                     </thead>
                     <tbody>
                         @foreach($byTier[$tier] as $item)
-                        <tr class="items-row" data-search="{{ strtolower($item->name . ' ' . $item->description) }}">
-                            <td class="items-name">
-                                {{ $item->name }}
-                                @if($item->conditional)<span class="items-conditional" title="Conditional — only appears in certain situations">★</span>@endif
-                            </td>
+                        <tr class="items-row" data-search="{{ strtolower($item->name . ' ' . $item->description . ' ' . $item->spawn_condition) }}">
+                            <td class="items-name">{{ $item->name }}</td>
                             <td class="items-desc">{{ $item->description ?: '—' }}</td>
+                            <td class="items-condition">
+                                @if($item->spawn_condition)
+                                    <span class="items-condition-badge">★ {{ $item->spawn_condition }}</span>
+                                @else
+                                    <span class="items-condition-always">Always</span>
+                                @endif
+                            </td>
                             @if($tier !== 'OMEGA')
                             <td class="items-pool">{{ ucfirst($item->pool) }}</td>
                             @endif

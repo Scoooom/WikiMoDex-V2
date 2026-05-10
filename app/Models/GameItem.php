@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class GameItem extends Model
 {
-    protected $fillable = ['key', 'name', 'description', 'tier', 'pool', 'conditional'];
+    protected $fillable = ['key', 'name', 'description', 'tier', 'pool', 'conditional', 'spawn_condition'];
 
     protected $casts = ['conditional' => 'boolean'];
 
