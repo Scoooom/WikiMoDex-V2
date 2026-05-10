@@ -374,7 +374,7 @@ var C_BG       = [19,  16,  34]
 var C_CARD     = [34,  25,  64]
 var C_CARD2    = [43,  32,  80]
 var C_HOVER    = [58,  44,  100]
-var C_BORDER   = [53,  40,  96]
+var C_BORDER   = [80,  60,  130]
 var C_ACCENT   = [124, 92,  191]
 var C_TEXT     = [237, 230, 255]
 var C_MUTED    = [157, 143, 192]
@@ -446,11 +446,12 @@ function draw() {
       rect(X, Y, W, H, CORNER)
     }
     // Border on top
-    strokeWeight(0.5)
+    strokeWeight(1)
     stroke(C_BORDER[0], C_BORDER[1], C_BORDER[2])
     noFill()
     rect(X, Y, W, H, CORNER)
     noStroke()
+    strokeWeight(1)
 
     // Click handler
     if (isHover && click) {
