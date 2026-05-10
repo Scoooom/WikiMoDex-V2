@@ -45,6 +45,8 @@ function normaliseSpeciesId(sid) {
     if (s.indexOf(regions[i]) === 0) { s = s.slice(regions[i].length); break }
   }
   var overrides = {
+    'nidoran-f':    'nidoran-f',
+    'nidoran-m':    'nidoran-m',
     'farfetchd':'farfetch-d','sirfetchd':'sirfetch-d','oricorio':'oricorio-baile',
     'indeedee':'indeedee-male','pumpkaboo':'pumpkaboo-average','gourgeist':'gourgeist-average',
     'basculin':'basculin-red-striped','meowstic':'meowstic-male','aegislash':'aegislash-shield',
@@ -223,8 +225,8 @@ function showSidebar(dayObj, rus, d) {
     var cell = document.createElement('div')
     cell.className = 'rus-cell'
     var img = document.createElement('img')
+    img.src = ''
     img.alt = getDisplayName(sid)
-    // Fetch via PokeAPI
     if (P) {
       P.getPokemon(normaliseSpeciesId(sid)).then(function(r) {
         if (r.sprites.front_default) img.src = r.sprites.front_default

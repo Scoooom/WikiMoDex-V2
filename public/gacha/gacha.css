@@ -159,5 +159,6 @@
     align-items: center;
     gap: 2px;
 }
-.rus-cell img { width: 100%; image-rendering: pixelated; }
+.rus-cell img { width: 100%; image-rendering: pixelated; min-height: 40px; background: var(--card2); }
+.rus-cell img:not([src]), .rus-cell img[src=""] { visibility: hidden; }
 .rus-name { font-size: 8px; color: var(--dim); text-align: center; line-height: 1.2; }
