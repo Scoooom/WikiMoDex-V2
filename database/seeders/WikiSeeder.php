@@ -778,6 +778,216 @@ MD,
             WikiArticle::create($article);
         }
 
-        $this->command->info('WikiSeeder: inserted ' . count($articles) . ' articles.');
+        // Items reference article
+        WikiArticle::create([
+            'slug'     => 'items-reference',
+            'title'    => 'Items Reference',
+            'category' => 'Items & Shop',
+            'order'    => 10,
+            'content'  => <<<'MD'
+# Items Reference
+
+All items available in PokéVoid, organised by tier. Tiers determine how rare an item is and which tier of Poké Ball is needed to see them in rewards.
+
+Items with a ★ symbol have conditional appearance — they only show up when relevant to your current party or game state.
+
+---
+
+## Common
+
+The most frequently appearing items. Appear from the start of a run.
+
+| Item | Description |
+|------|-------------|
+| **Glitch Piece** | A mysterious piece of glitch. Collect 2+ to unlock Glitch Items; 5+ for Glitch Form Change items. |
+| **Move Upgrade** | Randomly upgrades one of your party's moves — power, priority, effect, chance, multi-hit, and more. |
+| **AnyXM (Common)** | Teach a Common-tier move to any Pokémon, ignoring compatibility. |
+| **AnyXM (Great)** | Teach a Great-tier move to any Pokémon. |
+| **AnyXM (Ultra)** | Teach an Ultra-tier move to any Pokémon. |
+| **TM (Common)** | Teach a Common-tier move to a compatible Pokémon. |
+| **TM (Great)** | Teach a Great-tier move to a compatible Pokémon. |
+| **Any Ability** | Give any ability to any Pokémon. ★ Requires Glitch Pieces. |
+| **Any Passive Ability** | Set any ability as a passive on any Pokémon. ★ Requires Glitch Pieces. |
+| **Ultra Ball** | Receive Ultra Balls. ★ Only appears if you have fewer than 10. |
+| **Super Potion** | Restores HP for one Pokémon. ★ Only appears when party is injured. |
+
+---
+
+## Great
+
+Uncommon items. More powerful consumables and Glitch tools begin appearing here.
+
+| Item | Description |
+|------|-------------|
+| **Move Upgrade** | Higher-weighted move upgrade rolls. |
+| **AnyXM (Great / Ultra)** | Any-compatibility TMs at Great and Ultra tier. |
+| **Ability Switcher** | Swap a Pokémon's current ability with one of its other abilities. ★ Requires Glitch Pieces. |
+| **Type Switcher** | Changes a Pokémon's primary and secondary types. ★ Requires Glitch Pieces. |
+| **Primary Type Switcher** | Changes a Pokémon's primary type only. |
+| **Secondary Type Switcher** | Changes a Pokémon's secondary type only. |
+| **Stat Switcher** | Swap two of a Pokémon's base stats (e.g. ATK ↔ DEF). ★ Requires Glitch Pieces. |
+| **Add Pokémon** | Adds a Pokémon to your party. ★ Requires Glitch Pieces. |
+| **Ability Release** | Release a Pokémon to have another adopt its ability. ★ Party size > 1. |
+| **Type Release** | Release a Pokémon to have another inherit its types. ★ Party size > 1. |
+| **Move Release** | Release a Pokémon to have another inherit its moves. ★ Party size > 1. |
+| **Essences** | Collect Essences — use 4x instead of releasing a Pokémon for Release Items, or exchange with the Collector. |
+| **Glitch Piece** | Higher drop weight than Common tier. |
+| **Temp Stat Booster** | Raises one stat by 1 stage for all party members for 5 battles. |
+| **TM (Common / Great)** | Standard compatible TMs. |
+| **Soothe Bell** | Increases friendship gain per victory by 50%. |
+| **Full Heal** | Cures all status conditions for one Pokémon. ★ Only appears when a Pokémon has a status condition. |
+| **Revive** | Revives one fainted Pokémon and restores 50% HP. ★ Only appears when a Pokémon has fainted. |
+| **Max Revive** | Revives one fainted Pokémon fully. ★ Only appears when a Pokémon has fainted. |
+| **Sacred Ash** | Revives all fainted Pokémon, fully restoring HP. ★ Only when half or more of party is fainted. |
+| **Hyper Potion** | Restores a large amount of HP. ★ Appears when HP is low. |
+| **Max Potion** | Restores full HP for one Pokémon. ★ Appears when HP is very low. |
+| **Full Restore** | Fully heals HP and cures status for one Pokémon. ★ Conditional. |
+| **Dire Hit** | Greatly raises the critical-hit ratio for one battle. |
+| **Big Nugget** | Grants a large amount of money. ★ Not in final classic wave. |
+| **Evolution Item** | Causes certain Pokémon to evolve. Scales with wave index. |
+| **Memory Mushroom** | Recall one Pokémon's forgotten level-up move. ★ Only when a Pokémon has forgotten moves. |
+| **Tera Shard** | Terastallizes the holder for up to 25 battles (35 with Tera Orb). |
+| **Voucher** | Egg voucher. ★ Not in Daily mode; reduced chance after rerolls. |
+| **ΩGOLD (Small)** | Grants a small amount of persistent OmegaMoney. ★ Requires Glitch Pieces. |
+| **Selectable ΩGOLD** | Choose an ΩGOLD reward amount. |
+
+---
+
+## Ultra
+
+Rare items. Powerful held items, form changes, and advanced Glitch tools.
+
+| Item | Description |
+|------|-------------|
+| **Move Upgrade** | High-weight upgrade rolls. |
+| **AnyXM (Great / Ultra)** | Any-compatibility TMs. |
+| **Ability Switcher** | ★ Requires Glitch Pieces. |
+| **Any Ability / Any Passive Ability** | ★ Requires Glitch Pieces. |
+| **Type Switcher / Stat Switcher** | ★ Requires Glitch Pieces. |
+| **Sacrifice Items** | Release a Pokémon to boost another's stats, types, moves, abilities, or passive. |
+| **Add Pokémon** | Adds a Pokémon to the party. ★ Conditional on Glitch Pieces and mid-run state. |
+| **Primary / Secondary Type Switcher** | |
+| **Big Nugget** | Large money reward. |
+| **PP Max** | Maximises the PP of one Pokémon's move. |
+| **Mint** | Changes a Pokémon's nature (and permanently unlocks it for that starter). |
+| **Rare Evolution Item** | Triggers rare evolutions. Scales with wave index. |
+| **Form Change Item** | Triggers specific form changes (Mega, Smitty, Glitch). Scales with wave index. |
+| **Amulet Coin** | Increases money rewards by 20%. ★ Not in final classic wave. |
+| **Eviolite** | Boosts Defense and Sp. Def for Pokémon that can still evolve. ★ Requires unlock. |
+| **Species Stat Booster** | Boosts a species-specific stat (e.g. Thick Club for Marowak). |
+| **Leek** | Boosts Farfetch'd critical-hit ratio. ★ Only if you have Farfetch'd/Sirfetch'd. |
+| **Toxic Orb** | Badly poisons the holder — pairs with Guts, Quick Feet, Poison Heal, etc. ★ Ability/move conditional. |
+| **Flame Orb** | Burns the holder — pairs with Guts, Flare Boost, etc. ★ Ability/move conditional. |
+| **Reviver Seed** | Automatically revives the holder for 50% HP after fainting from a direct hit. |
+| **Attack Type Booster** | Increases the power of moves of a specific type by 20%. |
+| **TM (Ultra)** | Compatible Ultra-tier TMs. |
+| **Golden Punch** | Grants 50% of direct damage dealt as money. ★ Not in final classic wave. |
+| **IV Scanner** | Reveals 2 IVs of a wild Pokémon per stack (best IVs shown first). ★ Not in final classic wave. |
+| **EXP. All** | Non-participants receive 20% of a single participant's EXP. ★ Not in final classic wave. |
+| **EXP. Balance** | Weighs EXP gains toward lower-level party members. ★ Not in final classic wave. |
+| **Tera Orb** | Tera Shards last 10 more battles. Scales with wave index. |
+| **Quick Claw** | 10% chance to move first regardless of speed (after priority). |
+| **Voucher Plus** | Enhanced egg voucher. ★ Not in Daily mode; reduced chance after rerolls. |
+| **Wide Lens** | Increases move accuracy. |
+| **ΩGOLD (Medium)** | Selectable mid-tier ΩGOLD reward. ★ Requires Glitch Pieces. |
+| **Champion Type Ball** | A Poké Ball matching your Champion's primary type. ★ Conditional on Champion type and ball count. |
+
+---
+
+## Rogue
+
+Very rare items. Mostly passive combat items and powerful glitch tools.
+
+| Item | Description |
+|------|-------------|
+| **Move Upgrade** | Rogue-tier weighted upgrade rolls. |
+| **Rogue Ball** | High catch-rate Poké Ball. ★ Only if you have fewer than 10. |
+| **Champion Type Ball (Random)** | A random type ball. ★ Conditional on total ball count. |
+| **Relic Gold** | Very large money reward. ★ Not in final classic wave. |
+| **Leftovers** | Heals 1/16 of max HP every turn. ★ Rare conditional drop. |
+| **Shell Bell** | Heals 1/8 of damage dealt. ★ Rare conditional drop. |
+| **DNA Splicers** | Fuse two Pokémon together. ★ Only in non-Spliced modes with unfused party members. |
+| **Skill Points** | Gain Skill Points for your Champion's Skill Tree. |
+| **Berry Pouch** | 10% chance a used berry won't be consumed. |
+| **Grip Claw** | Extends the duration of binding moves. |
+| **Scope Lens** | Boosts the holder's critical-hit ratio. |
+| **Baton** | Pass effects when switching Pokémon; bypasses traps. |
+| **Base Stat Booster** | Boosts a random base stat. |
+| **AnyXM (Master)** | Teach a Master-tier move to any Pokémon. ★ Requires Glitch Pieces. |
+| **AnyXM (Ultra)** | Any-compatible Ultra TM. ★ Requires Glitch Pieces. |
+| **Focus Band** | 10% chance to survive a KO hit with 1 HP. |
+| **King's Rock** | 10% chance for attack moves to cause flinching. |
+| **Form Change Item** | Triggers form changes. |
+| **Any Ability / Any Passive Ability** | ★ Requires Glitch Pieces. |
+| **Party Ability** | Applies one ability to **all** current party members for the run. ★ Rare; requires Glitch Pieces. |
+| **Primary / Secondary Type Switcher** | |
+| **Map** | Lets you choose your destination at crossroads. ★ Chaos modes and before wave 90/100. |
+| **Voucher Plus Plus** | Premium egg voucher. ★ Not in Daily/Endless modes; reduced chance after rerolls. |
+
+---
+
+## Master
+
+The rarest in-run items. Game-changing permanent equipment.
+
+| Item | Description |
+|------|-------------|
+| **Soul Dew** | Increases the influence of a Pokémon's nature on its stats by 10% (additive). |
+| **Stat Release** | Release a Pokémon to boost another's specific stat by 15%. |
+| **Rarer Candy** | Like Rare Candy but rarer. |
+| **Shell Bell** | ★ Higher weight in Chaos modes. |
+| **Leftovers** | ★ Higher weight in Chaos modes. |
+| **Any Smitty Passive Ability** | Set a Smitty-exclusive passive ability on any Pokémon. ★ Requires Glitch Pieces. |
+| **Any Smitty Ability** | Give a Smitty-exclusive ability to any Pokémon. ★ Requires Glitch Pieces. |
+| **Candy Jar** | Increases levels gained from Rare Candy items by 1. ★ Not in final classic wave. |
+| **ΩGOLD (Large/Huge)** | Selectable large ΩGOLD reward. ★ Requires Glitch Pieces. |
+| **Mega Bracelet** | Makes Mega Stones available as future rewards. ★ Only if not already owned. |
+| **Dynamax Band** | Makes Max Mushrooms available as future rewards. ★ Only if not already owned. |
+| **Master Ball** | The ultimate Poké Ball. ★ Only if you have fewer than 5. |
+| **Shiny Charm** | Dramatically increases shiny encounter rate. |
+| **Healing Charm** | Increases HP restoration from moves and items by 10% (excludes Revives). |
+| **Multi Lens** | Attacks hit one additional time at reduced power per stack. |
+| **Voucher Premium** | Premium egg voucher. ★ Not in Daily/Endless modes. |
+| **Mini Black Hole** | Every turn, the holder acquires one held item from the foe. ★ Requires The Void unlock. |
+| **AnyXM (Luxury)** | Teach a Luxury-tier move to any Pokémon. ★ Requires Glitch Pieces + The Void Overtaken unlock. |
+| **AnyXM (Master)** | Teach a Master-tier move to any Pokémon. ★ Requires Glitch Pieces. |
+| **Party Ability** | Applies one ability to all current party members. ★ Requires Glitch Pieces. |
+
+---
+
+## ΩITEMS (OmegaItems)
+
+Purchased from the OmegaShop with ΩGOLD. Persist across runs. See [Omega Features](/wiki:omega-features.html) for full details.
+
+| Item | Description |
+|------|-------------|
+| **Glitch Piece Start Plus/EX/SMITTY** | Start each run with 2/3/4 Glitch Pieces. |
+| **Glitch Piece Plus/EX/SMITTY** | Get 3–4 / 4 / 4–5 Glitch Pieces per pickup. |
+| **Glitch Piece Max Plus/EX/SMITTY** | Increase maximum Glitch Piece cap by 1/2/3. |
+| **Reroll Cost ×1/2/3** | Reduces shop reroll cost. |
+| **Show Rewards ×1/2/3** | Shows more items in each shop visit. |
+| **Fusion Increase ×1/2/3** | Increases fusion encounter rate. |
+| **Catch Rate ×1/2/3** | Improves catch rate. |
+| **Trainer Snatch Cost ×1/2/3** | Reduces cost of buying trainer Pokémon. |
+| **More Revive ×1/2/3** | More revive items available in shop. |
+| **Start Ball ×1/2/3** | Start each run with extra Poké Balls. |
+| **Start Money ×1/2/3** | Start each run with ₽1500 / ₽2000 / ₽3000. |
+| **Post Battle Money ×1/2/3** | Earn more money after each battle. |
+| **Better Luck ×2/3** | Improves luck-based item rolls. |
+| **Cheaper Fusions ×1/2/3** | Reduces ΩGOLD cost of using Fusion Pokémon in Journey mode. |
+| **Starter Point Limit Inc ×1/2/3** | Increases starter team point allowance. |
+| **Longer Tera ×1/2/3** | Tera Shards last longer. |
+| **Longer Stat Boosts ×1/2/3** | Stat boosts from items last longer. |
+| **Free Reroll** | Grants one free reroll per run. |
+| **Metronome Levelup** | Trigger a level-up via Metronome. |
+| **New Round Tera** | Gain a Tera Shard at the start of each new biome. |
+| **Run Anything ×2** | Removes restrictions on which Pokémon you can run. |
+| **Shiny ×1/2/3** | Increases shiny rate. |
+| **Transfer Tera** | Carry your Tera type between runs. |
+| **Party Ability** | Applies one ability to all current party members (persistent Ω version). |
+MD,
+        ]);
+
+        $this->command->info('WikiSeeder: items-reference article added.');
     }
 }
