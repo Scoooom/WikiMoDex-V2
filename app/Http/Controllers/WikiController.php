@@ -17,7 +17,8 @@ class WikiController extends Controller
             'allow_unsafe_links' => false,
         ]);
         $environment->addExtension(new \League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension());
-        $environment->addExtension(new \League\CommonMark\Extension\GithubFlavoredMarkdown\GithubFlavoredMarkdownExtension());
+        $environment->addExtension(new \League\CommonMark\Extension\Table\TableExtension());
+        $environment->addExtension(new \League\CommonMark\Extension\Strikethrough\StrikethroughExtension());
 
         $converter = new \League\CommonMark\MarkdownConverter($environment);
         return $converter->convert($content)->getContent();
