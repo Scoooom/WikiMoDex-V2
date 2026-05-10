@@ -99,6 +99,44 @@
     const active = sidebar.querySelector('.wiki-sidebar-link.active');
     if (active) active.scrollIntoView({ block: 'nearest' });
 
+    // Build sublinks from headings on current page
+    const headings = document.querySelectorAll('.wiki-prose h2, .wiki-prose h3');
+    if (headings.length > 0 && active) {
+        const subList = document.createElement('ul');
+        subList.className = 'wiki-sidebar-sublist';
+
+        headings.forEach(h => {
+            const anchor = h.querySelector('.wiki-heading-anchor');
+            if (!anchor) return;
+            const id = anchor.getAttribute('href').slice(1);
+            const text = h.childNodes[0].textContent.trim(); // text before the # anchor
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#' + id;
+            a.className = 'wiki-sidebar-sublink' + (h.tagName === 'H3' ? ' wiki-sidebar-sublink--h3' : '');
+            a.textContent = text;
+            li.appendChild(a);
+            subList.appendChild(li);
+        });
+
+        // Insert after the active link's <li>
+        active.parentElement.after(subList);
+
+        // Highlight active sublink on scroll
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    subList.querySelectorAll('.wiki-sidebar-sublink').forEach(a => {
+                        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+                    });
+                }
+            });
+        }, { rootMargin: '-70px 0px -70% 0px', threshold: 0 });
+
+        headings.forEach(h => { if (h.id) observer.observe(h); });
+    }
+
     // Fix anchor-on-load being hidden under fixed nav
     function scrollToHash() {
         if (!window.location.hash) return;
