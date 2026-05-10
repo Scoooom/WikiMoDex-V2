@@ -217,8 +217,6 @@ class DiscordInteractionController extends Controller
         ]);
     }
 
-    }
-
     private function handleWikiSearch(string $query): \Illuminate\Http\JsonResponse
     {
         if (strlen(trim($query)) < 2) {
