@@ -22,6 +22,7 @@
 
             <a class="nav-link {{ request()->is('gacha*') ? 'active' : '' }}" href="/gacha.html">Gacha</a>
             <a class="nav-link {{ request()->is('faq*') ? 'active' : '' }}" href="/faq.html">FAQ</a>
+            <a class="nav-link {{ request()->is('wiki*') ? 'active' : '' }}" href="/wiki.html">Wiki</a>
             <a class="nav-link" href="https://pvoffine.scooom.xyz/" target="_blank" rel="noopener">Offline ↗</a>
 
             @auth
