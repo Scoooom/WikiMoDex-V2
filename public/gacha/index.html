@@ -1,30 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.js"></script>
-    <script src="https://unpkg.com/pokeapi-js-wrapper@1.2.8/dist/index.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/addons/p5.sound.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <meta charset="utf-8" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js" integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gacha Calendar</title>
+  <script src="https://unpkg.com/pokeapi-js-wrapper@1.2.8/dist/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js" crossorigin="anonymous"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="cal-header">
+      <button class="nav-btn" id="btn-prev-year" title="Previous year">«</button>
+      <button class="nav-btn" id="btn-prev-month" title="Previous month">‹</button>
+      <span id="month-label"></span>
+      <button class="nav-btn" id="btn-today" title="Today">Today</button>
+      <button class="nav-btn" id="btn-next-month" title="Next month">›</button>
+      <button class="nav-btn" id="btn-next-year" title="Next year">»</button>
+    </div>
+    <div id="cal-body">
+      <div id="cal-grid-wrap">
+        <div id="weekdays">
+          <div>Sunday</div><div>Monday</div><div>Tuesday</div>
+          <div>Wednesday</div><div>Thursday</div><div>Friday</div><div>Saturday</div>
+        </div>
+        <div id="cal-grid"></div>
+      </div>
+      <div id="sidebar" class="hidden">
+        <div id="sidebar-date"></div>
+        <div id="sidebar-sub"></div>
+        <div id="sidebar-sprite-wrap">
+          <img id="sidebar-sprite" src="" alt="">
+        </div>
+        <div id="sidebar-legend-name"></div>
+        <div id="sidebar-divider"></div>
+        <div id="sidebar-rus-label">Pokérus</div>
+        <div id="sidebar-rus-grid"></div>
+      </div>
+    </div>
+  </div>
 
-  </head>
-  <body>
-    <main>
-      <script>
-        pokeapi_loaded = false
-        if (typeof Pokedex == 'undefined') {
-          console.error("PokeAPI didn't connect! Images are unavailable")
-        } else {
-          P = new Pokedex.Pokedex()
-          pokeapi_loaded = true
-        }
-        special_key = "x0i2O7WRiANTqPmZ"
-        egg_seed = 1073741824
-      </script>
-    </main>
-    <script src="pokerogue_data/pokemonData.js"></script>
-    <script src="phaser-rand.js"></script>
-    <script src="sketch.js"></script>
-  </body>
+  <script src="pokerogue_data/pokemonData.js"></script>
+  <script src="phaser-rand.js"></script>
+  <script src="sketch.js"></script>
+</body>
 </html>
