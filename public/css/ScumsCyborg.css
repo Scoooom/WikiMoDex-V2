@@ -272,24 +272,27 @@ img { max-width: 100%; display: block; }
     text-transform: capitalize;
     letter-spacing: .02em;
 }
-.type-0  { background:rgba(168,168,120,.25); color:#d0d078; }
-.type-1  { background:rgba(104,144,240,.25); color:#85b0f5; }
-.type-2  { background:rgba(120,200,80,.25);  color:#88d050; }
-.type-3  { background:rgba(240,128,48,.25);  color:#f08030; }
-.type-4  { background:rgba(224,72,32,.25);   color:#f08060; }
-.type-5  { background:rgba(168,72,0,.25);    color:#c07850; }
-.type-6  { background:rgba(248,208,48,.25);  color:#f0c030; }
-.type-7  { background:rgba(240,216,104,.25); color:#e8c050; }
-.type-8  { background:rgba(184,160,240,.25); color:#c0a8e0; }
-.type-9  { background:rgba(120,168,0,.25);   color:#90c030; }
-.type-10 { background:rgba(112,192,168,.25); color:#70c0b0; }
-.type-11 { background:rgba(102,170,230,.25); color:#70b5e8; }
-.type-12 { background:rgba(112,88,152,.25);  color:#9a7ec8; }
-.type-13 { background:rgba(162,62,62,.25);   color:#c96060; }
-.type-14 { background:rgba(143,143,172,.25); color:#b8b8d0; }
-.type-15 { background:rgba(94,146,52,.25);   color:#78c850; }
-.type-16 { background:rgba(150,90,200,.25);  color:#b060e0; }
-.type-17 { background:rgba(246,214,138,.25); color:#f0d070; }
+/* Type badge colours — order matches PokeVoid Type enum (parse_forms.py load_types()) */
+/* 0=Normal 1=Fighting 2=Flying 3=Poison 4=Ground 5=Rock 6=Bug 7=Ghost */
+/* 8=Steel 9=Fire 10=Water 11=Grass 12=Electric 13=Psychic 14=Ice 15=Dragon 16=Dark 17=Fairy */
+.type-0  { background:rgba(168,168,120,.25); color:#d0d078; } /* Normal */
+.type-1  { background:rgba(192,48,40,.25);   color:#e06858; } /* Fighting */
+.type-2  { background:rgba(104,144,240,.25); color:#85b0f5; } /* Flying */
+.type-3  { background:rgba(160,64,160,.25);  color:#c07ec0; } /* Poison */
+.type-4  { background:rgba(224,192,104,.25); color:#deb868; } /* Ground */
+.type-5  { background:rgba(184,160,56,.25);  color:#c8a848; } /* Rock */
+.type-6  { background:rgba(168,184,32,.25);  color:#a8b820; } /* Bug */
+.type-7  { background:rgba(112,88,152,.25);  color:#9a7ec8; } /* Ghost */
+.type-8  { background:rgba(184,184,208,.25); color:#b8b8d0; } /* Steel */
+.type-9  { background:rgba(240,128,48,.25);  color:#f08030; } /* Fire */
+.type-10 { background:rgba(104,144,240,.25); color:#7ab4f5; } /* Water */
+.type-11 { background:rgba(120,200,80,.25);  color:#78c850; } /* Grass */
+.type-12 { background:rgba(248,208,48,.25);  color:#f0c030; } /* Electric */
+.type-13 { background:rgba(248,88,136,.25);  color:#f85888; } /* Psychic */
+.type-14 { background:rgba(152,216,216,.25); color:#98d8d8; } /* Ice */
+.type-15 { background:rgba(112,56,248,.25);  color:#9470f0; } /* Dragon */
+.type-16 { background:rgba(112,88,72,.25);   color:#907060; } /* Dark */
+.type-17 { background:rgba(238,153,172,.25); color:#ee99ac; } /* Fairy */
 
 /* --- Stat bars -------------------------------- */
 .stat-block { display: flex; flex-direction: column; gap: 9px; }
