@@ -356,6 +356,8 @@ def main():
         name, desc = get_item_info(key, i18n, key_to_class_map)
 
         if not name or key.endswith('_QUEST') or key.startswith('ENEMY_'):
+            skipped += 1
+            continue
 
         sql = f"""
             INSERT INTO game_items (`key`, name, description, tier, pool, conditional, spawn_condition, created_at, updated_at)
