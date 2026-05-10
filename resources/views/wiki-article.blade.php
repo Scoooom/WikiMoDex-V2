@@ -98,6 +98,24 @@
     // Auto-scroll active link into view
     const active = sidebar.querySelector('.wiki-sidebar-link.active');
     if (active) active.scrollIntoView({ block: 'nearest' });
+
+    // Fix anchor-on-load being hidden under fixed nav
+    function scrollToHash() {
+        if (!window.location.hash) return;
+        const target = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+        if (!target) return;
+        const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h') || '54');
+        const offset = navH + 24;
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'instant' });
+    }
+
+    // Run after layout is settled
+    if (document.readyState === 'complete') {
+        scrollToHash();
+    } else {
+        window.addEventListener('load', scrollToHash);
+    }
 })();
 </script>
 
