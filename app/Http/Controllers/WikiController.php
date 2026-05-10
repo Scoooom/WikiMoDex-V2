@@ -80,7 +80,13 @@ class WikiController extends Controller
 
         // Cross-links to gallery pages based on article slug
         $galleryMap = [
-            'glitch-system' => [
+            'champions-overview' => [
+                ['url' => '/wiki:champions-index.html', 'icon' => '🏆', 'label' => 'All Champions',  'sub' => 'Full champion roster'],
+                ['url' => '/wiki:apollo.html',          'icon' => '☀️', 'label' => 'Apollo',         'sub' => 'Champion of Sun'],
+                ['url' => '/wiki:diana.html',           'icon' => '🌙', 'label' => 'Diana',          'sub' => 'Champion of Moon'],
+                ['url' => '/wiki:brock.html',           'icon' => '🪨', 'label' => 'Brock',          'sub' => 'Rock / Ground'],
+                ['url' => '/wiki:misty.html',           'icon' => '💧', 'label' => 'Misty',          'sub' => 'Water'],
+            ],
                 ['url' => '/gallery.html',     'icon' => '👾', 'label' => 'Mod Glitch Forms',  'sub' => 'Community-made forms'],
                 ['url' => '/galleryCore.html',  'icon' => '✨', 'label' => 'Core Glitches',     'sub' => 'Official glitch forms'],
             ],
