@@ -13,7 +13,7 @@ class ParseChangelog extends Command
 
     public function handle()
     {
-        $repoPath = base_path('../pokevoid');
+        $repoPath = base_path('pokevoid');
 
         if (!is_dir($repoPath . '/.git')) {
             $this->error("pokevoid repo not found at {$repoPath}");
