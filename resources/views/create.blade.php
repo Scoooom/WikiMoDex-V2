@@ -1,20 +1,32 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="mt-4">
-    <h1>Upload a glitch to share!</h1>
+<div class="container">
+    <div class="section-header mt-2 mb-3">
+        <span class="section-title">Upload a glitch form</span>
+    </div>
 
     @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+        <div class="alert alert-danger mb-3">{{ session('error') }}</div>
     @endif
 
-    <form action="/upload.html" method="post" enctype="multipart/form-data">
-        @csrf
-        <div class="custom-file">
-            <input type="file" class="custom-file-input" name="pokeData" id="customFile">
-            <label class="custom-file-label" for="customFile">Choose file</label>
-            <button type="submit" class="btn btn-primary mt-2">Submit</button>
+    <div class="card" style="max-width:480px">
+        <div class="card-body">
+            <p style="font-size:13.5px;color:var(--muted);margin-bottom:18px;line-height:1.7">
+                Upload your <code>.prsv</code> save file and we'll extract your glitch form data automatically.
+                Your form will appear in the gallery once submitted.
+            </p>
+            <form action="/upload.html" method="post" enctype="multipart/form-data">
+                @csrf
+                <div style="margin-bottom:14px">
+                    <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">
+                        Save file (.prsv)
+                    </label>
+                    <input type="file" name="pokeData" class="form-input" accept=".prsv">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%">Upload glitch</button>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 @endsection

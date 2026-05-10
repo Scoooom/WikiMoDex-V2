@@ -10,7 +10,17 @@ use App\Http\Controllers\SpriteController;
 
 // Home
 Route::get('/', function () {
-    return view('welcome');
+    $stats = [
+        'glitches' => \App\Models\Glitch::count(),
+        'core'     => \App\Models\BuiltinForm::where('form_type', 'core')->count(),
+        'smitty'   => \App\Models\BuiltinForm::where('form_type', 'smitty')->count(),
+        'users'    => \App\Models\User::count(),
+    ];
+    $featured = \App\Models\Glitch::withCount('likes')
+        ->orderBy('likes_count', 'desc')
+        ->take(6)
+        ->get();
+    return view('welcome', compact('stats', 'featured'));
 });
 
 // Auth

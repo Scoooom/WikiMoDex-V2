@@ -18,31 +18,24 @@
 
     <div class="stats-strip">
         <div class="stat-cell">
-            <div class="stat-num">{{ \App\Models\Glitch::count() }}</div>
+            <div class="stat-num">{{ $stats['glitches'] }}</div>
             <div class="stat-label">Glitch forms</div>
         </div>
         <div class="stat-cell">
-            <div class="stat-num">{{ \App\Models\BuiltinForm::where('form_type', 'core')->count() }}</div>
+            <div class="stat-num">{{ $stats['core'] }}</div>
             <div class="stat-label">Core glitches</div>
         </div>
         <div class="stat-cell">
-            <div class="stat-num">{{ \App\Models\BuiltinForm::where('form_type', 'smitty')->count() }}</div>
+            <div class="stat-num">{{ $stats['smitty'] }}</div>
             <div class="stat-label">SMITTY forms</div>
         </div>
         <div class="stat-cell">
-            <div class="stat-num">{{ \App\Models\User::count() }}</div>
+            <div class="stat-num">{{ $stats['users'] }}</div>
             <div class="stat-label">Trainers</div>
         </div>
     </div>
 
-    @php
-        $featured = \App\Models\Glitch::withCount('likes')
-            ->orderBy('likes_count', 'desc')
-            ->take(6)
-            ->get();
-    @endphp
-
-    @if($featured->count())
+    @if(count($featured) > 0)
     <div class="section-header">
         <span class="section-title">Top-rated glitch forms</span>
         <a href="/gallery.html" class="section-link">View all →</a>
