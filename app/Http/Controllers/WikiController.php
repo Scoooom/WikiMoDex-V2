@@ -166,4 +166,21 @@ class WikiController extends Controller
         return redirect()->route('wiki.admin.index')
             ->with('success', 'Article deleted.');
     }
+
+    public function items()
+    {
+        $byTier = \App\Models\GameItem::orderBy('name')
+            ->get()
+            ->groupBy('tier');
+
+        $categoryOrder = WikiArticle::categoryOrder();
+        $allArticles = WikiArticle::orderBy('order')->orderBy('title')->get();
+        $grouped = collect($categoryOrder)
+            ->mapWithKeys(fn($cat) => [
+                $cat => $allArticles->where('category', $cat)->values()
+            ])
+            ->filter(fn($group) => $group->isNotEmpty());
+
+        return view('wiki-items', compact('byTier', 'grouped'));
+    }
 }
