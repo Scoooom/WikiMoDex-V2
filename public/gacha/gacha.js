@@ -114,7 +114,10 @@ function renderCal() {
 
   var firstDow = getFirstDayOfWeek(currentMonth, currentYear)
   var daysInMonth = getDaysInMonth(currentMonth, currentYear)
-  var today = new Date()
+  var now = new Date()
+  var todayD = now.getDate()
+  var todayM = now.getMonth() + 1
+  var todayY = now.getFullYear()
 
   // Empty cells before first day
   for (var e = 0; e < firstDow; e++) {
@@ -126,7 +129,7 @@ function renderCal() {
   for (var d = 1; d <= daysInMonth; d++) {
     var cell = document.createElement('div')
     cell.className = 'cal-day'
-    var isToday = d === today.getDate() && currentMonth === today.getMonth()+1 && currentYear === today.getFullYear()
+    var isToday = d === todayD && currentMonth === todayM && currentYear === todayY
     if (isToday) cell.classList.add('today')
 
     // Build the Day object phaser-rand.js expects
@@ -187,8 +190,9 @@ function getLegendaryDexId(apiSlug) {
 }
 
 function makeDayObj(d, month, year) {
-  var date = new Date(year, month - 1, d + (new Date().getHours() - new Date().getUTCHours() < 0 ? 0 : 1),
-    new Date().getHours() - new Date().getUTCHours() + (new Date().getHours() < new Date().getUTCHours() ? 24 : 0))
+  var utcOffset = new Date().getHours() - new Date().getUTCHours()
+  var date = new Date(year, month - 1, d + (utcOffset < 0 ? 0 : 1),
+    utcOffset + (new Date().getHours() < new Date().getUTCHours() ? 24 : 0))
   return {
     year: year, month: month, day: d - 1,
     date: date, mon: '', rus: [],
