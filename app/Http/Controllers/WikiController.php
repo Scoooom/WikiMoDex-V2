@@ -86,6 +86,7 @@ class WikiController extends Controller
                 ['url' => '/wiki:brock.html',           'icon' => '🪨', 'label' => 'Brock',             'sub' => 'Rock / Ground'],
                 ['url' => '/wiki:misty.html',           'icon' => '💧', 'label' => 'Misty',             'sub' => 'Water'],
             ],
+            'glitch-system' => [
                 ['url' => '/gallery.html',     'icon' => '👾', 'label' => 'Mod Glitch Forms',  'sub' => 'Community-made forms'],
                 ['url' => '/galleryCore.html',  'icon' => '✨', 'label' => 'Core Glitches',     'sub' => 'Official glitch forms'],
             ],
