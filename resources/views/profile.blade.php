@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<section>
+<div class="container">
+
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
@@ -9,144 +10,167 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-body text-center">
-                    <img src="{{ $user->getAvatarURL() }}" class="rounded-circle img-fluid" style="width: 150px;">
-                    <h5 class="my-3">{{ $user->username }}</h5>
+    <div class="profile-grid mt-2">
+
+        {{-- Sidebar --}}
+        <div>
+            <div class="card mb-3">
+                <div class="card-body" style="text-align:center">
+                    <img src="{{ $user->getAvatarURL() }}" class="profile-avatar mb-3" alt="{{ $user->username }}">
+                    <div class="mon-name" style="font-size:18px">{{ $user->username }}</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:4px">
+                        Joined {{ date('F Y', $user->join_date) }}
+                    </div>
 
                     @auth
-                    <div class="d-flex justify-content-center mb-2">
+                    <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
                         @if(Auth::user()->likesUser($user->id))
-                            <form action="/uRLike:{{ $user->id }}.html" method="post">
-                                @csrf
-                                <input type="hidden" name="returnURL" value="{{ url()->current() }}">
-                                <button type="submit" class="btn btn-success">Remove Like</button>
-                            </form>
+                        <form action="/uRLike:{{ $user->id }}.html" method="post">
+                            @csrf
+                            <input type="hidden" name="returnURL" value="{{ url()->current() }}">
+                            <button type="submit" class="btn btn-success btn-sm">♥ Liked</button>
+                        </form>
                         @else
-                            <form action="/uLike:{{ $user->id }}.html" method="post">
-                                @csrf
-                                <input type="hidden" name="returnURL" value="{{ url()->current() }}">
-                                <button type="submit" class="btn btn-success">Like</button>
-                            </form>
+                        <form action="/uLike:{{ $user->id }}.html" method="post">
+                            @csrf
+                            <input type="hidden" name="returnURL" value="{{ url()->current() }}">
+                            <button type="submit" class="btn btn-secondary btn-sm">♡ Like</button>
+                        </form>
                         @endif
                     </div>
-
-                    @if($isOwner)
-                    <div class="d-flex justify-content-center mb-2">
-                        <form action="/u:{{ $user->username }}.html" method="post" enctype="multipart/form-data">
-                            @csrf
-                            <input type="hidden" name="action" value="uploadNew">
-                            <input type="file" name="saveFile" class="form-control mb-2">
-                            <button type="submit" class="btn btn-primary">
-                                {{ ($user->b64_prsv && $user->raw_prsv) ? 'Update Save' : 'Upload Save File' }}
-                            </button>
-                        </form>
-                    </div>
-
-                    @if($user->b64_prsv && $user->raw_prsv)
-                    <div class="d-flex justify-content-center mb-2">
-                        <form action="/u:{{ $user->username }}.html" method="post" class="mr-2">
-                            @csrf
-                            <input type="hidden" name="action" value="dlSave">
-                            <button type="submit" class="btn btn-info">Download Save</button>
-                        </form>
-                        <form action="/u:{{ $user->username }}.html" method="post">
-                            @csrf
-                            <input type="hidden" name="action" value="delSave">
-                            <button type="submit" class="btn btn-danger">Delete Save</button>
-                        </form>
-                    </div>
-                    @endif
-                    @endif
                     @endauth
 
                     @if($user->b64_prsv && $user->raw_prsv)
-                    <div class="d-flex justify-content-center mb-2">
-                        <a href="/trainercard:{{ $user->username }}.html" class="btn btn-success">Trainer Card</a>
+                    <div style="margin-top:10px">
+                        <a href="/trainercard:{{ $user->username }}.html" class="btn btn-info btn-sm">Trainer Card</a>
                     </div>
                     @endif
                 </div>
             </div>
+
+            @if($isOwner ?? false)
+            <div class="card mb-3">
+                <div class="card-header">Save file</div>
+                <div class="card-body">
+                    <form action="/u:{{ $user->username }}.html" method="post" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="action" value="uploadNew">
+                        <input type="file" name="saveFile" class="form-input mb-2" style="padding:6px">
+                        <button type="submit" class="btn btn-primary btn-sm" style="width:100%">
+                            {{ ($user->b64_prsv && $user->raw_prsv) ? 'Update save file' : 'Upload save file' }}
+                        </button>
+                    </form>
+                    @if($user->b64_prsv && $user->raw_prsv)
+                    <div style="display:flex;gap:8px;margin-top:8px">
+                        <form action="/u:{{ $user->username }}.html" method="post" style="flex:1">
+                            @csrf
+                            <input type="hidden" name="action" value="dlSave">
+                            <button type="submit" class="btn btn-secondary btn-sm" style="width:100%">Download</button>
+                        </form>
+                        <form action="/u:{{ $user->username }}.html" method="post" style="flex:1">
+                            @csrf
+                            <input type="hidden" name="action" value="delSave">
+                            <button type="submit" class="btn btn-danger btn-sm" style="width:100%">Delete</button>
+                        </form>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endif
         </div>
 
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-sm-3"><p class="mb-0">Discord User</p></div>
-                        <div class="col-sm-9"><p class="text-muted mb-0">{{ $user->username }}</p></div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-3"><p class="mb-0">Likes</p></div>
-                        <div class="col-sm-9"><p class="text-muted mb-0">{{ $likes }}</p></div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-3"><p class="mb-0">Uploaded Glitches</p></div>
-                        <div class="col-sm-9"><p class="text-muted mb-0">{{ $user->getUploadCount() ?: 'None' }}</p></div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-3"><p class="mb-0">Join Date</p></div>
-                        <div class="col-sm-9"><p class="text-muted mb-0">{{ date('F j, Y', $user->join_date) }}</p></div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-3"><p class="mb-0">Last Login</p></div>
-                        <div class="col-sm-9"><p class="text-muted mb-0">{{ date('F j, Y, g:i a', $user->last_login) }}</p></div>
-                    </div>
+        {{-- Main --}}
+        <div>
+            <div class="card mb-3">
+                <div class="card-header">Trainer info</div>
+                <div class="card-body" style="padding:0">
+                    <table class="info-table" style="margin:0">
+                        <tr>
+                            <td style="padding:12px 20px">Discord</td>
+                            <td style="padding:12px 20px">{{ $user->username }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:12px 20px">Likes received</td>
+                            <td style="padding:12px 20px">{{ $likes }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:12px 20px">Uploaded glitches</td>
+                            <td style="padding:12px 20px">{{ $user->getUploadCount() ?: '0' }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:12px 20px">Last login</td>
+                            <td style="padding:12px 20px">{{ date('F j, Y', $user->last_login) }}</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
 
             @if($glitches->count() > 0)
-            <table class="table table-striped table-dark" id="userGlitches">
-                <thead>
-                    <tr>
-                        <th>Sprite</th>
-                        <th>Name</th>
-                        <th>Rating</th>
-                        <th>Base Pokemon</th>
-                        <th>Primary Type</th>
-                        <th>Secondary Type</th>
-                        <th>View</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($glitches as $glitch)
-                        @php
-                            $mon2 = $glitch->getJsonData();
-                            $ogMon = $glitch->getOGMon();
-                        @endphp
+            <div class="section-header mb-3">
+                <span class="section-title">Uploaded glitch forms</span>
+            </div>
+            <div class="gallery-wrap">
+                <div class="gallery-toolbar">
+                    <input type="text" id="gallery-search" class="gallery-search" placeholder="Search glitches…">
+                </div>
+                <div style="overflow-x:auto">
+                <table class="gallery-table">
+                    <thead>
                         <tr>
-                            <td><img src="/front:{{ $glitch->id }}.png" class="rounded-circle img-fluid" style="width: 64px;"></td>
-                            <td>{{ $glitch->name }}</td>
-                            <td>{{ $glitch->getRating() }}</td>
-                            <td>{{ ucwords(str_replace('-', ' ', $ogMon->name)) }}</td>
-                            <td><img src="/img/types/{{ $mon2->primaryType }}.png"></td>
-                            <td><img src="/img/types/{{ $mon2->secondaryType }}.png"></td>
-                            <td>
-                                <a href="/g:{{ urlencode(str_replace(' ', '', $glitch->name)) }}:{{ $glitch->id }}.html"
-                                    class="btn btn-primary btn-sm">View</a>
-                            </td>
+                            <th style="width:64px">Sprite</th>
+                            <th data-col="1">Name</th>
+                            <th data-col="2">Base Pokémon</th>
+                            <th>Types</th>
+                            <th data-col="4">Rating</th>
+                            <th></th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-
-            <script>
-                $(document).ready(function() {
-                    $('#userGlitches').DataTable({
-                        paging: true,
-                        searching: true,
-                        order: [[2, 'desc']]
-                    });
-                });
-            </script>
+                    </thead>
+                    <tbody>
+                        @foreach($glitches as $glitch)
+                            @php
+                                $mon2 = $glitch->getJsonData();
+                                $ogMon = $glitch->getOGMon();
+                                $ogName = ucwords(str_replace('-', ' ', $ogMon->name));
+                            @endphp
+                            <tr data-search="{{ strtolower($glitch->name . ' ' . $ogName) }}">
+                                <td>
+                                    <img src="/front:{{ $glitch->id }}.png" class="sprite-sm" alt="{{ $glitch->name }}">
+                                </td>
+                                <td data-sort="{{ $glitch->name }}"><strong>{{ $glitch->name }}</strong></td>
+                                <td data-sort="{{ $ogName }}">{{ $ogName }}</td>
+                                <td>
+                                    <div style="display:flex;gap:4px;flex-wrap:wrap">
+                                        <span class="type-badge type-{{ $mon2->primaryType }}">
+                                            {{ \App\Services\PokemonService::getTypeName($mon2->primaryType) }}
+                                        </span>
+                                        @if(isset($mon2->secondaryType) && $mon2->secondaryType !== $mon2->primaryType)
+                                        <span class="type-badge type-{{ $mon2->secondaryType }}">
+                                            {{ \App\Services\PokemonService::getTypeName($mon2->secondaryType) }}
+                                        </span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td data-sort="{{ $glitch->getRating() }}">
+                                    <span style="color:var(--accent2);font-weight:600">♥ {{ $glitch->getRating() }}</span>
+                                </td>
+                                <td>
+                                    <a href="/g:{{ urlencode(str_replace(' ', '', $glitch->name)) }}:{{ $glitch->id }}.html"
+                                        class="btn btn-secondary btn-sm">View</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                </div>
+                <div class="pagination">
+                    <span class="pagination-info" id="pag-info"></span>
+                    <div class="pagination-btns" id="pag-btns"></div>
+                </div>
+            </div>
+            @include('partials.gallery-js')
             @endif
         </div>
+
     </div>
-</section>
+</div>
 @endsection

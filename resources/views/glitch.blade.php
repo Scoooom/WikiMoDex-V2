@@ -4,145 +4,167 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ url()->current() }}">
 <meta property="og:title" content="{{ $glitch->name }} | {{ $creator->username }}">
-<meta property="og:description" content="{{ $glitch->name }}; Primary {{ $abilityOne['name'] }}; Ability 2: {{ $abilityTwo['name'] }}; HA: {{ $abilityHA['name'] }}; Rivals: {{ $rivals }}">
-<meta property="og:image" content="https://void.scooom.com/front:{{ $glitch->id }}.png">
+<meta property="og:description" content="{{ $glitch->name }}; {{ $abilityOne['name'] }} / {{ $abilityTwo['name'] }} / {{ $abilityHA['name'] }}">
+<meta property="og:image" content="https://void.scooom.xyz/front:{{ $glitch->id }}.png">
 @endpush
 
 @section('content')
-<section>
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-body text-center">
-                    <img src="/front:{{ $glitch->id }}.png" class="rounded-circle img-fluid" style="width: 150px;">
-                    <img src="/back:{{ $glitch->id }}.png" class="rounded-circle img-fluid" style="width: 150px;">
-                    <h5 class="my-3">{{ $glitch->name }}</h5>
-                    <p class="text-muted mb-1">Created By: <a href="/u:{{ $creator->username }}.html">{{ $creator->username }}</a></p>
-                    <div class="d-flex justify-content-center mb-2">
-                        <img src="/img/types/{{ $mon2->primaryType }}.png">
-                        <img src="/img/types/{{ $mon2->secondaryType }}.png">
-                    </div>
-                    <div class="d-flex justify-content-center mb-2">
-                        <a href="/d:{{ $glitch->id }}.html" class="btn btn-primary">Download</a>
-                        &nbsp;
-                        <button type="button" class="btn btn-secondary">Rating: {{ $rating }}</button>
-                    </div>
+<div class="container">
+    <div class="mon-detail-grid mt-2">
 
-                    @auth
-                    <div class="d-flex justify-content-center mb-2">
-                        @if($userLikesGlitch)
+        {{-- Sidebar --}}
+        <div class="mon-sidebar">
+            <div class="card">
+                <div class="card-body">
+                    <div class="sprite-duo">
+                        <img src="/front:{{ $glitch->id }}.png" class="sprite-lg" alt="{{ $glitch->name }} front">
+                        <img src="/back:{{ $glitch->id }}.png"  class="sprite-lg back" alt="{{ $glitch->name }} back">
+                    </div>
+                    <div class="mon-name">{{ $glitch->name }}</div>
+                    <div class="mon-creator">
+                        by <a href="/u:{{ $creator->username }}.html">{{ $creator->username }}</a>
+                    </div>
+                    <div class="type-badges">
+                        <span class="type-badge type-{{ $mon2->primaryType }}">
+                            {{ \App\Services\PokemonService::getTypeName($mon2->primaryType) }}
+                        </span>
+                        @if(isset($mon2->secondaryType) && $mon2->secondaryType !== $mon2->primaryType)
+                        <span class="type-badge type-{{ $mon2->secondaryType }}">
+                            {{ \App\Services\PokemonService::getTypeName($mon2->secondaryType) }}
+                        </span>
+                        @endif
+                    </div>
+                    <div class="mon-actions">
+                        <a href="/d:{{ $glitch->id }}.html" class="btn btn-primary btn-sm">↓ Download</a>
+                        @auth
+                            @if($userLikesGlitch)
                             <form action="/rLike:{{ $glitch->id }}.html" method="post">
                                 @csrf
                                 <input type="hidden" name="returnURL" value="{{ url()->current() }}">
-                                <button type="submit" class="btn btn-success">Remove Like</button>
+                                <button type="submit" class="btn btn-success btn-sm">♥ Unlike ({{ $rating }})</button>
                             </form>
-                        @else
+                            @else
                             <form action="/like:{{ $glitch->id }}.html" method="post">
                                 @csrf
                                 <input type="hidden" name="returnURL" value="{{ url()->current() }}">
-                                <button type="submit" class="btn btn-success">Like</button>
+                                <button type="submit" class="btn btn-secondary btn-sm">♡ Like ({{ $rating }})</button>
                             </form>
-                        @endif
+                            @endif
+                        @else
+                        <span class="btn btn-secondary btn-sm" style="cursor:default">♥ {{ $rating }}</span>
+                        @endauth
                     </div>
-                    @endauth
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-sm-3"><p class="mb-0">Glitched Pokemon</p></div>
-                        <div class="col-sm-9"><p class="text-muted mb-0">{{ $ogMon->name }}</p></div>
+        {{-- Main content --}}
+        <div>
+            <div class="card mb-3">
+                <div class="tab-strip">
+                    <button class="tab-btn active" onclick="switchTab('stats', this)">Stats</button>
+                    <button class="tab-btn" onclick="switchTab('abilities', this)">Abilities</button>
+                    <button class="tab-btn" onclick="switchTab('details', this)">Details</button>
+                </div>
+
+                <div id="tab-stats" class="tab-panel active">
+                    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">
+                        Boosted stats · BST <strong style="color:var(--text)">{{ $boostedBST }}</strong>
+                    </p>
+                    @php
+                        $bStats = [];
+                        foreach (['HP','Attack','Defense','Special Attack','Special Defense','Speed'] as $i => $n) {
+                            $bStats[] = ['name' => $n, 'value' => $boostedStats[$i]['value'], 'percent' => $boostedStats[$i]['percent']];
+                        }
+                    @endphp
+                    <div class="stat-block">
+                        @foreach($bStats as $s)
+                        @php $cls = $s['percent'] >= 60 ? 'high' : ($s['percent'] >= 35 ? 'medium' : 'low'); @endphp
+                        <div class="stat-row">
+                            <div class="stat-meta">
+                                <span>{{ $s['name'] }}</span>
+                                <span class="stat-val">{{ $s['value'] }}</span>
+                            </div>
+                            <div class="stat-track">
+                                <div class="stat-fill {{ $cls }}" style="width:{{ $s['percent'] }}%"></div>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-3"><p class="mb-0">Stat Spread Type</p></div>
-                        <div class="col-sm-9"><p class="text-muted mb-0">{{ $statBalance }}</p></div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-3"><p class="mb-0">Ability One</p></div>
-                        <div class="col-sm-9">
-                            <p class="text-muted mb-0">
+
+                    <details style="margin-top:16px">
+                        <summary style="font-size:12px;color:var(--muted);cursor:pointer">Show original stats (BST {{ $ogBST }})</summary>
+                        <div style="margin-top:12px" class="stat-block">
+                            @foreach(['HP','Attack','Defense','Special Attack','Special Defense','Speed'] as $i => $statName)
+                            @php $cls = $ogStats[$i]['percent'] >= 60 ? 'high' : ($ogStats[$i]['percent'] >= 35 ? 'medium' : 'low'); @endphp
+                            <div class="stat-row">
+                                <div class="stat-meta">
+                                    <span>{{ $statName }}</span>
+                                    <span class="stat-val">{{ $ogStats[$i]['value'] }}</span>
+                                </div>
+                                <div class="stat-track">
+                                    <div class="stat-fill {{ $cls }}" style="width:{{ $ogStats[$i]['percent'] }}%"></div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </details>
+                </div>
+
+                <div id="tab-abilities" class="tab-panel">
+                    <table class="info-table">
+                        <tr>
+                            <td>Ability 1</td>
+                            <td>
                                 <strong>{{ $abilityOne['name'] }}</strong><br>
-                                <small>{{ $abilityOne['desc'] }}</small>
-                            </p>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-3"><p class="mb-0">Ability Two</p></div>
-                        <div class="col-sm-9">
-                            <p class="text-muted mb-0">
+                                <span style="font-size:12px;color:var(--muted)">{{ $abilityOne['desc'] }}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Ability 2</td>
+                            <td>
                                 <strong>{{ $abilityTwo['name'] }}</strong><br>
-                                <small>{{ $abilityTwo['desc'] }}</small>
-                            </p>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-3"><p class="mb-0">Hidden Ability</p></div>
-                        <div class="col-sm-9">
-                            <p class="text-muted mb-0">
+                                <span style="font-size:12px;color:var(--muted)">{{ $abilityTwo['desc'] }}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Hidden ability</td>
+                            <td>
                                 <strong>{{ $abilityHA['name'] }}</strong><br>
-                                <small>{{ $abilityHA['desc'] }}</small>
-                            </p>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-3"><p class="mb-0">Rivals</p></div>
-                        <div class="col-sm-9"><p class="text-muted mb-0">{{ $rivals }}</p></div>
-                    </div>
+                                <span style="font-size:12px;color:var(--muted)">{{ $abilityHA['desc'] }}</span>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md">
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <p class="mb-4"><span class="text-primary font-italic">boosted</span> Stats <small>BST {{ $boostedBST }}</small></p>
-                            <details>
-                                <summary>See Boosted Stats</summary>
-                                @foreach(['HP', 'Attack', 'Defense', 'Special Attack', 'Special Defense', 'Speed'] as $i => $statName)
-                                <p class="mb-1" style="font-size: .77rem;">{{ $statName }} <small>{{ $boostedStats[$i]['value'] }}</small></p>
-                                <div class="progress rounded" style="height: 5px;">
-                                    <div class="progress-bar" role="progressbar"
-                                        style="width: {{ $boostedStats[$i]['percent'] }}%"
-                                        aria-valuenow="{{ $boostedStats[$i]['value'] }}"
-                                        aria-valuemin="0" aria-valuemax="255"></div>
-                                </div>
-                                @endforeach
-                            </details>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col">
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <p class="mb-4"><span class="text-primary font-italic">original</span> Stats <small>BST {{ $ogBST }}</small></p>
-                            <details>
-                                <summary>See Original Stats</summary>
-                                @foreach(['HP', 'Attack', 'Defense', 'Special Attack', 'Special Defense', 'Speed'] as $i => $statName)
-                                <p class="mb-1" style="font-size: .77rem;">{{ $statName }} <small>{{ $ogStats[$i]['value'] }}</small></p>
-                                <div class="progress rounded" style="height: 5px;">
-                                    <div class="progress-bar" role="progressbar"
-                                        style="width: {{ $ogStats[$i]['percent'] }}%"
-                                        aria-valuenow="{{ $ogStats[$i]['value'] }}"
-                                        aria-valuemin="0" aria-valuemax="255"></div>
-                                </div>
-                                @endforeach
-                            </details>
-                        </div>
-                    </div>
+                <div id="tab-details" class="tab-panel">
+                    <table class="info-table">
+                        <tr>
+                            <td>Glitch of</td>
+                            <td>{{ $ogMon->name }}</td>
+                        </tr>
+                        <tr>
+                            <td>Stat spread</td>
+                            <td>{{ $statBalance }}</td>
+                        </tr>
+                        <tr>
+                            <td>Rivals</td>
+                            <td>{{ $rivals ?: 'None' }}</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
+
     </div>
-</section>
+</div>
+
+<script>
+function switchTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+}
+</script>
 @endsection

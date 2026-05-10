@@ -1,22 +1,27 @@
 @php
     $stats = [
-        'HP'              => $mon->hp,
-        'Attack'          => $mon->atk,
-        'Defense'         => $mon->def,
-        'Special Attack'  => $mon->spatk,
-        'Special Defense' => $mon->spdef,
-        'Speed'           => $mon->spd,
+        'HP'           => $mon->hp,
+        'Attack'       => $mon->atk,
+        'Defense'      => $mon->def,
+        'Sp. Attack'   => $mon->spatk,
+        'Sp. Defense'  => $mon->spdef,
+        'Speed'        => $mon->spd,
     ];
 @endphp
-<details>
-    <summary>View Stats</summary>
+<div class="stat-block">
     @foreach($stats as $statName => $value)
-        <p class="mb-1" style="font-size: .77rem;">{{ $statName }} <small>{{ $value }}</small></p>
-        <div class="progress rounded" style="height: 5px;">
-            <div class="progress-bar" role="progressbar"
-                style="width: {{ floor(($value / 255) * 100) }}%"
-                aria-valuenow="{{ $value }}"
-                aria-valuemin="0" aria-valuemax="255"></div>
+        @php
+            $pct = min(100, floor(($value / 255) * 100));
+            $cls = $pct >= 60 ? 'high' : ($pct >= 35 ? 'medium' : 'low');
+        @endphp
+        <div class="stat-row">
+            <div class="stat-meta">
+                <span>{{ $statName }}</span>
+                <span class="stat-val">{{ $value }}</span>
+            </div>
+            <div class="stat-track">
+                <div class="stat-fill {{ $cls }}" style="width:{{ $pct }}%"></div>
+            </div>
         </div>
     @endforeach
-</details>
+</div>
