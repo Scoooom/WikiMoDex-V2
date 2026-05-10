@@ -300,6 +300,13 @@ FALLBACK_DESCRIPTIONS = {
     'ANY_PASSIVE_ABILITY':  'Set any ability as a passive on any Pokémon. Costs 1 Glitch Piece.',
     'ANY_SMITTY_PASSIVE_ABILITY': 'Set a Smitty-exclusive ability as a passive on any Pokémon. Costs 1 Glitch Piece.',
     'PERMA_PARTY_ABILITY':  'Give a selected ability to all Pokémon in your current party for the run.',
+    'BASE_STAT_BOOSTER':    'Boosts a random base stat of one Pokémon.',
+    'BERRY':                'A random berry that provides its effect when the holder\'s HP drops low.',
+    'MINT':                 'Changes a Pokémon\'s nature, affecting which stats are boosted and reduced.',
+    'SELECTABLE_PMONEY_3':  'Choose a medium-large ΩGOLD reward.',
+    'SELECTABLE_PMONEY_4':  'Choose a large ΩGOLD reward.',
+    'SPECIES_STAT_BOOSTER': 'Boosts a species-specific stat for compatible Pokémon (e.g. Thick Club for Marowak, Leek for Farfetch\'d).',
+    'TERA_SHARD':           'Terastallizes the holder into a specific type for up to 25 battles (35 with Tera Orb equipped).',
 }
 
 def key_to_name(key):
