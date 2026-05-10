@@ -121,7 +121,7 @@
 }
 
 #sidebar {
-    width: 190px;
+    width: 220px;
     flex-shrink: 0;
     background: var(--card2);
     border: 1px solid var(--border);
@@ -148,7 +148,7 @@
 #sidebar-legend-name { font-size: 12px; font-weight: 600; color: var(--text); text-align: center; }
 #sidebar-divider { height: 1px; background: var(--border); }
 #sidebar-rus-label { font-size: 11px; font-weight: 600; color: var(--muted); text-align: center; }
-#sidebar-rus-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+#sidebar-rus-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
 .rus-cell {
     background: var(--card);
     border: 1px solid var(--border);
