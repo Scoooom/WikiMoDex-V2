@@ -249,7 +249,7 @@ class DiscordInteractionController extends Controller
             'title'       => "{$build->species} — {$build->name}",
             'description' => "Champion: **{$champion}**",
             'color'       => 0x7c5cbf,
-            'image'       => ['url' => $spriteUrl],
+            'thumbnail'   => ['url' => $spriteUrl],
             'fields'      => $fields,
             'footer'      => ['text' => 'WikiMoDex • Alt Builds'],
             'url'         => 'https://void.scooom.xyz/wiki:alt-builds.html#champion-' . ($build->champion ?? ''),
