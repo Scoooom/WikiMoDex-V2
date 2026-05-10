@@ -1138,7 +1138,7 @@ img { max-width: 100%; display: block; }
 .wiki-prose h2,
 .wiki-prose h3,
 .wiki-prose h4 {
-    scroll-margin-top: 4rem;
+    scroll-margin-top: calc(var(--nav-h) + 1rem);
     position: relative;
 }
 
