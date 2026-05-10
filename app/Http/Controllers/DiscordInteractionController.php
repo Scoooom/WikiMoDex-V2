@@ -385,7 +385,6 @@ class DiscordInteractionController extends Controller
                         'url'       => $pageUrl,
                         'color'     => 0x7c5cbf,
                         'thumbnail' => ['url' => $frontUrl],
-                    'image'     => ['url' => $backUrl],
                         'fields'    => $fields,
                         'footer'    => ['text' => $footerLabel],
                     ]]
