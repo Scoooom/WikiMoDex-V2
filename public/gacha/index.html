@@ -4,6 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gacha Calendar</title>
+  <script>
+    // Polyfill p5.js globals needed by phaser-rand.js
+    var floor  = Math.floor
+    var ceil   = Math.ceil
+    var round  = Math.round
+    var abs    = Math.abs
+    var min    = Math.min
+    var max    = Math.max
+    var log    = Math.log
+    var sqrt   = Math.sqrt
+    var pow    = Math.pow
+    function map(v, a, b, c, d) { return c + (d - c) * ((v - a) / (b - a)) }
+    function random(a, b) {
+      if (a === undefined) return Math.random()
+      if (b === undefined) return Math.random() * a
+      return a + Math.random() * (b - a)
+    }
+  </script>
   <script src="https://unpkg.com/pokeapi-js-wrapper@1.2.8/dist/index.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js" crossorigin="anonymous"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
