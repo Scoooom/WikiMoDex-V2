@@ -1,8 +1,8 @@
 function setup() {
   createCanvas(windowWidth-1, windowHeight-1);
   resetMonth()
-  basicFillColor = color(255)
-  basicSelectColor = color(218, 236, 247)
+  basicFillColor = color(34, 25, 64)
+  basicSelectColor = color(43, 32, 80)
   basicFunction = function() {}
   
   rdg.init_builder()
@@ -263,7 +263,7 @@ click = false
 
 LOG = []
 function draw() {
-  background(220);
+  background(19, 16, 34);
   // Update sidebar scale
   sidebarSz = lerp(sidebarSz, sidebarTarg, 0.1)
   if (abs(sidebarSz - sidebarTarg) <= 0.001) {
@@ -290,19 +290,19 @@ function draw() {
     if (lastcol > m[i].date.getUTCDay()) {
       r++
     }
-    stroke(0)
+    stroke(53, 40, 96)
     lastcol = m[i].date.getUTCDay()
     var X = scalar(lastcol, 7, 4, width - 4 - max(0, sidebarSz), 4)
     var Y = scalar(r, rows, 28, height - 28, 4)
     var W = scalarSize(7, 4, width - 4 - max(0, sidebarSz), 4)
     var H = scalarSize(rows, 28, height - 28, 4)
-    fill(255)
+    fill(34, 25, 64)
     if (m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()) {
-      fill(218, 236, 247)
+      fill(43, 32, 80)
     }
     if (inRectArea(mouseX, mouseY, X, Y, W, H)) {
       //fill(184, 228, 230)
-      //fill(218, 236, 247)
+      //fill(43, 32, 80)
     }
     if (m[i].date.getUTCMonth() == 3 && m[i].date.getDate() == 1) {
       // April 1
@@ -347,12 +347,12 @@ function draw() {
       X -= 2
       Y -= 1
     }
-    fill(0)
-    stroke(0)
+    fill(237, 230, 255)
+    stroke(53, 40, 96)
     line(X, Y + 15, X + W, Y + 15)
     noStroke()
     if (m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()) {
-      fill(255, 0, 0)
+      fill(168, 125, 232)
     }
     rectText(m[i].date.getUTCDate(), X, Y, 15, 16)
     if (m[i].mon == undefined || m[i].mon == "") {
@@ -370,8 +370,8 @@ function draw() {
   }
   // Draw buttons at bottom right
   var btns = 6
-  fill(255)
-  stroke(0)
+  fill(34, 25, 64)
+  stroke(53, 40, 96)
   rect(4, height - 24, width - 8 - (btns * 24), 20)
   rectB(width - 24*6, height - 24, 20, 20, ___,
        prevYear)
@@ -384,7 +384,7 @@ function draw() {
   rectB(width - 24*1, height - 24, 20, 20, ___,
        nextYear)
   // Draw button labels
-  fill(0)
+  fill(237, 230, 255)
   noStroke()
   rectText(months[currentMonth - 1] + " " + currentYear, 4, height - 24, width - 8 - (btns * 24), 20)
   rectText("<<",    width - 24*6, height - 24, 20, 20)
@@ -396,17 +396,17 @@ function draw() {
   for (var i = 0; i < 7; i++) {
     var X = scalar(i, 7, 4, width - 4 - max(0, sidebarSz), 4)
     var W = scalarSize(7, 4, width - 4 - max(0, sidebarSz), 4)
-    fill(255)
-    stroke(0)
+    fill(34, 25, 64)
+    stroke(53, 40, 96)
     rect(X, 4, W, 20)
-    fill(0)
+    fill(237, 230, 255)
     noStroke()
     rectText(days[i], X, 4, W, 20)
   }
   // Draw sidebar, if visible
   if (true) {
-    fill(255)
-    stroke(0)
+    fill(34, 25, 64)
+    stroke(53, 40, 96)
     push()
     var X = width - sidebarSz + (sidebarSz < 100 ? (1 - sidebarSz/100) : 0)
     var Y = 4
@@ -416,13 +416,13 @@ function draw() {
     Rect(X - 1, Y - 1, W + 2, H + 2)
     endClip()
     Rect(X, Y, W, H)
-    fill(0)
+    fill(237, 230, 255)
     noStroke()
     rectText(sidebarDisplayDate, X + 4, Y + 4, W - 8, 16)
     var W2 = textWidth(sidebarDisplaySubtitle) * 0.9
     rectText(sidebarDisplaySubtitle, X + W / 2 - W2/2, Y + 22, W2, 8)
-    fill(255)
-    stroke(0)
+    fill(34, 25, 64)
+    stroke(53, 40, 96)
     Rect(X + 4, Y + 22 + 16, W - 8, sidebarDefaultSize - 12)
     if (LegendaryImages[LEGENDARIES.indexOf(sidebar_leg)] != undefined) {
       var X_1 = X + 4
@@ -431,7 +431,7 @@ function draw() {
       var H_1 = sidebarDefaultSize - 12
       image(LegendaryImages[LEGENDARIES.indexOf(sidebar_leg)], X_1 + W_1/2 - min(W_1, H_1 - 15) / 2, Y_1 + 15 + (H_1-15)/2 - min(W_1, H_1 - 15) / 2, min(W_1, H_1 - 15), min(W_1, H_1 - 15))
     }
-    fill(0)
+    fill(237, 230, 255)
     var Y2 = Y + 16 + 16 + sidebarDefaultSize
     line(X, Y2, X + W, Y2)
     noStroke()
