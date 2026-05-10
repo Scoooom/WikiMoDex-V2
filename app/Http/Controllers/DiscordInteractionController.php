@@ -378,6 +378,8 @@ class DiscordInteractionController extends Controller
         }
         return $capped;
     }
+
+    private function generateAltBuildSprite(\App\Models\AltBuild $build): ?string
     {
         $script    = base_path('scripts/render_alt_build_sprite.py');
         $srcSprite = base_path("pokevoid/public/images/pokemon/{$build->dex_number}.png");
