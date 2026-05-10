@@ -88,35 +88,6 @@ Route::get('/pokevoid-atlas/{dex}.json', function ($dex) {
                           ->header('Access-Control-Allow-Origin', '*')
                           ->header('Cache-Control', 'public, max-age=86400');
 })->where('dex', '\d+');
-    if (!preg_match('/^[\w\-]+\.png$/', $filename)) abort(404);
-    $path = base_path("pokevoid/public/images/pokemon/{$filename}");
-    if (!file_exists($path)) abort(404);
-
-    // Return embedded atlas JSON if requested
-    if ($request->has('atlas')) {
-        $img = new \Imagick($path);
-        $profiles = $img->getImageProfiles('*', true);
-        // PIL-style: read PNG text chunks via GD or raw parsing
-        $raw = file_get_contents($path);
-        // Find tEXt/zTXt chunks with jsonData
-        if (preg_match('/jsonData\x00([^"]+)/s', $raw, $m)) {
-            // Try to decompress
-            $b64 = trim($m[1]);
-        }
-        // Simpler: use Python to extract
-        $py = base_path('scripts/extract_atlas.py');
-        $out = shell_exec("python3 {$py} " . escapeshellarg($path) . " 2>/dev/null");
-        if ($out) return response($out)->header('Content-Type', 'application/json')
-                                      ->header('Access-Control-Allow-Origin', '*');
-        abort(404);
-    }
-
-    return response()->file($path, [
-        'Content-Type' => 'image/png',
-        'Cache-Control' => 'public, max-age=86400',
-        'Access-Control-Allow-Origin' => '*',
-    ]);
-})->where('filename', '[\w\-]+\.png');
 
 Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {
     $build = \App\Models\AltBuild::where('build_id', $buildId)->first();
