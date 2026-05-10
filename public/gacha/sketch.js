@@ -370,11 +370,11 @@ function inRectArea(X, Y, x, y, w, h, inclusive) {
 click = false
 
 // Colour palette matching site
-var C_BG       = [19,  16,  34]
-var C_CARD     = [34,  25,  64]
-var C_CARD2    = [43,  32,  80]
-var C_HOVER    = [58,  44,  100]
-var C_BORDER   = [80,  60,  130]
+var C_BG       = [13,  10,  22]
+var C_CARD     = [38,  28,  70]
+var C_CARD2    = [50,  38,  88]
+var C_HOVER    = [65,  50,  108]
+var C_BORDER   = [75,  58,  118]
 var C_ACCENT   = [124, 92,  191]
 var C_TEXT     = [237, 230, 255]
 var C_MUTED    = [157, 143, 192]
@@ -431,9 +431,7 @@ function draw() {
       noStroke()
       fill(C_CARD2[0], C_CARD2[1], C_CARD2[2])
       rect(X, Y, W, H, CORNER)
-      // Accent left border for today
       fill(C_ACCENT[0], C_ACCENT[1], C_ACCENT[2])
-      noStroke()
       rect(X, Y, 3, H, CORNER, 0, 0, CORNER)
     } else if (isHover) {
       noStroke()
@@ -445,13 +443,6 @@ function draw() {
       fill(C_CARD[0], C_CARD[1], C_CARD[2])
       rect(X, Y, W, H, CORNER)
     }
-    // Border on top
-    strokeWeight(1)
-    stroke(C_BORDER[0], C_BORDER[1], C_BORDER[2])
-    noFill()
-    rect(X, Y, W, H, CORNER)
-    noStroke()
-    strokeWeight(1)
 
     // Click handler
     if (isHover && click) {
@@ -513,7 +504,22 @@ function draw() {
     }
   }
 
-  // Weekday header row
+  // Second pass: draw borders on top of everything
+  var lastcol2 = 0
+  var r2 = 0
+  for (var i = 0; i < m.length; i++) {
+    if (lastcol2 > m[i].date.getUTCDay()) r2++
+    lastcol2 = m[i].date.getUTCDay()
+    var X = scalar(lastcol2, 7, PAD, width - PAD - SB, PAD)
+    var Y = scalar(r2, rows, TOP + PAD, height - BOT, PAD)
+    var W = scalarSize(7, PAD, width - PAD - SB, PAD)
+    var H = scalarSize(rows, TOP + PAD, height - BOT, PAD)
+    noFill()
+    strokeWeight(1)
+    stroke(C_BORDER[0], C_BORDER[1], C_BORDER[2])
+    rect(X, Y, W, H, CORNER)
+    noStroke()
+  }
   for (var i = 0; i < 7; i++) {
     var X = scalar(i, 7, PAD, width - PAD - SB, PAD)
     var W = scalarSize(7, PAD, width - PAD - SB, PAD)
