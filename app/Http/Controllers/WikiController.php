@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\WikiArticle;
 use Illuminate\Http\Request;
-use League\CommonMark\CommonMarkConverter;
 use Illuminate\Support\Str;
 
 class WikiController extends Controller
@@ -13,10 +12,14 @@ class WikiController extends Controller
 
     private function markdown(string $content): string
     {
-        $converter = new CommonMarkConverter([
-            'html_input' => 'strip',
+        $environment = new \League\CommonMark\Environment\Environment([
+            'html_input'         => 'strip',
             'allow_unsafe_links' => false,
         ]);
+        $environment->addExtension(new \League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension());
+        $environment->addExtension(new \League\CommonMark\Extension\GithubFlavoredMarkdown\GithubFlavoredMarkdownExtension());
+
+        $converter = new \League\CommonMark\MarkdownConverter($environment);
         return $converter->convert($content)->getContent();
     }
 
