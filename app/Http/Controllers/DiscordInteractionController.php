@@ -214,7 +214,7 @@ class DiscordInteractionController extends Controller
         ])->values()->toArray();
 
         return response()->json([
-            'type' => self::AUTOCOMPLETE,
+            'type' => self::AUTOCOMPLETE_RESULT,
             'data' => ['choices' => $choices],
         ]);
     }
