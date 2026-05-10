@@ -427,26 +427,28 @@ function draw() {
     var isToday = m[i].day == day() - 1 && m[i].month == month() && m[i].year == year()
     var isHover = inRectArea(mouseX, mouseY, X, Y, W, H)
 
-    noStroke()
     if (isToday) {
+      noStroke()
       fill(C_CARD2[0], C_CARD2[1], C_CARD2[2])
+      rect(X, Y, W, H, CORNER)
       // Accent left border for today
       fill(C_ACCENT[0], C_ACCENT[1], C_ACCENT[2])
+      noStroke()
       rect(X, Y, 3, H, CORNER, 0, 0, CORNER)
-      fill(C_CARD2[0], C_CARD2[1], C_CARD2[2])
-      rect(X + 3, Y, W - 3, H, 0, CORNER, CORNER, 0)
     } else if (isHover) {
+      noStroke()
       fill(C_HOVER[0], C_HOVER[1], C_HOVER[2])
       rect(X, Y, W, H, CORNER)
       cursor('pointer')
     } else {
+      noStroke()
       fill(C_CARD[0], C_CARD[1], C_CARD[2])
       rect(X, Y, W, H, CORNER)
     }
-    // Subtle border
-    noFill()
-    stroke(C_BORDER[0], C_BORDER[1], C_BORDER[2])
+    // Border on top
     strokeWeight(0.5)
+    stroke(C_BORDER[0], C_BORDER[1], C_BORDER[2])
+    noFill()
     rect(X, Y, W, H, CORNER)
     noStroke()
 
