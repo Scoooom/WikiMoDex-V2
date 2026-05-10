@@ -393,37 +393,6 @@ class DiscordInteractionController extends Controller
             ]);
         }
     }
-    {
-        $msg = str_replace('Ω', '_omega', $msg);
-        $msgLower = trim(strtolower($msg));
-
-        $form     = null;
-        $custom   = false;
-        $coreForm = false;
-        $smittyMon  = false;
-        $smittyForm = false;
-
-        $glitch = Glitch::whereRaw('LOWER(name) = ?', [$msgLower])->first();
-        if ($glitch) {
-            $form   = $glitch;
-            $custom = true;
-        } else {
-            $form = BuiltInService::loadCore($msgLower);
-            if ($form) {
-                $coreForm = true;
-            } else {
-                $form = BuiltInService::loadSmitty($msgLower);
-                if ($form) {
-                    $smittyMon = true;
-                } else {
-                    $form = BuiltInService::loadSmittyForm($msgLower);
-                    if ($form) {
-                        $smittyForm = true;
-                    }
-                }
-            }
-        }
-
     private function statBar(int $value): string
     {
         $rounded = round($value / 5) * 5;
