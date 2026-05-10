@@ -4,210 +4,158 @@
 @php
     $save = $user->getSave();
     if (is_array($save) && isset($save['er'])) {
-        echo '<small>Trainer Card Error [0001]<br>Please DM scooom on Discord if you encountered this page in error.</small>';
+        echo '<div class="alert alert-danger">Trainer Card Error [0001] — Please DM scooom on Discord if you encountered this page in error.</div>';
         return;
     }
-    $defeatedRivals = $save->getDefeatedRivals();
-    $glitchUnlocks = $save->getGlitchUnlocks();
-    $smittyUnlocks = $save->getSmittyUnlocks();
-    $formUnlocks = $save->getFormUnlocks();
+    $defeatedRivals  = $save->getDefeatedRivals();
+    $glitchUnlocks   = $save->getGlitchUnlocks();
+    $smittyUnlocks   = $save->getSmittyUnlocks();
+    $formUnlocks     = $save->getFormUnlocks();
 @endphp
 
 <style>
-img.gray {
-    -webkit-filter: grayscale(1);
-    filter: grayscale(1);
-}
-.overlayIMG {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    opacity: 0.15;
-}
-div.rivalImg {
-    position: relative;
-    overflow: hidden;
-    width: 75px;
-    height: 75px;
-    display: block;
-}
-p.rivalName {
-    left: -20%;
-    position: relative;
-}
+.tc-grid { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
+.tc-section { margin-bottom: 20px; }
+.tc-section-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+.tc-mon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.tc-mon-item { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 10px 8px; text-align: center; transition: border-color .15s; }
+.tc-mon-item:hover { border-color: var(--accent); }
+.tc-mon-item img { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; border-radius: 50%; background: var(--surface); }
+.tc-mon-item a { font-size: 11px; color: var(--accent2); display: block; margin-top: 5px; }
+.rival-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+.rival-item { text-align: center; }
+.rival-wrap { position: relative; width: 72px; height: 72px; margin: 0 auto 5px; }
+.rival-wrap img.rival-sprite { width: 72px; height: 72px; border-radius: 50%; background: var(--surface); object-fit: cover; }
+.rival-wrap img.rival-sprite.gray { filter: grayscale(1); opacity: .5; }
+.rival-wrap img.rival-overlay { position: absolute; bottom: 0; right: 0; width: 22px; height: 22px; }
+.rival-name { font-size: 10px; color: var(--muted); }
 </style>
 
-<section>
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-body text-center">
-                    <img src="{{ $user->getAvatarURL() }}" class="rounded-circle img-fluid" style="width: 150px;">
-                    <h5 class="my-3">{{ $user->username }}</h5>
+<div class="container mt-2">
+    <div class="tc-grid">
+
+        {{-- Sidebar --}}
+        <div>
+            <div class="card">
+                <div class="card-body" style="text-align:center">
+                    <img src="{{ $user->getAvatarURL() }}" class="profile-avatar mb-3" alt="{{ $user->username }}">
+                    <div class="mon-name" style="font-size:18px">{{ $user->username }}</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:4px">Trainer Card</div>
                 </div>
             </div>
         </div>
-        <div class="col-lg">
-            <div class="card mb">
-                <div class="card-body text-center">
-                    <h3>Rivals Defeated</h3>
-                    <div class="row">
+
+        {{-- Main --}}
+        <div>
+
+            {{-- Rivals --}}
+            <div class="card tc-section">
+                <div class="card-header">Rivals defeated</div>
+                <div class="card-body">
+                    <div class="rival-grid">
                         @foreach($defeatedRivals as $i => $rival)
                             @if(!is_string($i))
-                                @if($i > 0 && $i % 7 === 0)
-                                    </div><div class="row">
-                                @endif
-                                @php
-                                    $gray = $rival['defeated'] === 'true' ? '' : ' gray';
-                                    $imgURL = $rival['defeated'] === 'true'
-                                        ? '/img/green.png'
-                                        : '/img/red.png';
-                                    $rivalImg = strtolower(str_replace(' ', '_', $rival['name']));
-                                @endphp
-                                <div class="col text-center">
-                                    <div class="row rivalImg">
-                                        <img class="rounded-circle img-fluid{{ $gray }}"
-                                            style="height: 75px; width: 75px; background-color: gray"
-                                            src="/rivals/{{ $rivalImg }}.png">
-                                        <img class="overlayIMG rounded-circle img-fluid"
-                                            style="width: 100%; height: 100%;"
-                                            src="{{ $imgURL }}">
-                                    </div>
-                                    <p class="rivalName">{{ $rival['name'] }}</p>
-                                </div>
-                            @endif
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Core Glitch Unlocks --}}
-    <div>&nbsp;</div>
-    <div class="row">
-        <div class="col-lg-4"></div>
-        <div class="col-lg">
-            <div class="card mb">
-                <div class="card-body text-center">
-                    <h3>Unlocked Core Glitch</h3>
-                    <div class="row">
-                        @foreach($glitchUnlocks as $i => $un)
-                            @if($i > 0 && $i % 4 === 0)
-                                </div><div class="row">
-                            @endif
-                            <div class="col">
-                                <img class="rounded-circle img-fluid"
-                                    style="max-height: 150px; background-color: gray"
-                                    src="/cFront:{{ urlencode($un->name) }}.png">
-                                <br>
-                                <a href="/core:{{ urlencode($un->name) }}.html">{{ $un->name }}</a>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Mod Glitch Unlocks --}}
-    <div>&nbsp;</div>
-    <div class="row">
-        <div class="col-lg-4"></div>
-        <div class="col-lg">
-            <div class="card mb">
-                <div class="card-body text-center">
-                    <h3>Unlocked ModGlitches</h3>
-                    <div class="row">
-                        @php $counter = 0; @endphp
-                        @foreach($formUnlocks['modFormsUnlocked'] as $unlock)
                             @php
-                                $name = preg_replace('/(.*)_(.*)/', '$2', $unlock);
-                                $name = str_replace(' ', '', $name);
-                                $un = \App\Models\Glitch::where('name', $name)->first();
+                                $gray = $rival['defeated'] === 'true' ? '' : ' gray';
+                                $imgURL = $rival['defeated'] === 'true' ? '/img/green.png' : '/img/red.png';
+                                $rivalImg = strtolower(str_replace(' ', '_', $rival['name']));
                             @endphp
-                            @if($un)
-                                @if($counter > 0 && $counter % 4 === 0)
-                                    </div><div class="row">
-                                @endif
-                                <div class="col">
-                                    <img class="rounded-circle img-fluid"
-                                        style="max-height: 150px; background-color: gray"
-                                        src="/front:{{ $un->id }}.png">
-                                    <br>
-                                    <a href="/g:{{ urlencode($un->name) }}:{{ $un->id }}.html">{{ $un->name }}</a>
+                            <div class="rival-item">
+                                <div class="rival-wrap">
+                                    <img class="rival-sprite{{ $gray }}" src="/rivals/{{ $rivalImg }}.png" alt="{{ $rival['name'] }}">
+                                    <img class="rival-overlay" src="{{ $imgURL }}" alt="">
                                 </div>
-                                @php $counter++; @endphp
-                            @endif
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Smitty Form Unlocks --}}
-    <div>&nbsp;</div>
-    <div class="row">
-        <div class="col-lg-4"></div>
-        <div class="col-lg">
-            <div class="card mb">
-                <div class="card-body text-center">
-                    <h3>Unlocked Smitty Forms</h3>
-                    <div class="row">
-                        @foreach($smittyUnlocks as $i => $un)
-                            @if($i > 0 && $i % 4 === 0)
-                                </div><div class="row">
-                            @endif
-                            <div class="col">
-                                <img class="rounded-circle img-fluid"
-                                    style="max-height: 150px; background-color: gray"
-                                    src="/cFront:{{ urlencode($un->name) }}.png">
-                                <br>
-                                <a href="/smittyForm:{{ urlencode($un->name) }}.html">{{ $un->name }}</a>
+                                <div class="rival-name">{{ $rival['name'] }}</div>
                             </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- UniSMITTY Unlocks --}}
-    <div>&nbsp;</div>
-    <div class="row">
-        <div class="col-lg-4"></div>
-        <div class="col-lg">
-            <div class="card mb">
-                <div class="card-body text-center">
-                    <h3>Unlocked UniSMITTY Forms</h3>
-                    <div class="row">
-                        @php $counter = 0; @endphp
-                        @foreach($formUnlocks['uniSmittyUnlocks'] as $unlock)
-                            @if(empty($unlock)) @continue @endif
-                            @php
-                                $name = preg_replace('/(.*?)_(.*)/', '$2', $unlock);
-                                $name = str_replace(' ', '', $name);
-                                $un = \App\Services\BuiltInService::loadSmitty($name);
-                            @endphp
-                            @if($un)
-                                @if($counter > 0 && $counter % 4 === 0)
-                                    </div><div class="row">
-                                @endif
-                                <div class="col">
-                                    <img class="rounded-circle img-fluid"
-                                        style="max-height: 150px; background-color: gray"
-                                        src="/cFront:{{ urlencode($un->name) }}.png">
-                                    <br>
-                                    <a href="/smitty:{{ urlencode($un->name) }}.html">{{ $un->name }}</a>
-                                </div>
-                                @php $counter++; @endphp
                             @endif
                         @endforeach
                     </div>
                 </div>
             </div>
+
+            {{-- Core Glitch Unlocks --}}
+            @if(count($glitchUnlocks) > 0)
+            <div class="card tc-section">
+                <div class="card-header">Unlocked core glitches</div>
+                <div class="card-body">
+                    <div class="tc-mon-grid">
+                        @foreach($glitchUnlocks as $un)
+                        <div class="tc-mon-item">
+                            <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
+                            <a href="/core:{{ urlencode($un->name) }}.html">{{ ucwords($un->name) }}</a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            {{-- Mod Glitch Unlocks --}}
+            @php
+                $modForms = collect($formUnlocks['modFormsUnlocked'])->map(function($unlock) {
+                    $name = preg_replace('/(.*)_(.*)/', '$2', $unlock);
+                    $name = str_replace(' ', '', $name);
+                    return \App\Models\Glitch::where('name', $name)->first();
+                })->filter();
+            @endphp
+            @if($modForms->count() > 0)
+            <div class="card tc-section">
+                <div class="card-header">Unlocked mod glitches</div>
+                <div class="card-body">
+                    <div class="tc-mon-grid">
+                        @foreach($modForms as $un)
+                        <div class="tc-mon-item">
+                            <img src="/front:{{ $un->id }}.png" alt="{{ $un->name }}">
+                            <a href="/g:{{ urlencode($un->name) }}:{{ $un->id }}.html">{{ $un->name }}</a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            {{-- Smitty Form Unlocks --}}
+            @if(count($smittyUnlocks) > 0)
+            <div class="card tc-section">
+                <div class="card-header">Unlocked SMITTY forms</div>
+                <div class="card-body">
+                    <div class="tc-mon-grid">
+                        @foreach($smittyUnlocks as $un)
+                        <div class="tc-mon-item">
+                            <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
+                            <a href="/smittyForm:{{ urlencode($un->name) }}.html">{{ ucwords($un->name) }}</a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            {{-- UniSMITTY Unlocks --}}
+            @php
+                $uniSmitty = collect($formUnlocks['uniSmittyUnlocks'])->filter()->map(function($unlock) {
+                    $name = preg_replace('/(.*?)_(.*)/', '$2', $unlock);
+                    $name = str_replace(' ', '', $name);
+                    return \App\Services\BuiltInService::loadSmitty($name);
+                })->filter();
+            @endphp
+            @if($uniSmitty->count() > 0)
+            <div class="card tc-section">
+                <div class="card-header">Unlocked UniSMITTY forms</div>
+                <div class="card-body">
+                    <div class="tc-mon-grid">
+                        @foreach($uniSmitty as $un)
+                        <div class="tc-mon-item">
+                            <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
+                            <a href="/smitty:{{ urlencode($un->name) }}.html">{{ ucwords($un->name) }}</a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
         </div>
     </div>
-</section>
+</div>
 @endsection
