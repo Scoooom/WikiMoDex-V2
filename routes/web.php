@@ -82,7 +82,7 @@ Route::get('/pokevoid-sprites/{filename}', function ($filename) {
     if (!preg_match('/^[\w\-]+\.png$/', $filename)) abort(404);
     $path = base_path("pokevoid/public/images/pokemon/{$filename}");
     if (!file_exists($path)) abort(404);
-    return response()->file($path, ['Content-Type' => 'image/png', 'Cache-Control' => 'public, max-age=86400']);
+    return response()->file($path, ['Content-Type' => 'image/png', 'Cache-Control' => 'public, max-age=86400', 'Access-Control-Allow-Origin' => '*']);
 })->where('filename', '[\w\-]+\.png');
 
 Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {

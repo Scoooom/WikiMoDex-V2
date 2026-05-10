@@ -223,18 +223,20 @@ document.querySelectorAll('.altbuild-card').forEach(card => {
 
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = `/pokevoid-sprites/${dex}.png`;
+    img.src = `/pokevoid-sprites/${dex}.png?v=1`;
 
     img.onload = () => {
-        // Draw at canvas size (160×160), centred with aspect ratio
-        const scale = Math.min(160 / img.width, 160 / img.height);
-        const w = img.width * scale;
-        const h = img.height * scale;
-        const x = (160 - w) / 2;
-        const y = (160 - h) / 2;
+        // Draw at canvas size centred, preserving aspect ratio
+        const size = 160;
+        const scale = Math.min(size / img.naturalWidth, size / img.naturalHeight) * 0.85;
+        const w = Math.round(img.naturalWidth * scale);
+        const h = Math.round(img.naturalHeight * scale);
+        const x = Math.round((size - w) / 2);
+        const y = Math.round((size - h) / 2);
 
-        ctx.clearRect(0, 0, 160, 160);
-        ctx.drawImage(img, x, y, w, h);
+        ctx.clearRect(0, 0, size, size);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, x, y, w, h);
 
         // Apply recolour
         const imageData = ctx.getImageData(0, 0, 160, 160);
