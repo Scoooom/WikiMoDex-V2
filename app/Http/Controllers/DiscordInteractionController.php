@@ -336,7 +336,7 @@ class DiscordInteractionController extends Controller
                 $fields[] = ['name' => 'Created by', 'value' => "[{$creator->username}](https://void.scooom.xyz/u:{$creator->username}.html)", 'inline' => true];
             }
 
-            $fields[] = ['name' => 'Types', 'value' => $typesStr, 'inline' => true];
+            $fields[] = ['name' => 'Types', 'value' => $typesStr, 'inline' => false];
 
             $fields[] = ['name' => 'Ability 1', 'value' => "**{$ab1Name}**\n{$ab1Desc}", 'inline' => true];
             $fields[] = ['name' => 'Ability 2', 'value' => "**{$ab2Name}**\n{$ab2Desc}", 'inline' => true];
