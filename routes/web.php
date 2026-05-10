@@ -83,6 +83,7 @@ use App\Http\Controllers\WikiController;
 Route::get('/wiki.html',               [WikiController::class, 'index'])->name('wiki.index');
 Route::get('/wiki:items.html',         [WikiController::class, 'items'])->name('wiki.items');
 Route::get('/wiki:{slug}.html',        [WikiController::class, 'show'])->name('wiki.show');
+Route::get('/wiki-search.json',        [\App\Http\Controllers\WikiSearchController::class, 'search'])->name('wiki.search');
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin/wiki.html',           [WikiController::class, 'adminIndex'])->name('wiki.admin.index');
