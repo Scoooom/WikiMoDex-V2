@@ -162,12 +162,21 @@ class DiscordInteractionController extends Controller
             return response()->json([
                 'type' => self::CHANNEL_MESSAGE,
                 'data' => [
-                    'content' =>
-                        "The WikiMoDex can be found [here](<https://void.scooom.xyz/>)! " .
-                        "You can use it to look up [Core Glitches](<https://void.scooom.xyz/galleryCore.html>) " .
-                        "and [Mod Glitches](<https://void.scooom.xyz/gallery.html>).\n" .
-                        "Additionally, you may find the [FAQ](<https://void.scooom.xyz/faq.html>) " .
-                        "and the [Legendary Up And PokeRus Calendar](<https://void.scooom.xyz/gacha.html>)!"
+                    'embeds' => [[
+                        'title'       => 'WikiMoDex',
+                        'description' => 'The PokéVoid community wiki and Pokémon form database.',
+                        'color'       => 0x7c5cbf,
+                        'fields'      => [
+                            ['name' => '📖 Wiki',          'value' => "[Game mechanics, champions, items & more](<https://void.scooom.xyz/wiki.html>)",                   'inline' => false],
+                            ['name' => '🎒 Items',         'value' => "[Full item reference by tier](<https://void.scooom.xyz/wiki:items.html>)",                         'inline' => true],
+                            ['name' => '✨ Alt Builds',    'value' => "[Champion alt build gallery](<https://void.scooom.xyz/wiki:alt-builds.html>)",                     'inline' => true],
+                            ['name' => '👾 Mod Glitches',  'value' => "[Community-made glitch forms](<https://void.scooom.xyz/gallery.html>)",                           'inline' => true],
+                            ['name' => '⚡ Core Glitches', 'value' => "[Official glitch forms](<https://void.scooom.xyz/galleryCore.html>)",                             'inline' => true],
+                            ['name' => '📅 Gacha',         'value' => "[Today\'s legendary & Pokérus calendar](<https://void.scooom.xyz/gacha.html>)",                   'inline' => true],
+                            ['name' => '❓ FAQ',           'value' => "[Frequently asked questions](<https://void.scooom.xyz/faq.html>)",                                 'inline' => true],
+                        ],
+                        'footer' => ['text' => 'WikiMoDex • Use /form, /ability, or /alt-build for specific lookups'],
+                    ]]
                 ]
             ]);
         }

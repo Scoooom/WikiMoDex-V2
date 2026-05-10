@@ -37,6 +37,7 @@ class SyncPokevoid extends Command
         $this->call('items:parse');
         $this->call('changelog:parse');
         $this->call('altbuilds:parse');
+        $this->call('altbuilds:warm-sprites');
 
         $this->info('Sync complete!');
         return 0;
