@@ -1118,9 +1118,9 @@ Champions are the playable characters of PokéVoid. Each Champion has a unique t
 
 | Champion | Types | Signature Pokémon | Unlock |
 |----------|-------|-------------------|--------|
-| [Apollo / Diana](apollo) | Random (changes each run) | Solrock, Lunatone | Available from start |
-| [Brock](brock) | Rock / Ground | Onix | 75 Ground + 75 Rock Essences |
-| [Misty](misty) | Water | Staryu | 200 Water Essences |
+| [Apollo / Diana](/wiki:apollo.html) | Random (changes each run) | Solrock, Lunatone | Available from start |
+| [Brock](/wiki:brock.html) | Rock / Ground | Onix | 75 Ground + 75 Rock Essences |
+| [Misty](/wiki:misty.html) | Water | Staryu | 200 Water Essences |
 | Lt. Surge | Electric | Voltorb | *Coming soon* |
 | Blaine | Fire | *TBA* | *Coming soon* |
 | Sabrina | Psychic | *TBA* | *Coming soon* |
