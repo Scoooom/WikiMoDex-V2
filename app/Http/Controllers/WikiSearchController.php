@@ -20,6 +20,26 @@ class WikiSearchController extends Controller
 
         $results = [];
 
+        // ── Special pages ─────────────────────────────────────────────
+        $specialPages = [
+            ['title' => 'Items Reference',  'url' => route('wiki.items'),      'subtitle' => 'Items & Shop',  'excerpt' => 'All in-game items by tier — Common, Great, Ultra, Rogue, Master, Omega.'],
+            ['title' => 'Alt Builds',        'url' => route('wiki.altbuilds'),  'subtitle' => 'Champions',     'excerpt' => 'Alternate forms of Champion Signature Pokémon with unique types, abilities and stats.'],
+            ['title' => 'Changelog',         'url' => route('wiki.changelog'),  'subtitle' => 'Meta',          'excerpt' => 'All PokéVoid releases, auto-generated from the game source repository.'],
+        ];
+
+        foreach ($specialPages as $page) {
+            if (stripos($page['title'], $q) !== false || stripos($page['excerpt'], $q) !== false) {
+                $results[] = [
+                    'type'     => 'article',
+                    'label'    => 'Wiki',
+                    'title'    => $page['title'],
+                    'subtitle' => $page['subtitle'],
+                    'excerpt'  => $page['excerpt'],
+                    'url'      => $page['url'],
+                ];
+            }
+        }
+
         // ── Wiki Articles ─────────────────────────────────────────────
         $articles = WikiArticle::where('title', 'like', "%{$q}%")
             ->orWhere('content', 'like', "%{$q}%")
