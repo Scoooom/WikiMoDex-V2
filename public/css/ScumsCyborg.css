@@ -272,7 +272,7 @@ img { max-width: 100%; display: block; }
     text-transform: capitalize;
     letter-spacing: .02em;
 }
-/* Type badge colours — order matches PokeVoid Type enum (parse_forms.py load_types()) */
+/* Type badge colours -- order matches PokeVoid Type enum (parse_forms.py load_types()) */
 /* 0=Normal 1=Fighting 2=Flying 3=Poison 4=Ground 5=Rock 6=Bug 7=Ghost */
 /* 8=Steel 9=Fire 10=Water 11=Grass 12=Electric 13=Psychic 14=Ice 15=Dragon 16=Dark 17=Fairy */
 .type-0  { background:rgba(168,168,120,.25); color:#d0d078; } /* Normal */
@@ -419,8 +419,8 @@ img { max-width: 100%; display: block; }
     white-space: nowrap;
 }
 .gallery-table thead th:hover { color: var(--muted); }
-.gallery-table thead th.sorted-asc::after  { content: ' ↑'; color: var(--accent2); }
-.gallery-table thead th.sorted-desc::after { content: ' ↓'; color: var(--accent2); }
+.gallery-table thead th.sorted-asc::after  { content: ' asc'; color: var(--accent2); }
+.gallery-table thead th.sorted-desc::after { content: ' desc'; color: var(--accent2); }
 
 .gallery-table tbody tr {
     border-bottom: 1px solid var(--border);

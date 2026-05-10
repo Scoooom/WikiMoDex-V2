@@ -36,7 +36,7 @@
     </div>
 
     @php
-        $featured = \App\Models\Glitch::withCount(['glitchLikes as likes_count'])
+        $featured = \App\Models\Glitch::withCount('likes')
             ->orderBy('likes_count', 'desc')
             ->take(6)
             ->get();
@@ -66,7 +66,7 @@
                     </span>
                     @endif
                 </div>
-                <div class="mon-card-likes">♥ <span>{{ $glitch->likes_count }}</span> likes</div>
+                <div class="mon-card-likes">♥ <span>{{ $glitch->getRating() }}</span> likes</div>
             </a>
         @endforeach
     </div>
