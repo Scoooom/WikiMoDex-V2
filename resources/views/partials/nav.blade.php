@@ -98,12 +98,14 @@ document.addEventListener('click', function(e) {
 </div>
 
 <script>
-(function() {
+document.addEventListener('DOMContentLoaded', function() {
     const btn      = document.getElementById('wikiSearchOpen');
     const backdrop = document.getElementById('wikiSearchBackdrop');
     const modal    = document.getElementById('wikiSearchModal');
     const input    = document.getElementById('wikiSearchInput');
     const results  = document.getElementById('wikiSearchResults');
+
+    if (!btn || !modal) return;
 
     const TYPE_ICONS = {
         article: '📄',
@@ -219,5 +221,5 @@ document.addEventListener('click', function(e) {
             a.addEventListener('click', close);
         });
     }
-})();
+});
 </script>
