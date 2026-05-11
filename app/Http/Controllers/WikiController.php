@@ -8,8 +8,6 @@ use Illuminate\Support\Str;
 
 class WikiController extends Controller
 {
-    private const ADMIN_DISCORD_ID = '356260100064673814'; // scooom's Discord user ID
-
     private function markdown(string $content): string
     {
         $environment = new \League\CommonMark\Environment\Environment([
@@ -33,12 +31,6 @@ class WikiController extends Controller
 
         $converter = new \League\CommonMark\MarkdownConverter($environment);
         return $converter->convert($content)->getContent();
-    }
-
-    private function isAdmin(): bool
-    {
-        $user = auth()->user();
-        return $user && $user->user_id === self::ADMIN_DISCORD_ID;
     }
 
     // ── Public routes ──────────────────────────────────────────────
@@ -115,14 +107,12 @@ class WikiController extends Controller
 
     public function adminIndex()
     {
-        abort_unless($this->isAdmin(), 404);
         $articles = WikiArticle::orderBy('category')->orderBy('order')->get();
         return view('admin.wiki-index', compact('articles'));
     }
 
     public function adminEdit(string $slug)
     {
-        abort_unless($this->isAdmin(), 404);
         $article = WikiArticle::where('slug', $slug)->firstOrFail();
         $categories = WikiArticle::categoryOrder();
         return view('admin.wiki-edit', compact('article', 'categories'));
@@ -130,7 +120,6 @@ class WikiController extends Controller
 
     public function adminSave(Request $request, string $slug)
     {
-        abort_unless($this->isAdmin(), 404);
         $article = WikiArticle::where('slug', $slug)->firstOrFail();
 
         $data = $request->validate([
@@ -159,14 +148,12 @@ class WikiController extends Controller
 
     public function adminNew()
     {
-        abort_unless($this->isAdmin(), 404);
         $categories = WikiArticle::categoryOrder();
         return view('admin.wiki-new', compact('categories'));
     }
 
     public function adminCreate(Request $request)
     {
-        abort_unless($this->isAdmin(), 404);
 
         $data = $request->validate([
             'title'    => 'required|string|max:255',
@@ -190,7 +177,6 @@ class WikiController extends Controller
 
     public function adminDelete(Request $request, string $slug)
     {
-        abort_unless($this->isAdmin(), 404);
         WikiArticle::where('slug', $slug)->firstOrFail()->delete();
         return redirect()->route('wiki.admin.index')
             ->with('success', 'Article deleted.');

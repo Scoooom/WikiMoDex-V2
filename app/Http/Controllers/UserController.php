@@ -10,10 +10,17 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    private function isOwner(User $user): bool
+    {
+        if (!Auth::check()) return false;
+        $authUser = Auth::user();
+        return $authUser->id === $user->id || $authUser->isAdmin();
+    }
+
     public function profile($username)
     {
         $user = User::where('username', $username)->firstOrFail();
-        $isOwner = Auth::check() && (Auth::user()->username === $username || Auth::user()->username === 'scooom');
+        $isOwner = $this->isOwner($user);
         $likes = UserLike::where('creatorID', $user->id)->count();
         $glitches = $user->glitches;
 
@@ -23,9 +30,8 @@ class UserController extends Controller
     public function uploadSave(Request $request, $username)
     {
         $user = User::where('username', $username)->firstOrFail();
-        $isOwner = Auth::check() && (Auth::user()->username === $username || Auth::user()->username === 'scooom');
 
-        if (!$isOwner) {
+        if (!$this->isOwner($user)) {
             return redirect('/');
         }
 
@@ -42,9 +48,8 @@ class UserController extends Controller
     public function deleteSave($username)
     {
         $user = User::where('username', $username)->firstOrFail();
-        $isOwner = Auth::check() && (Auth::user()->username === $username || Auth::user()->username === 'scooom');
 
-        if (!$isOwner) {
+        if (!$this->isOwner($user)) {
             return redirect('/');
         }
 
@@ -58,9 +63,8 @@ class UserController extends Controller
     public function downloadSave($username)
     {
         $user = User::where('username', $username)->firstOrFail();
-        $isOwner = Auth::check() && (Auth::user()->username === $username || Auth::user()->username === 'scooom');
 
-        if (!$isOwner) {
+        if (!$this->isOwner($user)) {
             return redirect('/');
         }
 
@@ -92,5 +96,4 @@ class UserController extends Controller
                 return redirect('/u:' . $username . '.html');
         }
     }
-
 }

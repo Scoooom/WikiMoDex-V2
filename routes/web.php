@@ -181,11 +181,21 @@ Route::get('/wiki:changelog.html',     [WikiController::class, 'changelog'])->na
 Route::get('/wiki:{slug}.html',        [WikiController::class, 'show'])->name('wiki.show');
 Route::get('/wiki-search.json',        [\App\Http\Controllers\WikiSearchController::class, 'search'])->name('wiki.search');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/admin/wiki.html',           [WikiController::class, 'adminIndex'])->name('wiki.admin.index');
-    Route::get('/admin/wiki/new.html',       [WikiController::class, 'adminNew'])->name('wiki.admin.new');
-    Route::post('/admin/wiki/new.html',      [WikiController::class, 'adminCreate'])->name('wiki.admin.create');
-    Route::get('/admin/wiki:{slug}.html',    [WikiController::class, 'adminEdit'])->name('wiki.admin.edit');
-    Route::post('/admin/wiki:{slug}.html',   [WikiController::class, 'adminSave'])->name('wiki.admin.save');
-    Route::delete('/admin/wiki:{slug}.html', [WikiController::class, 'adminDelete'])->name('wiki.admin.delete');
+// ── Admin ─────────────────────────────────────────────────────────
+use App\Http\Controllers\AdminController;
+
+Route::middleware('admin')->prefix('admin')->group(function () {
+    Route::get('/',                          [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/users.html',                [AdminController::class, 'users'])->name('admin.users');
+    Route::post('/users/{user}/toggle-admin',[AdminController::class, 'toggleAdmin'])->name('admin.users.toggle');
+    Route::delete('/users/{user}',           [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+
+    // Wiki
+    Route::get('/wiki.html',           [WikiController::class, 'adminIndex'])->name('wiki.admin.index');
+    Route::get('/wiki/new.html',       [WikiController::class, 'adminNew'])->name('wiki.admin.new');
+    Route::post('/wiki/new.html',      [WikiController::class, 'adminCreate'])->name('wiki.admin.create');
+    Route::get('/wiki:{slug}.html',    [WikiController::class, 'adminEdit'])->name('wiki.admin.edit');
+    Route::post('/wiki:{slug}.html',   [WikiController::class, 'adminSave'])->name('wiki.admin.save');
+    Route::delete('/wiki:{slug}.html', [WikiController::class, 'adminDelete'])->name('wiki.admin.delete');
 });
+

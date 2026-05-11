@@ -13,6 +13,11 @@ class User extends Authenticatable
     protected $guarded = [];
     public $timestamps = false;
 
+    public function isAdmin(): bool
+    {
+        return (bool) $this->is_admin;
+    }
+
     public function glitches()
     {
         return $this->hasMany(Glitch::class, 'created_by');

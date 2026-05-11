@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens([
             'discord/interactions',
         ]);
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\RequireAdmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
