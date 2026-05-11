@@ -46,27 +46,29 @@
         <div class="build-slot">
             <div class="build-slot-header">
                 <div class="build-slot-sprite-wrap">
-                    <img
-                        src="/cFront:{{ $slot['species'] }}.png"
-                        class="build-slot-sprite"
-                        alt="{{ $slot['species'] }}"
-                        onerror="this.src='/avatars/default.svg'"
-                    >
+                    @if(!empty($slot['dex_number']))
+                        <canvas class="build-slot-sprite build-slot-sprite--canvas"
+                                data-dex="{{ $slot['dex_number'] }}"
+                                width="80" height="80"></canvas>
+                    @else
+                        <img
+                            src="/cFront:{{ $slot['species'] }}.png"
+                            class="build-slot-sprite"
+                            alt="{{ $slot['species'] }}"
+                            onerror="this.src='/avatars/default.svg'"
+                        >
+                    @endif
                 </div>
                 <div class="build-slot-info">
-                    <div class="build-slot-species">
-                        {{ $slot['species'] }}
-                        @if(!empty($slot['override_type1']) || !empty($slot['override_type2']))
-                            <span class="build-slot-types">
-                                @if(!empty($slot['override_type1']))
-                                    <span class="build-type-badge">{{ $slot['override_type1'] }}</span>
-                                @endif
-                                @if(!empty($slot['override_type2']))
-                                    <span class="build-type-badge">{{ $slot['override_type2'] }}</span>
-                                @endif
-                            </span>
+                    <div class="build-slot-species">{{ $slot['species'] }}</div>
+                    @if($slotTypes['type1'] !== null)
+                    <div class="build-slot-types-row">
+                        <span class="type-badge type-{{ $slotTypes['type1'] }}">{{ $slotTypes['type1_name'] }}</span>
+                        @if($slotTypes['type2'] !== null)
+                        <span class="type-badge type-{{ $slotTypes['type2'] }}">{{ $slotTypes['type2_name'] }}</span>
                         @endif
                     </div>
+                    @endif
                     @if(!empty($slot['ability']))
                         <div class="build-slot-ability">Ability: <span>{{ $slot['ability'] }}</span></div>
                     @endif
@@ -84,6 +86,7 @@
                 $statValues = $slotStat['stats'] ?? null;
                 $statError  = $slotStat['error'] ?? null;
                 $statSource = $slotStat['source'] ?? null;
+                $slotTypes  = $slotStat['types'] ?? ['type1'=>null,'type2'=>null,'type1_name'=>null,'type2_name'=>null];
                 $statFocus  = '';
                 if ($statSource === 'alt_build') {
                     $ab = \App\Models\AltBuild::where('name', $slot['species'])->first();
@@ -100,7 +103,44 @@
                     <div class="build-slot-section-label">Moves</div>
                     <div class="build-slot-moves">
                         @foreach(array_filter($slot['moves'] ?? []) as $move)
-                            <span class="build-move-pill">{{ $move }}</span>
+                            @php
+                                $moveData = $moveCache->get($move);
+                                $catIcon  = match($moveData?->category ?? '') {
+                                    'physical' => '⚔',
+                                    'special'  => '✦',
+                                    'status'   => '◎',
+                                    default    => '',
+                                };
+                                $typeInt  = $moveData?->type ?? null;
+                                $typeClass = $typeInt !== null ? 'build-move-pill--typed type-' . $typeInt : '';
+                                $tooltip  = '';
+                                if ($moveData) {
+                                    $pwr = $moveData->power ?? '—';
+                                    $acc = $moveData->accuracy ?? '—';
+                                    $pp  = $moveData->pp ?? '—';
+                                    $isDyn = $moveData->is_dynamic_type ? ' (dynamic)' : '';
+                                    $tooltip = ($moveData->type_name ?? '?') . $isDyn . ' · ' . ucfirst($moveData->category ?? '?') . ' · Pwr:' . $pwr . ' Acc:' . $acc . ' PP:' . $pp;
+                                }
+                            @endphp
+                            <div class="build-move-wrap" @if($tooltip) title="{{ $tooltip }}" @endif>
+                                <span class="build-move-pill {{ $typeClass }}">
+                                    @if($catIcon)<span class="build-move-cat-icon">{{ $catIcon }}</span>@endif
+                                    {{ $move }}
+                                </span>
+                                @if($moveData)
+                                <div class="build-move-stats">
+                                    <span class="build-move-stat-type {{ $typeInt !== null ? 'type-' . $typeInt : '' }}">
+                                        {{ $moveData->type_name ?? '?' }}{{ $moveData->is_dynamic_type ? '*' : '' }}
+                                    </span>
+                                    <span class="build-move-stat-sep">·</span>
+                                    <span class="build-move-stat">Pwr: {{ $moveData->power ?? '—' }}</span>
+                                    <span class="build-move-stat-sep">·</span>
+                                    <span class="build-move-stat">Acc: {{ $moveData->accuracy ? $moveData->accuracy . '%' : '—' }}</span>
+                                    <span class="build-move-stat-sep">·</span>
+                                    <span class="build-move-stat">PP: {{ $moveData->pp ?? '—' }}</span>
+                                </div>
+                                @endif
+                            </div>
                         @endforeach
                     </div>
                 </div>
@@ -268,4 +308,53 @@ function copyBuildLink() {
         setTimeout(() => btn.textContent = orig, 1800);
     });
 }
+
+</div>
+
+<script>
+// ── Sprite rendering ──────────────────────────────────────────────
+(function() {
+    async function extractFirstFrame(dex) {
+        return new Promise(resolve => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                const tmp = document.createElement('canvas');
+                tmp.width = img.naturalWidth; tmp.height = img.naturalHeight;
+                const tctx = tmp.getContext('2d', { willReadFrequently: true });
+                tctx.drawImage(img, 0, 0);
+                fetch(`/pokevoid-atlas/${dex}.json`)
+                    .then(r => r.json())
+                    .then(atlas => {
+                        const frame = atlas.textures[0].frames[0];
+                        const { x, y, w, h } = frame.frame;
+                        const { x: sx, y: sy } = frame.spriteSourceSize;
+                        const { w: sw, h: sh } = frame.sourceSize;
+                        const out = document.createElement('canvas');
+                        out.width = sw; out.height = sh;
+                        out.getContext('2d').drawImage(tmp, x, y, w, h, sx, sy, w, h);
+                        resolve(out);
+                    })
+                    .catch(() => resolve(tmp));
+            };
+            img.onerror = () => resolve(null);
+            img.src = `/pokevoid-sprites/${dex}.png`;
+        });
+    }
+
+    document.querySelectorAll('.build-slot-sprite--canvas').forEach(async canvas => {
+        const dex = canvas.dataset.dex;
+        if (!dex) return;
+        const frame = await extractFirstFrame(dex);
+        if (!frame) { canvas.style.display = 'none'; return; }
+        // Scale to fit canvas
+        const ctx = canvas.getContext('2d');
+        const scale = Math.min(canvas.width / frame.width, canvas.height / frame.height);
+        const dx = (canvas.width  - frame.width  * scale) / 2;
+        const dy = (canvas.height - frame.height * scale) / 2;
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(frame, dx, dy, frame.width * scale, frame.height * scale);
+    });
+})();
+</script>
 </script>

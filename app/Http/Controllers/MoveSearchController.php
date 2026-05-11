@@ -21,10 +21,17 @@ class MoveSearchController extends Controller
             ->limit(20)
             ->get()
             ->map(fn($m) => [
-                'label'     => $m->name,
-                'value'     => $m->name,
-                'is_smitty' => $m->is_smitty,
-                'category'  => $m->is_smitty ? 'SMITTY Move' : 'Move',
+                'label'          => $m->name,
+                'value'          => $m->name,
+                'is_smitty'      => $m->is_smitty,
+                'category'       => $m->is_smitty ? 'SMITTY Move' : 'Move',
+                'type'           => $m->type,
+                'type_name'      => $m->type_name,
+                'move_category'  => $m->category,
+                'power'          => $m->power,
+                'accuracy'       => $m->accuracy,
+                'pp'             => $m->pp,
+                'is_dynamic_type'=> $m->is_dynamic_type,
             ]);
 
         return response()->json($results)->header('Cache-Control', 'no-store');

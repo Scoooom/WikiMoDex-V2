@@ -72,6 +72,59 @@ class StatService
         ];
     }
 
+    // ── Type resolution ───────────────────────────────────────────────
+
+    const TYPE_NAMES = [
+        -1=>'Unknown',0=>'Normal',1=>'Fighting',2=>'Flying',3=>'Poison',
+        4=>'Ground',5=>'Rock',6=>'Bug',7=>'Ghost',8=>'Steel',9=>'Fire',
+        10=>'Water',11=>'Grass',12=>'Electric',13=>'Psychic',14=>'Ice',
+        15=>'Dragon',16=>'Dark',17=>'Fairy',18=>'Stellar',20=>'SMITTY',21=>'Glitch',
+    ];
+
+    /**
+     * Resolve types for a slot. Returns [type1_int|null, type2_int|null].
+     * Override types take precedence over DB types.
+     */
+    public static function resolveTypes(array $slot): array
+    {
+        $species       = trim($slot['species'] ?? '');
+        $overrideType1 = $slot['override_type1'] ?? null;
+        $overrideType2 = $slot['override_type2'] ?? null;
+
+        // Flip type name -> int
+        $nameToInt = array_flip(self::TYPE_NAMES);
+
+        // Resolve override types first
+        $ot1 = $overrideType1 ? ($nameToInt[$overrideType1] ?? null) : null;
+        $ot2 = $overrideType2 ? ($nameToInt[$overrideType2] ?? null) : null;
+
+        // Get base types from DB
+        $dbType1 = null;
+        $dbType2 = null;
+
+        $altBuild = AltBuild::where('name', $species)->first();
+        if ($altBuild) {
+            // Alt builds define type changes
+            $core = CorePokemon::where('dex_number', $altBuild->dex_number)->where('form_key', '')->first()
+                 ?? CorePokemon::where('dex_number', $altBuild->dex_number)->first();
+            if ($core) { $dbType1 = $core->type1; $dbType2 = $core->type2; }
+        } else {
+            $core = CorePokemon::where('name', $species)->first();
+            if ($core) { $dbType1 = $core->type1; $dbType2 = $core->type2; }
+            else {
+                $form = BuiltinForm::where('name', $species)->first();
+                if ($form) { $dbType1 = $form->type1; $dbType2 = $form->type2; }
+            }
+        }
+
+        return [
+            'type1'      => $ot1 ?? $dbType1,
+            'type2'      => $ot2 ?? $dbType2,
+            'type1_name' => self::TYPE_NAMES[$ot1 ?? $dbType1] ?? null,
+            'type2_name' => self::TYPE_NAMES[$ot2 ?? $dbType2] ?? null,
+        ];
+    }
+
     // ── Alt build stat calculation ─────────────────────────────────
 
     private static function coreStatsForDex(int $dex): ?array

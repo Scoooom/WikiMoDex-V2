@@ -3554,3 +3554,56 @@ img { max-width: 100%; display: block; }
     transition: all var(--transition);
 }
 .build-edit-btn:hover { background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent3); }
+
+/* ── Build show: typing row ── */
+.build-slot-types-row {
+    display: flex;
+    gap: 0.35rem;
+    margin-top: 0.25rem;
+}
+
+/* ── Build show: move pills with stats ── */
+.build-slot-moves { display: flex; flex-direction: column; gap: 0.4rem; }
+.build-move-wrap { display: flex; flex-direction: column; gap: 0.1rem; }
+.build-move-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
+    padding: 0.2rem 0.6rem;
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    color: var(--accent3);
+    width: fit-content;
+}
+.build-move-pill--typed {
+    /* type class overrides background/color */
+    opacity: 0.9;
+}
+.build-move-cat-icon { font-size: 0.7rem; opacity: 0.8; }
+.build-move-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding-left: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--dim);
+    flex-wrap: wrap;
+}
+.build-move-stat-type {
+    font-size: 0.68rem;
+    padding: 0.05rem 0.4rem;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+}
+.build-move-stat-sep { color: var(--border2); }
+.build-move-stat { color: var(--muted); }
+
+/* ── Build show: sprite canvas ── */
+.build-slot-sprite--canvas {
+    width: 80px;
+    height: 80px;
+    image-rendering: pixelated;
+}

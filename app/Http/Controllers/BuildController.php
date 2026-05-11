@@ -7,6 +7,7 @@ use App\Models\CommunityBuildVote;
 use App\Models\GameItem;
 use Illuminate\Http\Request;
 use App\Services\StatService;
+use App\Models\CoreMove;
 use Illuminate\Support\Facades\Auth;
 
 class BuildController extends Controller
@@ -42,13 +43,20 @@ class BuildController extends Controller
         $voted  = $build->hasVotedBy(Auth::id());
         $items  = GameItem::orderBy('name')->get()->keyBy('key');
 
-        // Resolve stats for each slot
+        // Resolve stats and typing for each slot
         $slotStats = [];
         foreach ($build->team as $i => $slot) {
             $slotStats[$i] = StatService::resolveSlot($slot);
+            $slotStats[$i]['types'] = StatService::resolveTypes($slot);
         }
 
-        return view('build-show', compact('build', 'voted', 'items', 'slotStats'));
+        // Resolve move data for display
+        $moveCache = CoreMove::whereIn('name', collect($build->team)
+            ->flatMap(fn($s) => $s['moves'] ?? [])
+            ->filter()->unique()->values()->all()
+        )->get()->keyBy('name');
+
+        return view('build-show', compact('build', 'voted', 'items', 'slotStats', 'moveCache'));
     }
 
     // ── Create / store ────────────────────────────────────────────
