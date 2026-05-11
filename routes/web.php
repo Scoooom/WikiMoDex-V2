@@ -189,6 +189,10 @@ Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {
     return response()->file($outPath, ['Content-Type' => 'image/png', 'Cache-Control' => 'public, max-age=3600']);
 });
 
+// ── Move search ──────────────────────────────────────────────────
+Route::get('/move-search.json', [App\Http\Controllers\MoveSearchController::class, 'search'])
+    ->middleware('cache:no-store');
+
 // ── Pokémon search (unified across all sources) ──────────────────
 Route::get('/pokemon-search.json', [App\Http\Controllers\PokemonSearchController::class, 'search'])
     ->middleware('cache:no-store');

@@ -117,7 +117,8 @@
                             <input type="text" name="team[{{ $i }}][moves][{{ $m }}]"
                                    value="{{ old("team.$i.moves.$m") }}"
                                    class="build-form-input build-move-input"
-                                   placeholder="Move {{ $m + 1 }}">
+                                   placeholder="Move {{ $m + 1 }}"
+                                   data-typeahead="move" autocomplete="off">
                             @endfor
                         </div>
                     </div>
@@ -365,6 +366,86 @@ addItemRow({!! $i !!}, {!! json_encode($item['name'] ?? '') !!}, {!! json_encode
 
         input.addEventListener('blur', () => setTimeout(closeDropdown, 150));
 
+        createDropdown();
+    });
+})();
+
+// ── Move typeahead ────────────────────────────────────────────────
+(function initMoveTypeahead() {
+    document.querySelectorAll('input[data-typeahead="move"]').forEach(input => {
+        let dropdown = null;
+        let debounce = null;
+        let activeIdx = -1;
+        let lastResults = [];
+
+        function createDropdown() {
+            dropdown = document.createElement('div');
+            dropdown.className = 'pokemon-typeahead-dropdown';
+            input.parentNode.style.position = 'relative';
+            input.parentNode.appendChild(dropdown);
+        }
+
+        function closeDropdown() {
+            if (dropdown) { dropdown.innerHTML = ''; dropdown.style.display = 'none'; }
+            activeIdx = -1;
+        }
+
+        function renderDropdown(results) {
+            lastResults = results;
+            if (!results.length) { closeDropdown(); return; }
+            dropdown.innerHTML = '';
+            dropdown.style.display = 'block';
+            results.slice(0, 12).forEach((r, i) => {
+                const item = document.createElement('div');
+                item.className = 'pokemon-typeahead-item';
+                const color = r.is_smitty ? '#a8e6cf' : 'var(--dim)';
+                item.innerHTML = `
+                    <span class="pokemon-typeahead-name">${r.label}</span>
+                    <span class="pokemon-typeahead-cat" style="color:${color}">${r.category}</span>
+                `;
+                item.addEventListener('mousedown', e => { e.preventDefault(); select(r); });
+                dropdown.appendChild(item);
+            });
+            activeIdx = -1;
+        }
+
+        function select(r) {
+            input.value = r.value;
+            closeDropdown();
+        }
+
+        input.addEventListener('input', () => {
+            clearTimeout(debounce);
+            const q = input.value.trim();
+            if (q.length < 2) { closeDropdown(); return; }
+            debounce = setTimeout(() => {
+                fetch(`/move-search.json?q=${encodeURIComponent(q)}`)
+                    .then(r => r.json())
+                    .then(renderDropdown)
+                    .catch(() => closeDropdown());
+            }, 180);
+        });
+
+        input.addEventListener('keydown', e => {
+            const items = dropdown?.querySelectorAll('.pokemon-typeahead-item');
+            if (!items?.length) return;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                activeIdx = Math.min(activeIdx + 1, items.length - 1);
+                items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                activeIdx = Math.max(activeIdx - 1, 0);
+                items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+            } else if (e.key === 'Enter' && activeIdx >= 0) {
+                e.preventDefault();
+                select(lastResults[activeIdx]);
+            } else if (e.key === 'Escape') {
+                closeDropdown();
+            }
+        });
+
+        input.addEventListener('blur', () => setTimeout(closeDropdown, 150));
         createDropdown();
     });
 })();
