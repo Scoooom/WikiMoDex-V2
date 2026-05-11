@@ -40,6 +40,19 @@ class SyncPokevoid extends Command
         $this->call('altbuilds:warm-sprites');
 
         $this->info('Sync complete!');
+
+        // Purge pages that forms:parse affects (sub-commands handle their own pages)
+        $base = rtrim(config('services.cloudflare.base_url'), '/');
+        \Illuminate\Support\Facades\Artisan::call('cf:purge', [
+            '--url' => [
+                $base . '/',
+                $base . '/galleryCore.html',
+                $base . '/gallerySmitty.html',
+                $base . '/gallerySmittyForm.html',
+            ],
+        ]);
+        $this->info('CF cache purged for galleries and homepage.');
+
         return 0;
     }
 }
