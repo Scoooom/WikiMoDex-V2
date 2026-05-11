@@ -28,12 +28,20 @@ class User extends Authenticatable
         return $this->hasMany(UserLike::class, 'creatorID');
     }
 
-    public function getAvatarURL()
+    public function getAvatarURL(): string
     {
-        if ($this->avatar_id === 'default') {
-            return 'https://dn721700.ca.archive.org/0/items/discordprofilepictures/discordblue.png';
+        // Prefer locally cached avatar (written on every login)
+        $local = public_path("avatars/{$this->user_id}.png");
+        if (file_exists($local)) {
+            return "/avatars/{$this->user_id}.png";
         }
-        return 'https://cdn.discordapp.com/avatars/' . $this->user_id . '/' . $this->avatar_id . '.png';
+
+        // Fallback: Discord CDN (works until user changes their avatar)
+        if ($this->avatar_id === 'default' || !$this->avatar_id) {
+            return 'https://cdn.discordapp.com/embed/avatars/0.png';
+        }
+
+        return "https://cdn.discordapp.com/avatars/{$this->user_id}/{$this->avatar_id}.png";
     }
 
     public function getUploadCount()
