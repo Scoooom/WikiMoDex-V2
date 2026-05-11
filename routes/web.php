@@ -21,7 +21,7 @@ Route::get('/', function () {
         ->take(6)
         ->get();
     return view('welcome', compact('stats', 'featured'));
-})->middleware('cache:public, max-age=300, s-maxage=300');
+})->middleware('cache:public, max-age=300, stale-while-revalidate=60');
 
 // Auth — never cache
 Route::get('/auth/discord/redirect', [AuthController::class, 'redirect'])->name('auth.discord');
@@ -30,14 +30,14 @@ Route::match(['get', 'post'], '/login.html', [AuthController::class, 'handleLogi
 Route::get('/logout.html', [AuthController::class, 'logout'])->name('logout');
 
 // Glitches — gallery 5 min, individual pages 1 hour, write/download no-store
-Route::middleware('cache:public, max-age=300, s-maxage=300')->group(function () {
+Route::middleware('cache:public, max-age=31536000, stale-while-revalidate=30')->group(function () {
     Route::get('/gallery.html', [GlitchController::class, 'index']);
     Route::get('/galleryCore.html', [GlitchController::class, 'galleryCore']);
     Route::get('/gallerySmitty.html', [GlitchController::class, 'gallerySmitty']);
     Route::get('/gallerySmittyForm.html', [GlitchController::class, 'gallerySmittyForm']);
 });
 Route::get('/g:{form}:{id}.html', [GlitchController::class, 'show'])->middleware('cache:no-store');
-Route::middleware('cache:public, max-age=3600, s-maxage=3600')->group(function () {
+Route::middleware('cache:public, max-age=31536000, stale-while-revalidate=30')->group(function () {
     Route::get('/core:{form}.html', [GlitchController::class, 'coreMon']);
     Route::get('/smitty:{form}.html', [GlitchController::class, 'smittyMon']);
     Route::get('/smittyForm:{form}.html', [GlitchController::class, 'smittyFormMon']);
@@ -47,7 +47,7 @@ Route::post('/upload.html', [GlitchController::class, 'store']);
 Route::get('/d:{id}.html', [GlitchController::class, 'download'])->middleware('cache:no-store');
 
 // Sprites — long cache, rarely change
-Route::middleware('cache:public, max-age=86400, s-maxage=86400')->group(function () {
+Route::middleware('cache:public, max-age=31536000, stale-while-revalidate=30')->group(function () {
     Route::get('/front:{id}.png', [SpriteController::class, 'front']);
     Route::get('/back:{id}.png', [SpriteController::class, 'back']);
     Route::get('/cFront:{name}.png', [SpriteController::class, 'coreFront']);
@@ -83,10 +83,10 @@ Route::get('/me.json', function () {
 // Users — no-store (isOwner panel, like buttons are user-specific)
 Route::get('/u:{username}.html', [UserController::class, 'profile'])->middleware('cache:no-store');
 Route::post('/u:{username}.html', [UserController::class, 'handleProfilePost']);
-Route::get('/trainercard:{username}.html', [UserController::class, 'trainerCard'])->middleware('cache:public, max-age=300, s-maxage=300');
+Route::get('/trainercard:{username}.html', [UserController::class, 'trainerCard'])->middleware('cache:public, max-age=31536000, stale-while-revalidate=30');
 
 // Static pages — 1 hour
-Route::middleware('cache:public, max-age=3600, s-maxage=3600')->group(function () {
+Route::middleware('cache:public, max-age=31536000, stale-while-revalidate=30')->group(function () {
     Route::get('/faq.html', fn() => view('faq'));
     Route::get('/gacha.html', fn() => view('gacha'));
 });
@@ -197,7 +197,7 @@ Route::get('/wiki-search.json', [\App\Http\Controllers\WikiSearchController::cla
     ->middleware('cache:no-store');
 
 // Wiki pages — 1 hour
-Route::middleware('cache:public, max-age=3600, s-maxage=3600')->group(function () {
+Route::middleware('cache:public, max-age=31536000, stale-while-revalidate=30')->group(function () {
     Route::get('/wiki.html',            [WikiController::class, 'index'])->name('wiki.index');
     Route::get('/wiki:items.html',      [WikiController::class, 'items'])->name('wiki.items');
     Route::get('/wiki:alt-builds.html', [WikiController::class, 'altBuilds'])->name('wiki.altbuilds');
