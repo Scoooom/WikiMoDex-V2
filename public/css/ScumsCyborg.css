@@ -3400,3 +3400,45 @@ img { max-width: 100%; display: block; }
     flex-shrink: 0;
     margin-left: 0.5rem;
 }
+
+/* ── Item param fields ── */
+.build-item-row-top {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.build-item-row-top .build-form-input { flex: 1; }
+.build-item-params {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    padding: 0.5rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.25rem;
+}
+.build-item-param-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.build-item-param-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--dim);
+    white-space: nowrap;
+    min-width: 120px;
+}
+.build-item-param-input {
+    flex: 1;
+    font-size: 0.85rem !important;
+    padding: 0.3rem 0.6rem !important;
+}
+.build-item-params-summary {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent2);
+    margin-left: 0.3rem;
+}

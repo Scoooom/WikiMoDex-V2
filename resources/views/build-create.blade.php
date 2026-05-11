@@ -128,6 +128,13 @@
     </form>
 </div>
 
+{{-- Ability datalist (used for ability param fields) --}}
+<datalist id="abilityOptions">
+    @foreach($abilities as $a)
+    <option value="{{ $a }}">
+    @endforeach
+</datalist>
+
 {{-- Item select datalist --}}
 <datalist id="itemOptions">
     @foreach($items as $item)
@@ -143,32 +150,83 @@ const ITEM_MAP = {
     @endforeach
 };
 
-function addItemRow(slot, nameVal = '', keyVal = '', stackVal = 1) {
-    const list  = document.getElementById('itemsList' + slot);
-    const idx   = list.querySelectorAll('.build-item-row').length;
-    const nameField = `team[${slot}][items][${idx}][name]`;
-    const keyField  = `team[${slot}][items][${idx}][key]`;
-    const stackField = `team[${slot}][items][${idx}][stack]`;
+const TYPES = ['Normal','Fighting','Flying','Poison','Ground','Rock','Bug','Ghost','Steel','Fire','Water','Grass','Electric','Psychic','Ice','Dragon','Dark','Fairy'];
+const STATS = ['HP','ATK','DEF','SP.ATK','SP.DEF','SPD'];
+
+const PARAM_ITEMS = {
+    'STAT_SWITCHER':            { type: 'stat2',   label1: 'Swap stat',              label2: 'With stat' },
+    'STAT_SACRIFICE':           { type: 'stat1',   label1: 'Stat sacrificed' },
+    'TYPE_SACRIFICE':           { type: 'type2',   label1: 'New Type 1',             label2: 'New Type 2 (optional, default = keep existing)' },
+    'COLLECTED_TYPE':           { type: 'type1',   label1: 'Collected type' },
+    'ABILITY_SACRIFICE':        { type: 'ability', label1: 'Ability sacrificed' },
+    'PASSIVE_ABILITY_SACRIFICE':{ type: 'ability', label1: 'Passive sacrificed' },
+};
+
+function buildParamHtml(base, cfg, params) {
+    if (!cfg) return '';
+    let html = '<div class="build-item-params">';
+    if (cfg.type.startsWith('type')) {
+        const t1 = (params && params.type1) || '';
+        const t2 = (params && params.type2) || '';
+        const typeOpts1 = '<option value="">— Default —</option>' + TYPES.map(t => `<option value="${t}"${t1===t?' selected':''}>${t}</option>`).join('');
+        html += `<div class="build-item-param-row"><label class="build-item-param-label">${cfg.label1}</label><select name="${base}[type1]" class="build-form-select build-item-param-input">${typeOpts1}</select></div>`;
+        if (cfg.type === 'type2') {
+            const typeOpts2 = '<option value="">— Default (keep existing) —</option>' + TYPES.map(t => `<option value="${t}"${t2===t?' selected':''}>${t}</option>`).join('');
+            html += `<div class="build-item-param-row"><label class="build-item-param-label">${cfg.label2}</label><select name="${base}[type2]" class="build-form-select build-item-param-input">${typeOpts2}</select></div>`;
+        }
+    } else if (cfg.type.startsWith('stat')) {
+        const s1 = (params && params.stat1) || '';
+        const s2 = (params && params.stat2) || '';
+        const statOpts1 = '<option value="">— Any —</option>' + STATS.map(s => `<option value="${s}"${s1===s?' selected':''}>${s}</option>`).join('');
+        html += `<div class="build-item-param-row"><label class="build-item-param-label">${cfg.label1}</label><select name="${base}[stat1]" class="build-form-select build-item-param-input">${statOpts1}</select></div>`;
+        if (cfg.type === 'stat2') {
+            const statOpts2 = '<option value="">— Any —</option>' + STATS.map(s => `<option value="${s}"${s2===s?' selected':''}>${s}</option>`).join('');
+            html += `<div class="build-item-param-row"><label class="build-item-param-label">${cfg.label2}</label><select name="${base}[stat2]" class="build-form-select build-item-param-input">${statOpts2}</select></div>`;
+        }
+    } else if (cfg.type === 'ability') {
+        const ab = (params && params.ability) || '';
+        html += `<div class="build-item-param-row"><label class="build-item-param-label">${cfg.label1}</label><input type="text" name="${base}[ability]" value="${ab}" class="build-form-input build-item-param-input" list="abilityOptions" placeholder="Ability name" autocomplete="off"></div>`;
+    }
+    html += '</div>';
+    return html;
+}
+
+function addItemRow(slot, nameVal, keyVal, stackVal, params) {
+    nameVal  = nameVal  || '';
+    keyVal   = keyVal   || '';
+    stackVal = stackVal || 1;
+    params   = params   || {};
+
+    const list = document.getElementById('itemsList' + slot);
+    const idx  = list.querySelectorAll('.build-item-row').length;
+    const base = `team[${slot}][items][${idx}]`;
 
     const row = document.createElement('div');
     row.className = 'build-item-row';
-    row.innerHTML = `
-        <input type="text" name="${nameField}" value="${nameVal}"
-               class="build-form-input build-item-name-input"
-               placeholder="Item name" list="itemOptions" autocomplete="off">
-        <input type="hidden" name="${keyField}" class="build-item-key-input" value="${keyVal}">
-        <input type="number" name="${stackField}" value="${stackVal}"
-               class="build-form-input build-item-stack-input"
-               min="1" max="99" placeholder="Stack">
-        <button type="button" class="build-item-remove-btn" onclick="this.closest('.build-item-row').remove()">✕</button>
-    `;
 
-    // Auto-fill key when name matches
-    row.querySelector('.build-item-name-input').addEventListener('input', function() {
-        const key = (ITEM_MAP[this.value] !== undefined) ? ITEM_MAP[this.value] : '';
-        row.querySelector('.build-item-key-input').value = key;
-    });
+    function render(key, p) {
+        const cfg     = PARAM_ITEMS[key];
+        const paramBase = `${base}[params]`;
+        const paramHtml = buildParamHtml(paramBase, cfg, p);
+        row.innerHTML = `
+            <div class="build-item-row-top">
+                <input type="text" name="${base}[name]" value="${nameVal}"
+                       class="build-form-input build-item-name-input"
+                       placeholder="Item name" list="itemOptions" autocomplete="off">
+                <input type="hidden" name="${base}[key]" class="build-item-key-input" value="${key}">
+                <input type="number" name="${base}[stack]" value="${stackVal}"
+                       class="build-form-input build-item-stack-input" min="1" max="99" placeholder="x">
+                <button type="button" class="build-item-remove-btn" onclick="this.closest('.build-item-row').remove()">✕</button>
+            </div>
+            ${paramHtml}
+        `;
+        row.querySelector('.build-item-name-input').addEventListener('input', function() {
+            const newKey = (ITEM_MAP[this.value] !== undefined) ? ITEM_MAP[this.value] : '';
+            render(newKey, {});
+        });
+    }
 
+    render(keyVal, params);
     list.appendChild(row);
 }
 

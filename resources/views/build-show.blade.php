@@ -91,11 +91,23 @@
                             @php
                                 $gameItem = $items->get($item['key'] ?? '');
                                 $tierColor = $gameItem ? \App\Models\GameItem::TIER_COLORS[$gameItem->tier] ?? 'var(--dim)' : 'var(--dim)';
+                                $params = $item['params'] ?? [];
                             @endphp
                             <span class="build-item-dot" style="background:{{ $tierColor }}"></span>
                             <span class="build-item-name">{{ $item['name'] }}</span>
                             @if(($item['stack'] ?? 1) > 1)
                                 <span class="build-item-stack">×{{ $item['stack'] }}</span>
+                            @endif
+                            @if(!empty($params))
+                                <span class="build-item-params-summary">
+                                    @if(!empty($params['stat1']) || !empty($params['stat2']))
+                                        ({{ $params['stat1'] ?? '?' }}{{ !empty($params['stat2']) ? ' ↔ ' . $params['stat2'] : '' }})
+                                    @elseif(!empty($params['type1']) || !empty($params['type2']))
+                                        ({{ $params['type1'] ?? 'Default' }}{{ !empty($params['type2']) ? ' / ' . $params['type2'] : '' }})
+                                    @elseif(!empty($params['ability']))
+                                        ({{ $params['ability'] }})
+                                    @endif
+                                </span>
                             @endif
                         </div>
                         @endif

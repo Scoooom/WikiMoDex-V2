@@ -74,6 +74,12 @@ class BuildController extends Controller
             'team.*.items.*.key'            => 'nullable|string|max:60',
             'team.*.items.*.name'           => 'nullable|string|max:80',
             'team.*.items.*.stack'          => 'nullable|integer|min:1|max:99',
+            'team.*.items.*.params'         => 'nullable|array',
+            'team.*.items.*.params.type1'   => 'nullable|string|max:20',
+            'team.*.items.*.params.type2'   => 'nullable|string|max:20',
+            'team.*.items.*.params.stat1'   => 'nullable|string|max:10',
+            'team.*.items.*.params.stat2'   => 'nullable|string|max:10',
+            'team.*.items.*.params.ability' => 'nullable|string|max:80',
             'team.*.notes'                  => 'nullable|string|max:500',
         ]);
 
