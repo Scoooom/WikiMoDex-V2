@@ -15,8 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'discord/interactions',
         ]);
         $middleware->alias([
-            'admin'  => \App\Http\Middleware\RequireAdmin::class,
-            'cache'  => \App\Http\Middleware\SetCacheHeaders::class,
+            'admin'    => \App\Http\Middleware\RequireAdmin::class,
+            'cache'    => \App\Http\Middleware\SetCacheHeaders::class,
+            'nosession'=> \App\Http\Middleware\SuppressSession::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
