@@ -28,36 +28,8 @@
             </button>
             <a class="nav-link" href="https://pvoffine.scooom.xyz/" target="_blank" rel="noopener">Offline ↗</a>
 
-            @auth
-            <div class="nav-dropdown" id="account-dropdown">
-                <button class="nav-link nav-dropdown-toggle" aria-expanded="false" onclick="toggleDropdown('account-dropdown')">
-                    <img class="nav-avatar" src="{{ Auth::user()->getAvatarURL() }}" alt="{{ Auth::user()->username }}">
-                    {{ Auth::user()->username }} <span class="nav-caret">▾</span>
-                </button>
-                <div class="nav-dropdown-menu nav-dropdown-menu--right">
-                    <a class="nav-dropdown-item" href="/u:{{ Auth::user()->username }}.html">Profile</a>
-                    <a class="nav-dropdown-item" href="/create.html">Upload Glitch</a>
-                    @if(Auth::user()->isAdmin())
-                    <div class="nav-dropdown-divider"></div>
-                    <a class="nav-dropdown-item nav-dropdown-item--admin" href="/admin/">⚙ Admin Panel</a>
-                    @endif
-                    <div class="nav-dropdown-divider"></div>
-                    <form method="post" action="/login.html" style="display:contents">
-                        @csrf
-                        <input type="hidden" name="logoutkey" value="1">
-                        <input type="hidden" name="returnURL" value="/">
-                        <button type="submit" class="nav-dropdown-item nav-dropdown-item--danger">Logout</button>
-                    </form>
-                </div>
-            </div>
-            @else
-            <form method="post" action="/login.html" style="display:contents">
-                @csrf
-                <input type="hidden" name="loginkey" value="1">
-                <input type="hidden" name="returnURL" value="{{ request()->getRequestUri() }}">
-                <button type="submit" class="nav-login-btn">Login with Discord</button>
-            </form>
-            @endauth
+            {{-- Auth slot: populated by /me.json fetch. Hidden until resolved to prevent flash. --}}
+            <div id="nav-auth-slot" style="display:none"></div>
         </div>
 
         <button class="nav-burger" aria-label="Toggle navigation" onclick="toggleMobileNav()">
@@ -81,9 +53,71 @@ document.addEventListener('click', function(e) {
         document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
     }
 });
+
+// Auth injection — fetch /me.json (no-store, bypasses CF) and render user-specific nav.
+// The HTML page itself contains zero user state, making it fully CF-cacheable.
+(function initNavAuth() {
+    const slot = document.getElementById('nav-auth-slot');
+    if (!slot) return;
+
+    const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
+
+    function getCsrfToken() {
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        if (match) return decodeURIComponent(match[1]);
+        return document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    }
+
+    function renderAuthed(me) {
+        const adminLink = me.isAdmin
+            ? `<div class="nav-dropdown-divider"></div>
+               <a class="nav-dropdown-item nav-dropdown-item--admin" href="/admin/">&#9881; Admin Panel</a>`
+            : '';
+        return `
+            <div class="nav-dropdown" id="account-dropdown">
+                <button class="nav-link nav-dropdown-toggle" aria-expanded="false" onclick="toggleDropdown('account-dropdown')">
+                    <img class="nav-avatar" src="${me.avatar}" alt="${me.username}">
+                    ${me.username} <span class="nav-caret">&#9662;</span>
+                </button>
+                <div class="nav-dropdown-menu nav-dropdown-menu--right">
+                    <a class="nav-dropdown-item" href="${me.profile}">Profile</a>
+                    <a class="nav-dropdown-item" href="/create.html">Upload Glitch</a>
+                    ${adminLink}
+                    <div class="nav-dropdown-divider"></div>
+                    <form method="post" action="/login.html" style="display:contents">
+                        <input type="hidden" name="_token" value="${getCsrfToken()}">
+                        <input type="hidden" name="logoutkey" value="1">
+                        <input type="hidden" name="returnURL" value="/">
+                        <button type="submit" class="nav-dropdown-item nav-dropdown-item--danger">Logout</button>
+                    </form>
+                </div>
+            </div>`;
+    }
+
+    function renderGuest() {
+        return `
+            <form method="post" action="/login.html" style="display:contents">
+                <input type="hidden" name="_token" value="${getCsrfToken()}">
+                <input type="hidden" name="loginkey" value="1">
+                <input type="hidden" name="returnURL" value="${currentPath}">
+                <button type="submit" class="nav-login-btn">Login with Discord</button>
+            </form>`;
+    }
+
+    fetch('/me.json', { credentials: 'same-origin' })
+        .then(r => r.json())
+        .then(me => {
+            slot.innerHTML = me.authed ? renderAuthed(me) : renderGuest();
+            slot.style.display = '';
+        })
+        .catch(() => {
+            slot.innerHTML = renderGuest();
+            slot.style.display = '';
+        });
+})();
 </script>
 
-{{-- ── Wiki Search Modal ──────────────────────────────────────────── --}}
+{{-- Wiki Search Modal --}}
 <div class="wiki-search-backdrop" id="wikiSearchBackdrop"></div>
 <div class="wiki-search-modal" id="wikiSearchModal" role="dialog" aria-modal="true" aria-label="Search">
     <div class="wiki-search-input-wrap">
@@ -107,133 +141,78 @@ function initWikiSearch() {
 
     if (!btn || !modal) return;
 
-    const TYPE_ICONS = {
-        article:  '📄',
-        item:     '🎒',
-        form:     '✨',
-        glitch:   '👾',
-        altbuild: '⚡',
-    };
+    const TYPE_ICONS  = { article:'📄', item:'🎒', form:'✨', glitch:'👾', altbuild:'⚡' };
+    const TYPE_COLORS = { article:'var(--accent2)', item:'#f5d76e', form:'#a8e6cf', glitch:'#ffaaa5', altbuild:'#c9a8ff' };
+    const groupLabels = { article:'Wiki Articles', item:'Items', form:'Pokémon Forms', glitch:'Mod Glitch Forms', altbuild:'Alt Builds' };
+    const groupOrder  = ['article','item','form','glitch','altbuild'];
 
-    const TYPE_COLORS = {
-        article:  'var(--accent2)',
-        item:     '#f5d76e',
-        form:     '#a8e6cf',
-        glitch:   '#ffaaa5',
-        altbuild: '#c9a8ff',
-    };
+    function open()  { modal.classList.add('open'); backdrop.classList.add('open'); document.body.style.overflow='hidden'; input.focus(); input.select(); }
+    function close() { modal.classList.remove('open'); backdrop.classList.remove('open'); document.body.style.overflow=''; }
 
-    const groupLabels = { article: 'Wiki Articles', item: 'Items', form: 'Pokémon Forms', glitch: 'Mod Glitch Forms', altbuild: 'Alt Builds' };
-    const groupOrder  = ['article', 'item', 'form', 'glitch', 'altbuild'];
-
-    function open() {
-        modal.classList.add('open');
-        backdrop.classList.add('open');
-        document.body.style.overflow = 'hidden';
-        input.focus();
-        input.select();
-    }
-
-    function close() {
-        modal.classList.remove('open');
-        backdrop.classList.remove('open');
-        document.body.style.overflow = '';
-    }
-
-    // Ensure closed on init
     close();
-
     btn.addEventListener('click', open);
     backdrop.addEventListener('click', close);
 
     document.addEventListener('keydown', e => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); open(); }
-        if (e.key === 'Escape') close();
-        if (e.key === 'ArrowDown' && modal.classList.contains('open')) {
+        if ((e.ctrlKey||e.metaKey) && e.key==='k') { e.preventDefault(); open(); }
+        if (e.key==='Escape') close();
+        if (e.key==='ArrowDown' && modal.classList.contains('open')) {
             e.preventDefault();
-            const links = results.querySelectorAll('.wiki-search-result-item');
-            const idx = [...links].indexOf(document.activeElement);
-            (links[idx + 1] || links[0])?.focus();
+            const links=[...results.querySelectorAll('.wiki-search-result-item')];
+            const idx=links.indexOf(document.activeElement);
+            (links[idx+1]||links[0])?.focus();
         }
-        if (e.key === 'ArrowUp' && modal.classList.contains('open')) {
+        if (e.key==='ArrowUp' && modal.classList.contains('open')) {
             e.preventDefault();
-            const links = results.querySelectorAll('.wiki-search-result-item');
-            const idx = [...links].indexOf(document.activeElement);
-            (links[idx - 1] || links[links.length - 1])?.focus();
+            const links=[...results.querySelectorAll('.wiki-search-result-item')];
+            const idx=links.indexOf(document.activeElement);
+            (links[idx-1]||links[links.length-1])?.focus();
         }
     });
 
-    let debounce;
-    let lastQ = '';
-
+    let debounce, lastQ='';
     input.addEventListener('input', () => {
         clearTimeout(debounce);
-        const q = input.value.trim();
-        if (q === lastQ) return;
-        lastQ = q;
-
-        if (q.length < 2) {
-            results.innerHTML = '<div class="wiki-search-hint">Type at least 2 characters to search…</div>';
-            return;
-        }
-
-        results.innerHTML = '<div class="wiki-search-hint">Searching…</div>';
-
-        debounce = setTimeout(() => {
+        const q=input.value.trim();
+        if (q===lastQ) return; lastQ=q;
+        if (q.length<2) { results.innerHTML='<div class="wiki-search-hint">Type at least 2 characters to search…</div>'; return; }
+        results.innerHTML='<div class="wiki-search-hint">Searching…</div>';
+        debounce=setTimeout(()=>{
             fetch(`/wiki-search.json?q=${encodeURIComponent(q)}`)
-                .then(r => r.json())
-                .then(data => renderResults(data.results, q))
-                .catch(() => {
-                    results.innerHTML = '<div class="wiki-search-hint wiki-search-error">Search failed. Try again.</div>';
-                });
-        }, 200);
+                .then(r=>r.json()).then(data=>renderResults(data.results,q))
+                .catch(()=>{ results.innerHTML='<div class="wiki-search-hint wiki-search-error">Search failed. Try again.</div>'; });
+        },200);
     });
 
-    function highlight(text, q) {
+    function highlight(text,q) {
         if (!text) return '';
-        return text.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
-            '<mark class="wiki-search-mark">$1</mark>');
+        return text.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi'),'<mark class="wiki-search-mark">$1</mark>');
     }
 
-    function renderResults(items, q) {
-        if (!items.length) {
-            results.innerHTML = `<div class="wiki-search-hint">No results for "<strong>${q}</strong>"</div>`;
-            return;
-        }
-
-        // Group by type
-        const groups = {};
-        items.forEach(item => { (groups[item.type] = groups[item.type] || []).push(item); });
-
-        let html = '';
+    function renderResults(items,q) {
+        if (!items.length) { results.innerHTML=`<div class="wiki-search-hint">No results for "<strong>${q}</strong>"</div>`; return; }
+        const groups={};
+        items.forEach(item=>{ (groups[item.type]=groups[item.type]||[]).push(item); });
+        let html='';
         for (const type of groupOrder) {
             if (!groups[type]) continue;
-            html += `<div class="wiki-search-group-label">${groupLabels[type]}</div>`;
+            html+=`<div class="wiki-search-group-label">${groupLabels[type]}</div>`;
             for (const item of groups[type]) {
-                html += `<a href="${item.url}" class="wiki-search-result-item" tabindex="0">
+                html+=`<a href="${item.url}" class="wiki-search-result-item" tabindex="0">
                     <span class="wiki-search-result-icon" style="color:${TYPE_COLORS[item.type]}">${TYPE_ICONS[item.type]}</span>
                     <span class="wiki-search-result-body">
-                        <span class="wiki-search-result-title">${highlight(item.title, q)}</span>
-                        ${item.subtitle ? `<span class="wiki-search-result-sub">${item.subtitle}</span>` : ''}
-                        ${item.excerpt ? `<span class="wiki-search-result-excerpt">${highlight(item.excerpt, q)}</span>` : ''}
+                        <span class="wiki-search-result-title">${highlight(item.title,q)}</span>
+                        ${item.subtitle?`<span class="wiki-search-result-sub">${item.subtitle}</span>`:''}
+                        ${item.excerpt?`<span class="wiki-search-result-excerpt">${highlight(item.excerpt,q)}</span>`:''}
                     </span>
                     <span class="wiki-search-result-badge" style="color:${TYPE_COLORS[item.type]}">${item.label}</span>
                 </a>`;
             }
         }
-
-        results.innerHTML = html;
-
-        // Close on result click
-        results.querySelectorAll('.wiki-search-result-item').forEach(a => {
-            a.addEventListener('click', close);
-        });
+        results.innerHTML=html;
+        results.querySelectorAll('.wiki-search-result-item').forEach(a=>a.addEventListener('click',close));
     }
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initWikiSearch);
-} else {
-    initWikiSearch();
-}
+if (document.readyState==='loading') { document.addEventListener('DOMContentLoaded',initWikiSearch); } else { initWikiSearch(); }
 </script>

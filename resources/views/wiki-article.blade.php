@@ -47,11 +47,7 @@
         <div class="wiki-article-meta">
             <span class="wiki-article-category">{{ $article->category }}</span>
             <span class="wiki-article-updated">Updated {{ $article->updated_at->diffForHumans() }}</span>
-            @auth
-                @if(auth()->user()->isAdmin())
-                <a href="{{ route('wiki.admin.edit', $article->slug) }}" class="wiki-edit-btn">Edit Article</a>
-                @endif
-            @endauth
+            <span id="wiki-edit-btn-slot"></span>
         </div>
 
         <div class="wiki-prose">
@@ -61,6 +57,20 @@
         @include('partials.wiki-gallery-links')
     </main>
 </div>
+
+<script>
+// Inject admin edit button if user is admin (keeps page CF-cacheable)
+fetch('/me.json', { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(me => {
+        if (!me.isAdmin) return;
+        const slot = document.getElementById('wiki-edit-btn-slot');
+        if (slot) {
+            slot.innerHTML = '<a href="{{ route('wiki.admin.edit', $article->slug) }}" class="wiki-edit-btn">Edit Article</a>';
+        }
+    })
+    .catch(() => {});
+</script>
 
 <script>
 (function() {

@@ -8,7 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\SpriteController;
 
-// Home
+// Home — 5 min (stats + featured glitches change)
 Route::get('/', function () {
     $stats = [
         'glitches' => \App\Models\Glitch::count(),
@@ -21,24 +21,38 @@ Route::get('/', function () {
         ->take(6)
         ->get();
     return view('welcome', compact('stats', 'featured'));
-});
+})->middleware('cache:public, max-age=300, s-maxage=300');
 
-// Auth
+// Auth — never cache
 Route::get('/auth/discord/redirect', [AuthController::class, 'redirect'])->name('auth.discord');
 Route::get('/auth/discord/callback', [AuthController::class, 'callback']);
 Route::match(['get', 'post'], '/login.html', [AuthController::class, 'handleLogin']);
 Route::get('/logout.html', [AuthController::class, 'logout'])->name('logout');
 
-// Glitches
-Route::get('/gallery.html', [GlitchController::class, 'index']);
-Route::get('/g:{form}:{id}.html', [GlitchController::class, 'show']);
-Route::get('/create.html', [GlitchController::class, 'create']);
+// Glitches — gallery 5 min, individual pages 1 hour, write/download no-store
+Route::middleware('cache:public, max-age=300, s-maxage=300')->group(function () {
+    Route::get('/gallery.html', [GlitchController::class, 'index']);
+    Route::get('/galleryCore.html', [GlitchController::class, 'galleryCore']);
+    Route::get('/gallerySmitty.html', [GlitchController::class, 'gallerySmitty']);
+    Route::get('/gallerySmittyForm.html', [GlitchController::class, 'gallerySmittyForm']);
+});
+Route::get('/g:{form}:{id}.html', [GlitchController::class, 'show'])->middleware('cache:no-store');
+Route::middleware('cache:public, max-age=3600, s-maxage=3600')->group(function () {
+    Route::get('/core:{form}.html', [GlitchController::class, 'coreMon']);
+    Route::get('/smitty:{form}.html', [GlitchController::class, 'smittyMon']);
+    Route::get('/smittyForm:{form}.html', [GlitchController::class, 'smittyFormMon']);
+});
+Route::get('/create.html', [GlitchController::class, 'create'])->middleware('cache:no-store');
 Route::post('/upload.html', [GlitchController::class, 'store']);
-Route::get('/d:{id}.html', [GlitchController::class, 'download']);
+Route::get('/d:{id}.html', [GlitchController::class, 'download'])->middleware('cache:no-store');
 
-// Sprites
-Route::get('/front:{id}.png', [SpriteController::class, 'front']);
-Route::get('/back:{id}.png', [SpriteController::class, 'back']);
+// Sprites — long cache, rarely change
+Route::middleware('cache:public, max-age=86400, s-maxage=86400')->group(function () {
+    Route::get('/front:{id}.png', [SpriteController::class, 'front']);
+    Route::get('/back:{id}.png', [SpriteController::class, 'back']);
+    Route::get('/cFront:{name}.png', [SpriteController::class, 'coreFront']);
+    Route::get('/cBack:{name}.png', [SpriteController::class, 'coreBack']);
+});
 
 // Likes
 Route::middleware('throttle:30,1')->group(function () {
@@ -50,29 +64,32 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::post('/uRLike:{id}.html', [LikeController::class, 'removeUserLike']);
 });
 
-// Users
-Route::get('/u:{username}.html', [UserController::class, 'profile']);
+// Auth state — lightweight endpoint for JS injection, never cached
+Route::get('/me.json', function () {
+    if (!Auth::check()) {
+        return response()->json(['authed' => false])
+            ->header('Cache-Control', 'no-store');
+    }
+    $user = Auth::user();
+    return response()->json([
+        'authed'   => true,
+        'username' => $user->username,
+        'avatar'   => $user->getAvatarURL(),
+        'profile'  => '/u:' . $user->username . '.html',
+        'isAdmin'  => $user->isAdmin(),
+    ])->header('Cache-Control', 'no-store');
+})->name('me');
+
+// Users — no-store (isOwner panel, like buttons are user-specific)
+Route::get('/u:{username}.html', [UserController::class, 'profile'])->middleware('cache:no-store');
 Route::post('/u:{username}.html', [UserController::class, 'handleProfilePost']);
-Route::get('/trainercard:{username}.html', [UserController::class, 'trainerCard']);
+Route::get('/trainercard:{username}.html', [UserController::class, 'trainerCard'])->middleware('cache:public, max-age=300, s-maxage=300');
 
-// Static pages
-Route::get('/faq.html', function () {
-    return view('faq');
+// Static pages — 1 hour
+Route::middleware('cache:public, max-age=3600, s-maxage=3600')->group(function () {
+    Route::get('/faq.html', fn() => view('faq'));
+    Route::get('/gacha.html', fn() => view('gacha'));
 });
-Route::get('/gacha.html', function () {
-    return view('gacha');
-});
-
-Route::get('/galleryCore.html', [GlitchController::class, 'galleryCore']);
-Route::get('/gallerySmitty.html', [GlitchController::class, 'gallerySmitty']);
-Route::get('/gallerySmittyForm.html', [GlitchController::class, 'gallerySmittyForm']);
-
-Route::get('/cFront:{name}.png', [SpriteController::class, 'coreFront']);
-Route::get('/cBack:{name}.png', [SpriteController::class, 'coreBack']);
-
-Route::get('/core:{form}.html', [GlitchController::class, 'coreMon']);
-Route::get('/smitty:{form}.html', [GlitchController::class, 'smittyMon']);
-Route::get('/smittyForm:{form}.html', [GlitchController::class, 'smittyFormMon']);
 
 // Bot
 Route::post('/discord/interactions', [App\Http\Controllers\DiscordInteractionController::class, 'handle'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
@@ -174,17 +191,24 @@ Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {
 // ── Wiki ──────────────────────────────────────────────────────────
 use App\Http\Controllers\WikiController;
 
-Route::get('/wiki.html',               [WikiController::class, 'index'])->name('wiki.index');
-Route::get('/wiki:items.html',         [WikiController::class, 'items'])->name('wiki.items');
-Route::get('/wiki:alt-builds.html',    [WikiController::class, 'altBuilds'])->name('wiki.altbuilds');
-Route::get('/wiki:changelog.html',     [WikiController::class, 'changelog'])->name('wiki.changelog');
-Route::get('/wiki:{slug}.html',        [WikiController::class, 'show'])->name('wiki.show');
-Route::get('/wiki-search.json',        [\App\Http\Controllers\WikiSearchController::class, 'search'])->name('wiki.search');
+// Wiki search — no-store (dynamic per query)
+Route::get('/wiki-search.json', [\App\Http\Controllers\WikiSearchController::class, 'search'])
+    ->name('wiki.search')
+    ->middleware('cache:no-store');
 
-// ── Admin ─────────────────────────────────────────────────────────
+// Wiki pages — 1 hour
+Route::middleware('cache:public, max-age=3600, s-maxage=3600')->group(function () {
+    Route::get('/wiki.html',            [WikiController::class, 'index'])->name('wiki.index');
+    Route::get('/wiki:items.html',      [WikiController::class, 'items'])->name('wiki.items');
+    Route::get('/wiki:alt-builds.html', [WikiController::class, 'altBuilds'])->name('wiki.altbuilds');
+    Route::get('/wiki:changelog.html',  [WikiController::class, 'changelog'])->name('wiki.changelog');
+    Route::get('/wiki:{slug}.html',     [WikiController::class, 'show'])->name('wiki.show');
+});
+
+// ── Admin — never cached ──────────────────────────────────────────
 use App\Http\Controllers\AdminController;
 
-Route::middleware('admin')->prefix('admin')->group(function () {
+Route::middleware(['admin', 'cache:no-store'])->prefix('admin')->group(function () {
     Route::get('/',                          [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/users.html',                [AdminController::class, 'users'])->name('admin.users');
     Route::post('/users/{user}/toggle-admin',[AdminController::class, 'toggleAdmin'])->name('admin.users.toggle');

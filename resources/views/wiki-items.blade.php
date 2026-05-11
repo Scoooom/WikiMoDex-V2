@@ -48,12 +48,18 @@
     <main class="wiki-content">
         <div class="wiki-article-meta">
             <span class="wiki-article-category">Items & Shop</span>
-            @auth
-                @if(auth()->user()->isAdmin())
-                <span class="wiki-edit-btn">Auto-generated · run <code>php artisan items:parse</code> to update</span>
-                @endif
-            @endauth
+            <span id="wiki-items-admin-slot"></span>
         </div>
+
+        <script>
+        fetch("/me.json", { credentials: "same-origin" })
+            .then(r => r.json())
+            .then(me => {
+                if (!me.isAdmin) return;
+                const slot = document.getElementById("wiki-items-admin-slot");
+                if (slot) slot.innerHTML = '<span class="wiki-edit-btn" style="cursor:default">Auto-generated &middot; run <code>php artisan items:parse</code> to update</span>';
+            }).catch(() => {});
+        </script>
 
         <div class="wiki-prose">
             <h1>Items Reference</h1>

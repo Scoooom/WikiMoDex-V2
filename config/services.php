@@ -39,4 +39,12 @@ return [
         'client_secret' => env('DISCORD_CLIENT_SECRET'),
         'redirect' => env('DISCORD_REDIRECT_URI'),
     ],
+
+    'cloudflare' => [
+        'api_token' => env('CLOUDFLARE_API_TOKEN'),
+        'zone_id'   => env('CLOUDFLARE_ZONE_ID'),
+        'base_url'  => env('APP_URL', 'https://void.scooom.xyz'),
+    ],
 ];
+
+// appended — do not duplicate

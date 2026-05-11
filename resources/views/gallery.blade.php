@@ -4,10 +4,15 @@
 <div class="container">
     <div class="section-header mt-2 mb-3">
         <span class="section-title">Mod Glitch Forms</span>
-        @auth
-        <a href="/create.html" class="btn btn-primary btn-sm">+ Upload glitch</a>
-        @endauth
+        <span id="gallery-upload-slot"></span>
     </div>
+    <script>
+    fetch('/me.json',{credentials:'same-origin'}).then(r=>r.json()).then(me=>{
+        if(!me.authed) return;
+        const s=document.getElementById('gallery-upload-slot');
+        if(s) s.innerHTML='<a href="/create.html" class="btn btn-primary btn-sm">+ Upload glitch</a>';
+    }).catch(()=>{});
+    </script>
 
     <div class="gallery-wrap">
         <div class="gallery-toolbar">
