@@ -47,5 +47,22 @@ class AppServiceProvider extends ServiceProvider
                 ],
             ]);
         });
+
+        // Auto-purge when glitches are uploaded or deleted
+        $glitchUrls = function() {
+            $base = rtrim(config('services.cloudflare.base_url'), '/');
+            return [
+                $base . '/',
+                $base . '/gallery.html',
+            ];
+        };
+
+        \App\Models\Glitch::created(function () use ($glitchUrls) {
+            \Illuminate\Support\Facades\Artisan::queue('cf:purge', ['--url' => $glitchUrls()]);
+        });
+
+        \App\Models\Glitch::deleted(function () use ($glitchUrls) {
+            \Illuminate\Support\Facades\Artisan::queue('cf:purge', ['--url' => $glitchUrls()]);
+        });
     }
 }

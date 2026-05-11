@@ -43,6 +43,14 @@ class ParseAltBuilds extends Command
         $exit = proc_close($process);
 
         $this->info($exit === 0 ? 'Done!' : "Parser exited with code {$exit}");
+
+        if ($exit === 0) {
+            \Illuminate\Support\Facades\Artisan::call('cf:purge', [
+                '--url' => [rtrim(config('services.cloudflare.base_url'), '/') . '/wiki:alt-builds.html'],
+            ]);
+            $this->info('CF cache purged for alt builds.');
+        }
+
         return $exit;
     }
 }

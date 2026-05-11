@@ -68,6 +68,12 @@ class ParseChangelog extends Command
         }
 
         $this->info("Done! Upserted {$upserted} entries.");
+
+        \Illuminate\Support\Facades\Artisan::call('cf:purge', [
+            '--url' => [rtrim(config('services.cloudflare.base_url'), '/') . '/wiki:changelog.html'],
+        ]);
+        $this->info('CF cache purged for changelog.');
+
         return 0;
     }
 }

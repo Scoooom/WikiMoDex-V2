@@ -51,6 +51,10 @@ class ParseItems extends Command
 
         if ($exit === 0) {
             $this->info('Done!');
+            \Illuminate\Support\Facades\Artisan::call('cf:purge', [
+                '--url' => [rtrim(config('services.cloudflare.base_url'), '/') . '/wiki:items.html'],
+            ]);
+            $this->info('CF cache purged for items.');
         } else {
             $this->error("Parser exited with code {$exit}");
         }
