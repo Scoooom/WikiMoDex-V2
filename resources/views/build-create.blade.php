@@ -85,6 +85,28 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        {{-- Override Type 1 --}}
+                        <div class="build-form-field">
+                            <label>Override Type 1</label>
+                            <select name="team[{{ $i }}][override_type1]" class="build-form-select">
+                                <option value="">— None —</option>
+                                @foreach(['Normal','Fighting','Flying','Poison','Ground','Rock','Bug','Ghost','Steel','Fire','Water','Grass','Electric','Psychic','Ice','Dragon','Dark','Fairy'] as $type)
+                                <option value="{{ $type }}" {{ old("team.$i.override_type1") === $type ? 'selected' : '' }}>{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Override Type 2 --}}
+                        <div class="build-form-field">
+                            <label>Override Type 2</label>
+                            <select name="team[{{ $i }}][override_type2]" class="build-form-select">
+                                <option value="">— None —</option>
+                                @foreach(['Normal','Fighting','Flying','Poison','Ground','Rock','Bug','Ghost','Steel','Fire','Water','Grass','Electric','Psychic','Ice','Dragon','Dark','Fairy'] as $type)
+                                <option value="{{ $type }}" {{ old("team.$i.override_type2") === $type ? 'selected' : '' }}>{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
                     {{-- Moves --}}
@@ -128,13 +150,6 @@
     </form>
 </div>
 
-{{-- Ability datalist (used for ability param fields) --}}
-<datalist id="abilityOptions">
-    @foreach($abilities as $a)
-    <option value="{{ $a }}">
-    @endforeach
-</datalist>
-
 {{-- Item select datalist --}}
 <datalist id="itemOptions">
     @foreach($items as $item)
@@ -154,23 +169,12 @@ const TYPES = ['Normal','Fighting','Flying','Poison','Ground','Rock','Bug','Ghos
 const STATS = ['HP','ATK','DEF','SP.ATK','SP.DEF','SPD'];
 
 const PARAM_ITEMS = {
-    // Stat switchers — which two stats were swapped
-    'STAT_SWITCHER':             { type: 'stat2',   label1: 'Swap stat',          label2: 'With stat' },
-    'RANDOM_STAT_SWITCHER':      { type: 'stat2',   label1: 'Swap stat',          label2: 'With stat' },
-    'STAT_SACRIFICE':            { type: 'stat1',   label1: 'Stat sacrificed' },
-    // Type switchers — new primary and/or secondary type
-    'TYPE_SWITCHER':             { type: 'type2',   label1: 'Type 1',             label2: 'Type 2 (leave blank to keep existing)' },
-    'PRIMARY_TYPE_SWITCHER':     { type: 'type1',   label1: 'New primary type' },
-    'SECONDARY_TYPE_SWITCHER':   { type: 'type2secondary', label1: 'Type 1 (keep — leave blank)', label2: 'New secondary type' },
-    'TYPE_SACRIFICE':            { type: 'type2',   label1: 'New Type 1',         label2: 'New Type 2 (leave blank to keep existing)' },
-    // Collected type
-    'COLLECTED_TYPE':            { type: 'type1',   label1: 'Collected type' },
-    'PERMA_COLLECTED_TYPE':      { type: 'type1',   label1: 'Collected type' },
-    // Ability/passive sacrifices
-    'ABILITY_SACRIFICE':         { type: 'ability', label1: 'Ability sacrificed' },
-    'ABILITY_SACRIFICE_PASSIVE': { type: 'ability', label1: 'Ability sacrificed' },
-    'PASSIVE_ABILITY_SACRIFICE': { type: 'ability', label1: 'Passive sacrificed' },
-    'MOVE_SACRIFICE':            { type: 'move',    label1: 'Move sacrificed' },
+    'STAT_SWITCHER':           { type: 'stat2', label1: 'Swap stat',        label2: 'With stat' },
+    'STAT_SACRIFICE':          { type: 'stat1', label1: 'Stat sacrificed' },
+    'TYPE_SWITCHER':           { type: 'type2', label1: 'Type 1',           label2: 'Type 2 (blank = keep existing)' },
+    'PRIMARY_TYPE_SWITCHER':   { type: 'type1', label1: 'New primary type' },
+    'SECONDARY_TYPE_SWITCHER': { type: 'type2secondary', label1: 'Type 1 (blank = keep)', label2: 'New secondary type' },
+    // TYPE_SACRIFICE and POKEMON_ALT_BUILD have no params — override type fields on the slot handle typing
 };
 
 function buildParamHtml(base, cfg, params) {
@@ -186,9 +190,6 @@ function buildParamHtml(base, cfg, params) {
             const typeOpts2 = '<option value="">— Keep existing —</option>' + TYPES.map(t => `<option value="${t}"${t2===t?' selected':''}>${t}</option>`).join('');
             html += `<div class="build-item-param-row"><label class="build-item-param-label">${cfg.label2}</label><select name="${base}[type2]" class="build-form-select build-item-param-input">${typeOpts2}</select></div>`;
         }
-    } else if (cfg.type === 'move') {
-        const mv = (params && params.move) || '';
-        html += `<div class="build-item-param-row"><label class="build-item-param-label">${cfg.label1}</label><input type="text" name="${base}[move]" value="${mv}" class="build-form-input build-item-param-input" placeholder="Move name" autocomplete="off"></div>`;
     } else if (cfg.type.startsWith('stat')) {
         const s1 = (params && params.stat1) || '';
         const s2 = (params && params.stat2) || '';

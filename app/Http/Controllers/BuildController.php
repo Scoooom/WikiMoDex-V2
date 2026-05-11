@@ -49,10 +49,13 @@ class BuildController extends Controller
     public function create()
     {
         abort_unless(Auth::check(), 403, 'Login required');
-        $items     = GameItem::orderBy('name')->get();
-        $abilities = \App\Models\Ability::orderBy('name')->pluck('name');
+        $whitelist = [
+            'STAT_SWITCHER', 'PRIMARY_TYPE_SWITCHER', 'SECONDARY_TYPE_SWITCHER',
+            'TYPE_SWITCHER', 'STAT_SACRIFICE', 'TYPE_SACRIFICE', 'POKEMON_ALT_BUILD',
+        ];
+        $items     = GameItem::whereIn('key', $whitelist)->orderBy('name')->get();
         $species   = \App\Models\BuiltinForm::orderBy('name')->pluck('name');
-        return view('build-create', compact('items', 'abilities', 'species'));
+        return view('build-create', compact('items', 'species'));
     }
 
     public function store(Request $request)
@@ -79,8 +82,8 @@ class BuildController extends Controller
             'team.*.items.*.params.type2'   => 'nullable|string|max:20',
             'team.*.items.*.params.stat1'   => 'nullable|string|max:10',
             'team.*.items.*.params.stat2'   => 'nullable|string|max:10',
-            'team.*.items.*.params.ability' => 'nullable|string|max:80',
-            'team.*.items.*.params.move'    => 'nullable|string|max:60',
+            'team.*.override_type1'         => 'nullable|string|max:20',
+            'team.*.override_type2'         => 'nullable|string|max:20',
             'team.*.notes'                  => 'nullable|string|max:500',
         ]);
 

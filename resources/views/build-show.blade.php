@@ -54,7 +54,19 @@
                     >
                 </div>
                 <div class="build-slot-info">
-                    <div class="build-slot-species">{{ $slot['species'] }}</div>
+                    <div class="build-slot-species">
+                        {{ $slot['species'] }}
+                        @if(!empty($slot['override_type1']) || !empty($slot['override_type2']))
+                            <span class="build-slot-types">
+                                @if(!empty($slot['override_type1']))
+                                    <span class="build-type-badge">{{ $slot['override_type1'] }}</span>
+                                @endif
+                                @if(!empty($slot['override_type2']))
+                                    <span class="build-type-badge">{{ $slot['override_type2'] }}</span>
+                                @endif
+                            </span>
+                        @endif
+                    </div>
                     @if(!empty($slot['ability']))
                         <div class="build-slot-ability">Ability: <span>{{ $slot['ability'] }}</span></div>
                     @endif
@@ -104,10 +116,6 @@
                                         ({{ $params['stat1'] ?? '?' }}{{ !empty($params['stat2']) ? ' ↔ ' . $params['stat2'] : '' }})
                                     @elseif(!empty($params['type1']) || !empty($params['type2']))
                                         ({{ $params['type1'] ?? 'Default' }}{{ !empty($params['type2']) ? ' / ' . $params['type2'] : '' }})
-                                    @elseif(!empty($params['ability']))
-                                        ({{ $params['ability'] }})
-                                    @elseif(!empty($params['move']))
-                                        ({{ $params['move'] }})
                                     @endif
                                 </span>
                             @endif
