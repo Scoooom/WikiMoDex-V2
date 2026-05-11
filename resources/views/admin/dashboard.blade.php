@@ -79,6 +79,14 @@
                 </div>
                 <a href="/wiki:alt-builds.html" class="admin-stat-link">View →</a>
             </div>
+            <div class="admin-stat-card">
+                <div class="admin-stat-icon">🏗️</div>
+                <div class="admin-stat-body">
+                    <div class="admin-stat-value">{{ $stats['builds'] }}</div>
+                    <div class="admin-stat-label">Community Builds</div>
+                </div>
+                <a href="/builds.html" class="admin-stat-link">View →</a>
+            </div>
         </div>
 
         {{-- Two column lower section --}}

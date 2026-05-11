@@ -189,6 +189,19 @@ Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {
     return response()->file($outPath, ['Content-Type' => 'image/png', 'Cache-Control' => 'public, max-age=3600']);
 });
 
+// ── Community Builds ──────────────────────────────────────────────
+use App\Http\Controllers\BuildController;
+
+// Gallery + show — publicly cacheable (1 hour CDN, but no-store for logged-in vote state)
+Route::get('/builds.html',              [BuildController::class, 'index'])->middleware('cache:no-store');
+Route::get('/build/{slug}.html',        [BuildController::class, 'show'])->middleware('cache:no-store');
+
+// Create / store — auth required, never cached
+Route::get('/builds/new.html',          [BuildController::class, 'create'])->middleware('cache:no-store');
+Route::post('/builds',                  [BuildController::class, 'store']);
+Route::delete('/build/{slug}.html',     [BuildController::class, 'destroy']);
+Route::post('/build/{slug}/vote.html',  [BuildController::class, 'vote'])->middleware('throttle:30,1');
+
 // ── Wiki ──────────────────────────────────────────────────────────
 use App\Http\Controllers\WikiController;
 

@@ -8,6 +8,7 @@ use App\Models\WikiArticle;
 use App\Models\GameItem;
 use App\Models\AltBuild;
 use App\Models\ChangelogEntry;
+use App\Models\CommunityBuild;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -23,6 +24,7 @@ class AdminController extends Controller
             'items'     => GameItem::count(),
             'altBuilds' => AltBuild::count(),
             'changelog' => ChangelogEntry::count(),
+            'builds'    => CommunityBuild::count(),
         ];
 
         $recentUsers    = User::orderByDesc('id')->take(8)->get();
