@@ -411,6 +411,10 @@ def main():
 
         name, desc = get_item_info(key, i18n, key_to_class_map)
 
+        # Overwrite garbled descriptions containing unreplaced template placeholders
+        if not desc or ('?' in desc and 'Receive' in desc):
+            desc = FALLBACK_DESCRIPTIONS.get(key, desc)
+
         if not name or key.endswith('_QUEST') or key.startswith('ENEMY_'):
             skipped += 1
             continue
