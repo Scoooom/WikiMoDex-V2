@@ -106,6 +106,8 @@
                                         ({{ $params['type1'] ?? 'Default' }}{{ !empty($params['type2']) ? ' / ' . $params['type2'] : '' }})
                                     @elseif(!empty($params['ability']))
                                         ({{ $params['ability'] }})
+                                    @elseif(!empty($params['move']))
+                                        ({{ $params['move'] }})
                                     @endif
                                 </span>
                             @endif

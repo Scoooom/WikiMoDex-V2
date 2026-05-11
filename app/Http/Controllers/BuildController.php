@@ -80,6 +80,7 @@ class BuildController extends Controller
             'team.*.items.*.params.stat1'   => 'nullable|string|max:10',
             'team.*.items.*.params.stat2'   => 'nullable|string|max:10',
             'team.*.items.*.params.ability' => 'nullable|string|max:80',
+            'team.*.items.*.params.move'    => 'nullable|string|max:60',
             'team.*.notes'                  => 'nullable|string|max:500',
         ]);
 
