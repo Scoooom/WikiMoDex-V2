@@ -77,7 +77,7 @@ Route::get('/me.json', function () {
         'avatar'   => $user->getAvatarURL(),
         'profile'  => '/u:' . $user->username . '.html',
         'isAdmin'  => $user->isAdmin(),
-        'isEditor' => $user->isWikiEditor() && $user->mfa_enabled,
+        'isEditor' => $user->isWikiEditor(),
     ])->header('Cache-Control', 'no-store');
 })->name('me');
 
