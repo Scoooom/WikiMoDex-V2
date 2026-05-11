@@ -84,6 +84,8 @@
                 $statValues = $slotStat['stats'] ?? null;
                 $statError  = $slotStat['error'] ?? null;
                 $statSource = $slotStat['source'] ?? null;
+                // DEBUG — remove after fixing
+                \Illuminate\Support\Facades\Log::info('SlotStat debug', ['i' => $i, 'species' => $slot['species'] ?? null, 'slotStat' => $slotStat]);
                 $statFocus  = '';
                 if ($statSource === 'alt_build') {
                     $ab = \App\Models\AltBuild::where('name', $slot['species'])->first();
