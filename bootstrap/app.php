@@ -15,9 +15,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'discord/interactions',
         ]);
         $middleware->alias([
-            'admin'    => \App\Http\Middleware\RequireAdmin::class,
-            'cache'    => \App\Http\Middleware\SetCacheHeaders::class,
-            'nosession'=> \App\Http\Middleware\SuppressSession::class,
+            'admin'     => \App\Http\Middleware\RequireAdmin::class,
+            'cache'     => \App\Http\Middleware\SetCacheHeaders::class,
+            'nosession' => \App\Http\Middleware\SuppressSession::class,
+        ]);
+
+        // SuppressSession must run before StartSession so the array driver
+        // is set before the session is initialised for that request.
+        $middleware->priority([
+            \App\Http\Middleware\SuppressSession::class,
+            \Illuminate\Session\Middleware\StartSession::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

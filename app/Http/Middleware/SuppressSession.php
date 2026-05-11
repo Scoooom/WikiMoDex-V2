@@ -4,26 +4,30 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Suppresses the Laravel session on routes that don't need it.
+ * Prevents session cookies from being written on cacheable routes.
  *
- * Without a session, Laravel won't set XSRF-TOKEN or laravel-session
- * cookies, and won't stamp "Cache-Control: no-cache, private" on the
- * response. This allows Cloudflare to cache the page normally.
+ * Must run BEFORE StartSession in the middleware stack to be effective.
+ * Registered as a priority middleware in bootstrap/app.php.
  *
- * Safe to use on any route where auth state is handled client-side
- * via /me.json (i.e. all our JS-injected nav routes).
+ * Sets the session driver to 'array' before StartSession initialises,
+ * so StartSession boots but never persists anything or writes a cookie.
+ * Laravel then has no reason to stamp "Cache-Control: no-cache, private".
  */
 class SuppressSession
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Switch to array driver — session exists in memory only,
-        // never persisted, no cookie written to the response.
         config(['session.driver' => 'array']);
 
-        return $next($request);
+        $response = $next($request);
+
+        // Belt-and-braces: strip any session/CSRF cookies that snuck through
+        $response->headers->remove('Set-Cookie');
+
+        return $response;
     }
 }
