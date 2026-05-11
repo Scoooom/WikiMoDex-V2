@@ -165,7 +165,7 @@ function addItemRow(slot, nameVal = '', keyVal = '', stackVal = 1) {
 
     // Auto-fill key when name matches
     row.querySelector('.build-item-name-input').addEventListener('input', function() {
-        const key = ITEM_MAP[this.value] ?? '';
+        const key = (ITEM_MAP[this.value] !== undefined) ? ITEM_MAP[this.value] : '';
         row.querySelector('.build-item-key-input').value = key;
     });
 
@@ -251,7 +251,7 @@ addItemRow({{ $i }}, {{ json_encode($item['name'] ?? '') }}, {{ json_encode($ite
 
         function selectResult(r) {
             input.value = r.value;
-            if (dexInput) dexInput.value = r.dex ?? '';
+            if (dexInput) dexInput.value = (r.dex !== undefined && r.dex !== null) ? r.dex : '';
             // Auto-fill abilities if fields are empty
             if (ab1Input && !ab1Input.value && r.ability1) ab1Input.value = r.ability1;
             if (ab2Input && !ab2Input.value && r.abilityH) ab2Input.value = r.abilityH;
