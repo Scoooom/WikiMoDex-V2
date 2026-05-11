@@ -49,8 +49,10 @@ class BuildController extends Controller
     public function create()
     {
         abort_unless(Auth::check(), 403, 'Login required');
-        $items = GameItem::orderBy('name')->get();
-        return view('build-create', compact('items'));
+        $items     = GameItem::orderBy('name')->get();
+        $abilities = \App\Models\Ability::orderBy('name')->pluck('name');
+        $species   = \App\Models\BuiltinForm::orderBy('name')->pluck('name');
+        return view('build-create', compact('items', 'abilities', 'species'));
     }
 
     public function store(Request $request)

@@ -52,6 +52,7 @@
                                    class="build-form-input build-species-input"
                                    placeholder="e.g. Charizard"
                                    data-slot="{{ $i }}"
+                                   list="speciesOptions"
                                    autocomplete="off">
                             <input type="hidden" name="team[{{ $i }}][dex_number]"
                                    class="build-dex-input" data-slot="{{ $i }}">
@@ -62,7 +63,8 @@
                             <label>Ability</label>
                             <input type="text" name="team[{{ $i }}][ability]"
                                    value="{{ old("team.$i.ability") }}"
-                                   class="build-form-input" placeholder="e.g. Drought">
+                                   class="build-form-input" placeholder="e.g. Drought"
+                                   list="abilityOptions" autocomplete="off">
                         </div>
 
                         {{-- Passive --}}
@@ -70,7 +72,8 @@
                             <label>Passive Ability</label>
                             <input type="text" name="team[{{ $i }}][passive_ability]"
                                    value="{{ old("team.$i.passive_ability") }}"
-                                   class="build-form-input" placeholder="e.g. Flash Fire">
+                                   class="build-form-input" placeholder="e.g. Flash Fire"
+                                   list="abilityOptions" autocomplete="off">
                         </div>
 
                         {{-- Nature --}}
@@ -125,6 +128,20 @@
         </div>
     </form>
 </div>
+
+{{-- Species datalist --}}
+<datalist id="speciesOptions">
+    @foreach($species as $s)
+    <option value="{{ $s }}">
+    @endforeach
+</datalist>
+
+{{-- Ability datalist --}}
+<datalist id="abilityOptions">
+    @foreach($abilities as $a)
+    <option value="{{ $a }}">
+    @endforeach
+</datalist>
 
 {{-- Item select datalist --}}
 <datalist id="itemOptions">
