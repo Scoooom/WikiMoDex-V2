@@ -2652,36 +2652,72 @@ img { max-width: 100%; display: block; }
 
 /* ── Pagination ──────────────────────────────────────────────── */
 .admin-pagination {
-    margin-top: 1.25rem;
+    margin-top: 1.5rem;
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
-.admin-pagination .pagination {
+.admin-pagination-info {
+    font-size: 0.8rem;
+    color: var(--dim);
+}
+
+.admin-pagination-links {
     display: flex;
     gap: 4px;
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    align-items: center;
 }
 
-.admin-pagination .page-item .page-link {
-    padding: 4px 10px;
+.admin-page-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 11px;
     border-radius: var(--radius-sm);
     font-size: 0.82rem;
     background: var(--card);
     border: 1px solid var(--border);
     color: var(--muted);
     text-decoration: none;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+    cursor: pointer;
+    line-height: 1.4;
 }
 
-.admin-pagination .page-item.active .page-link {
+.admin-page-btn:hover {
+    background: var(--card2);
+    color: var(--text);
+    border-color: var(--border2);
+}
+
+.admin-page-btn--active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    cursor: default;
+}
+
+.admin-page-btn--active:hover {
     background: var(--accent);
     border-color: var(--accent);
     color: #fff;
 }
 
-.admin-pagination .page-item.disabled .page-link { opacity: 0.4; pointer-events: none; }
+.admin-page-btn--disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
+.admin-page-btn--dots {
+    border-color: transparent;
+    background: transparent;
+    color: var(--dim);
+    cursor: default;
+    padding: 5px 6px;
+}
 
 /* ── Nav admin item ──────────────────────────────────────────── */
 .nav-dropdown-item--admin {
