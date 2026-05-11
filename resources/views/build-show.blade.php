@@ -80,7 +80,7 @@
             </div>
 
             @php
-                $slotStat   = $slotStats[$loop->index] ?? null;
+                $slotStat   = $slotStats[$i] ?? null;
                 $statValues = $slotStat['stats'] ?? null;
                 $statError  = $slotStat['error'] ?? null;
                 $statSource = $slotStat['source'] ?? null;
@@ -175,6 +175,13 @@
             const isOwner = me.username === '{{ $build->user->username }}';
             if (isOwner || me.isAdmin) {
                 const slot = document.getElementById('build-delete-slot');
+                // Edit button
+                const editLink = document.createElement('a');
+                editLink.href = '/build/{{ $build->slug }}/edit.html';
+                editLink.className = 'build-edit-btn';
+                editLink.textContent = '✏ Edit';
+                slot.appendChild(editLink);
+                // Delete form
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '/build/{{ $build->slug }}.html';

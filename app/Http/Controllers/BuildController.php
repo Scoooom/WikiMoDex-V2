@@ -116,6 +116,71 @@ class BuildController extends Controller
         return redirect("/build/{$build->slug}.html")->with('success', 'Build submitted!');
     }
 
+    // ── Edit / update ─────────────────────────────────────────────
+
+    public function edit(string $slug)
+    {
+        $build = CommunityBuild::where('slug', $slug)->firstOrFail();
+        $user  = Auth::user();
+        abort_unless($user && ($user->id === $build->user_id || $user->isAdmin()), 403);
+
+        $whitelist = [
+            'STAT_SWITCHER', 'PRIMARY_TYPE_SWITCHER', 'SECONDARY_TYPE_SWITCHER',
+            'TYPE_SWITCHER', 'STAT_SACRIFICE', 'TYPE_SACRIFICE', 'POKEMON_ALT_BUILD',
+        ];
+        $items   = GameItem::whereIn('key', $whitelist)->orderBy('name')->get();
+        $species = \App\Models\BuiltinForm::orderBy('name')->pluck('name');
+
+        return view('build-edit', compact('build', 'items', 'species'));
+    }
+
+    public function update(Request $request, string $slug)
+    {
+        $build = CommunityBuild::where('slug', $slug)->firstOrFail();
+        $user  = Auth::user();
+        abort_unless($user && ($user->id === $build->user_id || $user->isAdmin()), 403);
+
+        $data = $request->validate([
+            'title'                         => 'required|string|max:80',
+            'description'                   => 'nullable|string|max:1000',
+            'team'                          => 'required|array|min:1|max:6',
+            'team.*.species'                => 'nullable|string|max:60',
+            'team.*.dex_number'             => 'nullable|integer',
+            'team.*.ability'                => 'nullable|string|max:80',
+            'team.*.passive_ability'        => 'nullable|string|max:80',
+            'team.*.nature'                 => 'nullable|string|max:20',
+            'team.*.alt_build_rank'         => 'nullable|integer|min:1|max:9',
+            'team.*.moves'                  => 'nullable|array|max:4',
+            'team.*.moves.*'                => 'nullable|string|max:60',
+            'team.*.items'                  => 'nullable|array|max:20',
+            'team.*.items.*.key'            => 'nullable|string|max:60',
+            'team.*.items.*.name'           => 'nullable|string|max:80',
+            'team.*.items.*.stack'          => 'nullable|integer|min:1|max:99',
+            'team.*.items.*.params'         => 'nullable|array',
+            'team.*.items.*.params.type1'   => 'nullable|string|max:20',
+            'team.*.items.*.params.type2'   => 'nullable|string|max:20',
+            'team.*.items.*.params.stat1'   => 'nullable|string|max:10',
+            'team.*.items.*.params.stat2'   => 'nullable|string|max:10',
+            'team.*.override_type1'         => 'nullable|string|max:20',
+            'team.*.override_type2'         => 'nullable|string|max:20',
+            'team.*.notes'                  => 'nullable|string|max:500',
+        ]);
+
+        $team = collect($data['team'])->filter(fn($slot) => !empty($slot['species']))->values()->toArray();
+
+        if (empty($team)) {
+            return back()->withErrors(['team' => 'Add at least one Pokémon.'])->withInput();
+        }
+
+        $build->update([
+            'title'       => $data['title'],
+            'description' => $data['description'] ?? null,
+            'team'        => $team,
+        ]);
+
+        return redirect("/build/{$build->slug}.html")->with('success', 'Build updated!');
+    }
+
     // ── Delete ────────────────────────────────────────────────────
 
     public function destroy(string $slug)

@@ -209,6 +209,8 @@ Route::get('/builds/new.html',          [BuildController::class, 'create'])->mid
 Route::post('/builds',                  [BuildController::class, 'store']);
 Route::delete('/build/{slug}.html',     [BuildController::class, 'destroy']);
 Route::post('/build/{slug}/vote.html',  [BuildController::class, 'vote'])->middleware('throttle:30,1');
+Route::get('/build/{slug}/edit.html',   [BuildController::class, 'edit'])->middleware('cache:no-store');
+Route::post('/build/{slug}/edit.html',  [BuildController::class, 'update']);
 
 // ── Wiki ──────────────────────────────────────────────────────────
 use App\Http\Controllers\WikiController;

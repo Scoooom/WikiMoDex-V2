@@ -3541,3 +3541,16 @@ img { max-width: 100%; display: block; }
     border-radius: var(--radius-sm);
     padding: 0.4rem 0.7rem;
 }
+
+/* ── Build edit button ── */
+.build-edit-btn {
+    display: inline-block;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    color: var(--accent2);
+    font-size: 0.82rem;
+    padding: 0.4rem 0.75rem;
+    text-decoration: none;
+    transition: all var(--transition);
+}
+.build-edit-btn:hover { background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent3); }
