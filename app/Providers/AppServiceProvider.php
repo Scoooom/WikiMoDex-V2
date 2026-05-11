@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Auto-purge Cloudflare cache when wiki content changes
         \App\Models\WikiArticle::saved(function (\App\Models\WikiArticle $article) {
-            \Illuminate\Support\Facades\Artisan::queue('cf:purge', [
+            \Illuminate\Support\Facades\Artisan::call('cf:purge', [
                 '--url' => [
                     rtrim(config('services.cloudflare.base_url'), '/') . '/wiki.html',
                     rtrim(config('services.cloudflare.base_url'), '/') . '/wiki:' . $article->slug . '.html',
@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         \App\Models\WikiArticle::deleted(function (\App\Models\WikiArticle $article) {
-            \Illuminate\Support\Facades\Artisan::queue('cf:purge', [
+            \Illuminate\Support\Facades\Artisan::call('cf:purge', [
                 '--url' => [
                     rtrim(config('services.cloudflare.base_url'), '/') . '/wiki.html',
                     rtrim(config('services.cloudflare.base_url'), '/') . '/wiki:' . $article->slug . '.html',
@@ -58,11 +58,11 @@ class AppServiceProvider extends ServiceProvider
         };
 
         \App\Models\Glitch::created(function () use ($glitchUrls) {
-            \Illuminate\Support\Facades\Artisan::queue('cf:purge', ['--url' => $glitchUrls()]);
+            \Illuminate\Support\Facades\Artisan::call('cf:purge', ['--url' => $glitchUrls()]);
         });
 
         \App\Models\Glitch::deleted(function () use ($glitchUrls) {
-            \Illuminate\Support\Facades\Artisan::queue('cf:purge', ['--url' => $glitchUrls()]);
+            \Illuminate\Support\Facades\Artisan::call('cf:purge', ['--url' => $glitchUrls()]);
         });
     }
 }
