@@ -81,4 +81,5 @@ Homestead.yaml
 Thumbs.db
 pokevoid/
 scripts/__pycache__/
-/public/avatars/
+/public/avatars/*.png
+/public/avatars/*.hash

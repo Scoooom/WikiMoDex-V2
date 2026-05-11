@@ -36,12 +36,8 @@ class User extends Authenticatable
             return "/avatars/{$this->user_id}.png";
         }
 
-        // Fallback: Discord CDN (works until user changes their avatar)
-        if ($this->avatar_id === 'default' || !$this->avatar_id) {
-            return 'https://cdn.discordapp.com/embed/avatars/0.png';
-        }
-
-        return "https://cdn.discordapp.com/avatars/{$this->user_id}/{$this->avatar_id}.png";
+        // Fall back to default avatar — never a broken image
+        return '/avatars/default.svg';
     }
 
     public function getUploadCount()

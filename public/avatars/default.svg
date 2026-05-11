@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <circle cx="64" cy="64" r="64" fill="#221940"/>
+  <!-- Head -->
+  <circle cx="64" cy="48" r="22" fill="#5a4880"/>
+  <!-- Body -->
+  <ellipse cx="64" cy="100" rx="30" ry="22" fill="#5a4880"/>
+  <!-- Subtle inner glow ring -->
+  <circle cx="64" cy="64" r="62" fill="none" stroke="#7c5cbf" stroke-width="1.5" opacity="0.4"/>
+</svg>
