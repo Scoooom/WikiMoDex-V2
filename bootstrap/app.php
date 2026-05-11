@@ -20,11 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'nosession' => \App\Http\Middleware\SuppressSession::class,
         ]);
 
-        // SuppressSession must run before StartSession so the array driver
-        // is set before the session is initialised for that request.
+        // SuppressSession must run before StartSession.
+        // SetCacheHeaders must run last so it overrides Laravel's own no-cache stamp.
         $middleware->priority([
             \App\Http\Middleware\SuppressSession::class,
             \Illuminate\Session\Middleware\StartSession::class,
+            \App\Http\Middleware\SetCacheHeaders::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
