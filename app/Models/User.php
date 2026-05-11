@@ -18,6 +18,17 @@ class User extends Authenticatable
         return (bool) $this->is_admin;
     }
 
+    public function isWikiEditor(): bool
+    {
+        // Admins inherit editor privileges
+        return (bool) $this->is_admin || (bool) $this->is_wiki_editor;
+    }
+
+    public function canAccessPanel(): bool
+    {
+        return ($this->isAdmin() || $this->isWikiEditor()) && (bool) $this->mfa_enabled;
+    }
+
     public function glitches()
     {
         return $this->hasMany(Glitch::class, 'created_by');

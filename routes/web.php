@@ -77,6 +77,7 @@ Route::get('/me.json', function () {
         'avatar'   => $user->getAvatarURL(),
         'profile'  => '/u:' . $user->username . '.html',
         'isAdmin'  => $user->isAdmin(),
+        'isEditor' => $user->isWikiEditor() && $user->mfa_enabled,
     ])->header('Cache-Control', 'no-store');
 })->name('me');
 
@@ -208,11 +209,17 @@ Route::middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, sta
 // ── Admin — never cached ──────────────────────────────────────────
 use App\Http\Controllers\AdminController;
 
+// Admin-only routes (full admins with 2FA)
 Route::middleware(['admin', 'cache:no-store'])->prefix('admin')->group(function () {
-    Route::get('/',                          [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/users.html',                [AdminController::class, 'users'])->name('admin.users');
     Route::post('/users/{user}/toggle-admin',[AdminController::class, 'toggleAdmin'])->name('admin.users.toggle');
+    Route::post('/users/{user}/toggle-editor',[AdminController::class, 'toggleEditor'])->name('admin.users.toggle-editor');
     Route::delete('/users/{user}',           [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+});
+
+// Editor routes (wiki editors + admins, both require 2FA)
+Route::middleware(['editor', 'cache:no-store'])->prefix('admin')->group(function () {
+    Route::get('/',                    [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
     // Wiki
     Route::get('/wiki.html',           [WikiController::class, 'adminIndex'])->name('wiki.admin.index');

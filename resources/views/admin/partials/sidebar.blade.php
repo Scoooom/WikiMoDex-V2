@@ -1,16 +1,25 @@
 <aside class="admin-sidebar">
     <div class="admin-sidebar-header">
-        <span class="admin-sidebar-title">⚙ Admin</span>
+        @if(auth()->user()->isAdmin())
+            <span class="admin-sidebar-title">⚙ Admin</span>
+        @else
+            <span class="admin-sidebar-title">✏ Editor</span>
+        @endif
     </div>
     <nav class="admin-sidebar-nav">
         <a href="{{ route('admin.dashboard') }}"
            class="admin-sidebar-link {{ ($active ?? '') === 'dashboard' ? 'active' : '' }}">
             <span class="admin-sidebar-icon">🏠</span> Dashboard
         </a>
-        <a href="{{ route('admin.users') }}"
-           class="admin-sidebar-link {{ ($active ?? '') === 'users' ? 'active' : '' }}">
-            <span class="admin-sidebar-icon">👥</span> Users
-        </a>
+
+        {{-- User management is admin-only --}}
+        @if(auth()->user()->isAdmin())
+            <a href="{{ route('admin.users') }}"
+               class="admin-sidebar-link {{ ($active ?? '') === 'users' ? 'active' : '' }}">
+                <span class="admin-sidebar-icon">👥</span> Users
+            </a>
+        @endif
+
         <div class="admin-sidebar-divider"></div>
         <span class="admin-sidebar-section-label">Wiki</span>
         <a href="{{ route('wiki.admin.index') }}"

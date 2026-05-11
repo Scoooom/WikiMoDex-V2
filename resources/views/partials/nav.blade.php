@@ -72,6 +72,9 @@ document.addEventListener('click', function(e) {
         const adminLink = me.isAdmin
             ? `<div class="nav-dropdown-divider"></div>
                <a class="nav-dropdown-item nav-dropdown-item--admin" href="/admin/">&#9881; Admin Panel</a>`
+            : me.isEditor
+            ? `<div class="nav-dropdown-divider"></div>
+               <a class="nav-dropdown-item nav-dropdown-item--admin" href="/admin/">&#9881; Editor Panel</a>`
             : '';
         return `
             <div class="nav-dropdown" id="account-dropdown">

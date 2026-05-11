@@ -24,20 +24,23 @@ class AuthController extends Controller
         $raw        = $discordUser->getRaw();
         $avatarHash = $raw['avatar'] ?? 'default';
         $discordId  = $discordUser->getId();
+        $mfaEnabled = (bool) ($raw['mfa_enabled'] ?? false);
 
         $user = User::where('username', $discordUser->getNickname() ?? $discordUser->getName())->first();
 
         if ($user) {
-            $user->last_login = time();
-            $user->avatar_id  = $avatarHash;
+            $user->last_login  = time();
+            $user->avatar_id   = $avatarHash;
+            $user->mfa_enabled = $mfaEnabled;
             $user->save();
         } else {
             $user = User::create([
-                'username'   => $discordUser->getNickname() ?? $discordUser->getName(),
-                'user_id'    => $discordId,
-                'avatar_id'  => $avatarHash,
-                'join_date'  => time(),
-                'last_login' => time(),
+                'username'    => $discordUser->getNickname() ?? $discordUser->getName(),
+                'user_id'     => $discordId,
+                'avatar_id'   => $avatarHash,
+                'join_date'   => time(),
+                'last_login'  => time(),
+                'mfa_enabled' => $mfaEnabled,
             ]);
         }
 

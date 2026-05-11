@@ -40,6 +40,14 @@
                 <a href="{{ route('admin.users') }}?admins_only=1" class="admin-stat-link">View →</a>
             </div>
             <div class="admin-stat-card">
+                <div class="admin-stat-icon">✏️</div>
+                <div class="admin-stat-body">
+                    <div class="admin-stat-value">{{ $stats['editors'] }}</div>
+                    <div class="admin-stat-label">Wiki Editors</div>
+                </div>
+                <a href="{{ route('admin.users') }}?editors_only=1" class="admin-stat-link">View →</a>
+            </div>
+            <div class="admin-stat-card">
                 <div class="admin-stat-icon">👾</div>
                 <div class="admin-stat-body">
                     <div class="admin-stat-value">{{ number_format($stats['glitches']) }}</div>

@@ -7,16 +7,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class RequireAdmin
+class RequireEditor
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || !Auth::user()->isAdmin()) {
+        $user = Auth::user();
+
+        if (!Auth::check() || !$user->isWikiEditor()) {
             abort(404);
         }
 
-        // Admin is flagged but 2FA is off — show a clear, actionable error
-        if (!Auth::user()->mfa_enabled) {
+        // Has editor/admin role but 2FA is off — show a clear, actionable error
+        if (!$user->mfa_enabled) {
             abort(403, 'no_mfa');
         }
 

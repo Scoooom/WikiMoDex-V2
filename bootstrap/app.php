@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'admin'     => \App\Http\Middleware\RequireAdmin::class,
+            'editor'    => \App\Http\Middleware\RequireEditor::class,
             'cache'     => \App\Http\Middleware\SetCacheHeaders::class,
             'nosession' => \App\Http\Middleware\SuppressSession::class,
         ]);
@@ -29,5 +30,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, $request) {
+            if ($e->getStatusCode() === 403 && $e->getMessage() === 'no_mfa') {
+                return response()->view('errors.no-mfa', [], 403);
+            }
+        });
     })->create();
