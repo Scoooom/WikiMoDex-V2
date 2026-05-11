@@ -52,8 +52,7 @@
                                    class="build-form-input build-species-input"
                                    placeholder="e.g. Charizard"
                                    data-slot="{{ $i }}"
-                                   list="speciesOptions"
-                                   autocomplete="off">
+                                   autocomplete="off" data-typeahead="species">
                             <input type="hidden" name="team[{{ $i }}][dex_number]"
                                    class="build-dex-input" data-slot="{{ $i }}">
                         </div>
@@ -129,20 +128,6 @@
     </form>
 </div>
 
-{{-- Species datalist --}}
-<datalist id="speciesOptions">
-    @foreach($species as $s)
-    <option value="{{ $s }}">
-    @endforeach
-</datalist>
-
-{{-- Ability datalist --}}
-<datalist id="abilityOptions">
-    @foreach($abilities as $a)
-    <option value="{{ $a }}">
-    @endforeach
-</datalist>
-
 {{-- Item select datalist --}}
 <datalist id="itemOptions">
     @foreach($items as $item)
@@ -205,4 +190,108 @@ addItemRow({{ $i }}, {{ json_encode($item['name'] ?? '') }}, {{ json_encode($ite
 @endif
 @endforeach
 @endif
+
+
+// ── Species typeahead ─────────────────────────────────────────────
+(function initSpeciesTypeahead() {
+    const CATEGORY_COLORS = {
+        'Official':       'var(--dim)',
+        'Core Glitch':    '#ffaaa5',
+        'SMITTY Pokémon': '#a8e6cf',
+        'SMITTY Form':    '#a8e6cf',
+        'Mod Glitch':     '#c9a8ff',
+        'Alt Build':      '#f5d76e',
+    };
+
+    document.querySelectorAll('input[data-typeahead="species"]').forEach(input => {
+        const slot = input.dataset.slot;
+        const dexInput = document.querySelector(`.build-dex-input[data-slot="${slot}"]`);
+        const ab1Input = input.closest('.build-slot-editor').querySelector('[name$="[ability]"]');
+        const ab2Input = input.closest('.build-slot-editor').querySelector('[name$="[passive_ability]"]');
+
+        let dropdown = null;
+        let debounce = null;
+        let activeIdx = -1;
+        let lastResults = [];
+
+        function createDropdown() {
+            dropdown = document.createElement('div');
+            dropdown.className = 'pokemon-typeahead-dropdown';
+            input.parentNode.style.position = 'relative';
+            input.parentNode.appendChild(dropdown);
+        }
+
+        function closeDropdown() {
+            if (dropdown) { dropdown.innerHTML = ''; dropdown.style.display = 'none'; }
+            activeIdx = -1;
+        }
+
+        function renderDropdown(results) {
+            lastResults = results;
+            if (!results.length) { closeDropdown(); return; }
+            dropdown.innerHTML = '';
+            dropdown.style.display = 'block';
+            results.slice(0, 12).forEach((r, i) => {
+                const item = document.createElement('div');
+                item.className = 'pokemon-typeahead-item';
+                item.dataset.idx = i;
+                const color = CATEGORY_COLORS[r.category] || 'var(--dim)';
+                item.innerHTML = `
+                    <span class="pokemon-typeahead-name">${r.label}</span>
+                    <span class="pokemon-typeahead-cat" style="color:${color}">${r.category}</span>
+                `;
+                item.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    selectResult(r);
+                });
+                dropdown.appendChild(item);
+            });
+            activeIdx = -1;
+        }
+
+        function selectResult(r) {
+            input.value = r.value;
+            if (dexInput) dexInput.value = r.dex ?? '';
+            // Auto-fill abilities if fields are empty
+            if (ab1Input && !ab1Input.value && r.ability1) ab1Input.value = r.ability1;
+            if (ab2Input && !ab2Input.value && r.abilityH) ab2Input.value = r.abilityH;
+            closeDropdown();
+        }
+
+        input.addEventListener('input', () => {
+            clearTimeout(debounce);
+            const q = input.value.trim();
+            if (q.length < 2) { closeDropdown(); return; }
+            debounce = setTimeout(() => {
+                fetch(`/pokemon-search.json?q=${encodeURIComponent(q)}`)
+                    .then(r => r.json())
+                    .then(renderDropdown)
+                    .catch(() => closeDropdown());
+            }, 180);
+        });
+
+        input.addEventListener('keydown', (e) => {
+            const items = dropdown?.querySelectorAll('.pokemon-typeahead-item');
+            if (!items?.length) return;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                activeIdx = Math.min(activeIdx + 1, items.length - 1);
+                items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                activeIdx = Math.max(activeIdx - 1, 0);
+                items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+            } else if (e.key === 'Enter' && activeIdx >= 0) {
+                e.preventDefault();
+                selectResult(lastResults[activeIdx]);
+            } else if (e.key === 'Escape') {
+                closeDropdown();
+            }
+        });
+
+        input.addEventListener('blur', () => setTimeout(closeDropdown, 150));
+
+        createDropdown();
+    });
+})();
 </script>

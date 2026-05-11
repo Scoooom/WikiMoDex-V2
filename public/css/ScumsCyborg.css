@@ -3363,3 +3363,40 @@ img { max-width: 100%; display: block; }
 .btn-primary:hover  { background: var(--accent2); color: #fff; }
 .btn-secondary { background: var(--card2); border: 1px solid var(--border2); color: var(--muted); }
 .btn-secondary:hover { color: var(--text); border-color: var(--accent2); }
+
+/* ── Pokémon species typeahead ── */
+.pokemon-typeahead-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--card2);
+    border: 1px solid var(--border2);
+    border-top: none;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    max-height: 260px;
+    overflow-y: auto;
+    z-index: 200;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+.pokemon-typeahead-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.88rem;
+    border-bottom: 1px solid var(--border);
+    transition: background var(--transition);
+}
+.pokemon-typeahead-item:last-child { border-bottom: none; }
+.pokemon-typeahead-item:hover,
+.pokemon-typeahead-item.active { background: var(--card); }
+.pokemon-typeahead-name { color: var(--text); }
+.pokemon-typeahead-cat {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+}
