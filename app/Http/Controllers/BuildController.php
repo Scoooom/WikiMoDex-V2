@@ -6,6 +6,7 @@ use App\Models\CommunityBuild;
 use App\Models\CommunityBuildVote;
 use App\Models\GameItem;
 use Illuminate\Http\Request;
+use App\Services\StatService;
 use Illuminate\Support\Facades\Auth;
 
 class BuildController extends Controller
@@ -41,7 +42,13 @@ class BuildController extends Controller
         $voted  = $build->hasVotedBy(Auth::id());
         $items  = GameItem::orderBy('name')->get()->keyBy('key');
 
-        return view('build-show', compact('build', 'voted', 'items'));
+        // Resolve stats for each slot
+        $slotStats = [];
+        foreach ($build->team as $i => $slot) {
+            $slotStats[$i] = StatService::resolveSlot($slot);
+        }
+
+        return view('build-show', compact('build', 'voted', 'items', 'slotStats'));
     }
 
     // ── Create / store ────────────────────────────────────────────
@@ -82,6 +89,7 @@ class BuildController extends Controller
             'team.*.items.*.params.type2'   => 'nullable|string|max:20',
             'team.*.items.*.params.stat1'   => 'nullable|string|max:10',
             'team.*.items.*.params.stat2'   => 'nullable|string|max:10',
+            'team.*.alt_build_rank'          => 'nullable|integer|min:1|max:9',
             'team.*.override_type1'         => 'nullable|string|max:20',
             'team.*.override_type2'         => 'nullable|string|max:20',
             'team.*.notes'                  => 'nullable|string|max:500',

@@ -79,6 +79,20 @@
                 </div>
             </div>
 
+            @php
+                $slotStat   = $slotStats[$loop->index] ?? null;
+                $statValues = $slotStat['stats'] ?? null;
+                $statError  = $slotStat['error'] ?? null;
+                $statSource = $slotStat['source'] ?? null;
+                $statFocus  = '';
+                if ($statSource === 'alt_build') {
+                    $ab = \App\Models\AltBuild::where('name', $slot['species'])->first();
+                    $statFocus = $ab->stat_focus ?? '';
+                }
+                $displayStats = $statValues
+                    ? \App\Services\StatService::formatForDisplay($statValues, $slot['items'] ?? [], $statFocus)
+                    : null;
+            @endphp
             <div class="build-slot-body">
                 {{-- Moves --}}
                 @if(!empty(array_filter($slot['moves'] ?? [])))

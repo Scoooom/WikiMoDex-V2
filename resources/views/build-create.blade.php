@@ -155,6 +155,11 @@ function addSlot(data) {
                 <label>Override Type 2</label>
                 <select name="team[${i}][override_type2]" class="build-form-select">${typeOpts2}</select>
             </div>
+            <div class="build-form-field build-altbuild-rank" style="display:none">
+                <label>Alt Build Rank <span style="color:var(--dim);font-size:0.75em">(1–9)</span></label>
+                <input type="number" name="team[${i}][alt_build_rank]" value="${data?.alt_build_rank||1}"
+                       class="build-form-input" min="1" max="9" placeholder="1">
+            </div>
         </div>
         <div class="build-form-subsection">
             <div class="build-form-sublabel">Moves (up to 4)</div>
@@ -335,6 +340,9 @@ function initSpeciesTypeahead(input) {
         if (dexInput) dexInput.value = (r.dex !== undefined && r.dex !== null) ? r.dex : '';
         if (ab1Input && !ab1Input.value && r.ability1) ab1Input.value = r.ability1;
         if (ab2Input && !ab2Input.value && r.abilityH) ab2Input.value = r.abilityH;
+        // Show rank field for alt builds
+        const rankField = input.closest('.build-slot-editor').querySelector('.build-altbuild-rank');
+        if (rankField) rankField.style.display = r.category === 'Alt Build' ? '' : 'none';
     });
 }
 
