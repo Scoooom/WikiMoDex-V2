@@ -139,7 +139,7 @@
 // Build a lookup map from item name → key
 const ITEM_MAP = {
     @foreach($items as $item)
-    {{ json_encode($item->name) }}: {{ json_encode($item->key) }},
+    {!! json_encode($item->name) !!}: {!! json_encode($item->key) !!},
     @endforeach
 };
 
@@ -185,7 +185,7 @@ function clearSlot(slot) {
 @foreach(old('team', []) as $i => $slot)
 @if(!empty($slot['items']))
 @foreach($slot['items'] as $item)
-addItemRow({{ $i }}, {{ json_encode($item['name'] ?? '') }}, {{ json_encode($item['key'] ?? '') }}, {{ $item['stack'] ?? 1 }});
+addItemRow({!! $i !!}, {!! json_encode($item['name'] ?? '') !!}, {!! json_encode($item['key'] ?? '') !!}, {!! $item['stack'] ?? 1 !!});
 @endforeach
 @endif
 @endforeach
