@@ -47,7 +47,7 @@ Route::post('/upload.html', [GlitchController::class, 'store']);
 Route::get('/d:{id}.html', [GlitchController::class, 'download'])->middleware('cache:no-store');
 
 // Sprites — browser AND CDN cache for a year, URL is ID-based so never stale
-Route::middleware(['nosession', 'cache:public, max-age=31536000, s-maxage=31536000'])->group(function () {
+Route::middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, stale-while-revalidate=30'])->group(function () {
     Route::get('/front:{id}.png', [SpriteController::class, 'front']);
     Route::get('/back:{id}.png', [SpriteController::class, 'back']);
     Route::get('/cFront:{name}.png', [SpriteController::class, 'coreFront']);

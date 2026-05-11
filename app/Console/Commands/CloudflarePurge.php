@@ -11,7 +11,8 @@ class CloudflarePurge extends Command
         {--url=*       : One or more URLs to purge}
         {--wiki        : Purge all wiki pages}
         {--gallery     : Purge gallery pages}
-        {--home        : Purge the homepage}';
+        {--home        : Purge the homepage}
+        {--sprites     : Purge all pokevoid sprites}';
 
     protected $description = 'Purge pages from the Cloudflare cache';
 
@@ -48,11 +49,16 @@ class CloudflarePurge extends Command
             $urls = array_merge($urls, $this->galleryUrls());
         }
 
+        if ($this->option('sprites')) {
+            $urls = array_merge($urls, $this->spriteUrls());
+        }
+
         if (empty($urls)) {
             $this->error('Specify --all, --url=<url>, --wiki, --gallery, or --home.');
             $this->line('Examples:');
             $this->line('  php artisan cf:purge --all');
             $this->line('  php artisan cf:purge --wiki');
+            $this->line('  php artisan cf:purge --sprites');
             $this->line('  php artisan cf:purge --url=https://void.scooom.xyz/wiki.html --url=https://void.scooom.xyz/');
             return self::FAILURE;
         }
@@ -117,6 +123,32 @@ class CloudflarePurge extends Command
         $articles = \App\Models\WikiArticle::pluck('slug');
         foreach ($articles as $slug) {
             $urls[] = $this->baseUrl . '/wiki:' . $slug . '.html';
+        }
+
+        return $urls;
+    }
+
+    private function spriteUrls(): array
+    {
+        // Purge Laravel sprite routes
+        $urls = [];
+        $glitchIds = \App\Models\Glitch::pluck('id');
+        foreach ($glitchIds as $id) {
+            $urls[] = $this->baseUrl . '/front:' . $id . '.png';
+            $urls[] = $this->baseUrl . '/back:' . $id . '.png';
+        }
+
+        // Purge pokevoid atlas sprites by dex number
+        $dexNumbers = \App\Models\AltBuild::whereNotNull('dex_number')->pluck('dex_number')->unique();
+        foreach ($dexNumbers as $dex) {
+            $urls[] = $this->baseUrl . '/pokevoid-sprites/' . $dex . '.png';
+            $urls[] = $this->baseUrl . '/pokevoid-atlas/' . $dex . '.json';
+        }
+
+        // Purge alt build sprites
+        $buildIds = \App\Models\AltBuild::pluck('build_id');
+        foreach ($buildIds as $id) {
+            $urls[] = $this->baseUrl . '/alt-build-sprite:' . $id . '.png';
         }
 
         return $urls;
