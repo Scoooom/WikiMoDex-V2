@@ -18,6 +18,7 @@ class SetCacheHeaders
 
         $response->headers->set('Cache-Control', $directive, true);
         $response->headers->set('X-Accel-Cache-Control', $directive, true);
+        $response->headers->set('X-Cache-Debug', 'middleware-ran', true);
 
         return $response;
     }
