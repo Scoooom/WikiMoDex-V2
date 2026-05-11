@@ -84,8 +84,6 @@
                 $statValues = $slotStat['stats'] ?? null;
                 $statError  = $slotStat['error'] ?? null;
                 $statSource = $slotStat['source'] ?? null;
-                // DEBUG — remove after fixing
-                \Illuminate\Support\Facades\Log::info('SlotStat debug', ['i' => $i, 'species' => $slot['species'] ?? null, 'slotStat' => $slotStat]);
                 $statFocus  = '';
                 if ($statSource === 'alt_build') {
                     $ab = \App\Models\AltBuild::where('name', $slot['species'])->first();
@@ -146,6 +144,36 @@
                 @if(!empty($slot['notes']))
                 <div class="build-slot-notes">{{ $slot['notes'] }}</div>
                 @endif
+
+                {{-- Base Stats --}}
+                @if($displayStats)
+                <div class="build-slot-section">
+                    <div class="build-slot-section-label">
+                        Base Stats
+                        @if(!empty($slot['alt_build_rank']))
+                            <span style="color:var(--dim);font-weight:normal"> — Rank {{ $slot['alt_build_rank'] }}</span>
+                        @endif
+                        <span class="build-stat-bst">{{ array_sum(array_column($displayStats, 'value')) }} BST</span>
+                    </div>
+                    <div class="build-stat-bars">
+                        @foreach($displayStats as $stat)
+                        <div class="build-stat-row">
+                            <span class="build-stat-label {{ $stat['is_focus'] ? 'build-stat-focus' : '' }}">{{ $stat['label'] }}</span>
+                            <div class="build-stat-bar-wrap">
+                                <div class="build-stat-bar {{ $stat['is_focus'] ? 'build-stat-bar--focus' : '' }}"
+                                     style="width:{{ $stat['pct'] }}%"></div>
+                            </div>
+                            <span class="build-stat-value">{{ $stat['value'] }}</span>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @elseif($statError)
+                <div class="build-slot-section">
+                    <div class="build-stat-error">⚠ {{ $statError }}</div>
+                </div>
+                @endif
+
             </div>
         </div>
         @endif
