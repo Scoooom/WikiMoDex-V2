@@ -109,10 +109,40 @@
                             @php
                                 $moveData = $moveCache->get($move);
                                 $typeInt  = $moveData?->type ?? null;
-                                $typeName = $moveData?->is_dynamic_type
-                                    ? 'Dynamic'
-                                    : ($moveData?->type_name ?? null);
-                                $typeInt  = $moveData?->is_dynamic_type ? null : $typeInt;
+                                $typeName = $moveData?->type_name ?? null;
+                                if ($moveData?->is_dynamic_type) {
+                                    $behaviour = $moveData->dynamic_type_behaviour;
+                                    switch ($behaviour) {
+                                        case 'primary':
+                                            $typeInt  = $slotTypes['type1'];
+                                            $typeName = $slotTypes['type1_name'] ?? 'Dynamic';
+                                            break;
+                                        case 'secondary':
+                                            // Use type2 if exists, else type1
+                                            $typeInt  = $slotTypes['type2'] ?? $slotTypes['type1'];
+                                            $typeName = $slotTypes['type2_name'] ?? $slotTypes['type1_name'] ?? 'Dynamic';
+                                            break;
+                                        case 'form':
+                                            $typeInt  = null;
+                                            $typeName = 'Form-based';
+                                            break;
+                                        case 'weather':
+                                            $typeInt  = null;
+                                            $typeName = 'Weather';
+                                            break;
+                                        case 'terrain':
+                                            $typeInt  = null;
+                                            $typeName = 'Terrain';
+                                            break;
+                                        case 'iv':
+                                            $typeInt  = null;
+                                            $typeName = 'IV-based';
+                                            break;
+                                        default:
+                                            $typeInt  = null;
+                                            $typeName = 'Dynamic';
+                                    }
+                                }
                             @endphp
                             <div class="build-move-card {{ $typeInt !== null ? 'type-bg-' . $typeInt : 'type-bg-none' }}">
                                 <div class="build-move-card-name {{ $typeInt !== null ? 'type-text-' . $typeInt : '' }}">{{ $move }}</div>

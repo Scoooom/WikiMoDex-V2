@@ -24,7 +24,23 @@ SMITTY_KEYS = {'SMITTY_NUGGETS', 'NUGGET_OF_SMITTY'}
 DYNAMIC_TYPE_KEYS = {
     'REVELATION_DANCE', 'WEATHER_BALL', 'HIDDEN_POWER',
     'TERRAIN_PULSE', 'SMITTY_NUGGETS', 'NUGGET_OF_SMITTY',
-    'MULTI_ATTACK', 'NATURAL_GIFT',
+    'MULTI_ATTACK', 'NATURAL_GIFT', 'JUDGMENT', 'TECHNO_BLAST',
+}
+
+# Dynamic type resolution behaviour per move
+# 'primary'    -> user's type1
+# 'secondary'  -> user's type2, fallback to type1
+# 'form'       -> depends on held item/form, cannot resolve in builder
+DYNAMIC_TYPE_BEHAVIOUR = {
+    'REVELATION_DANCE': 'primary',
+    'SMITTY_NUGGETS':   'secondary',
+    'NUGGET_OF_SMITTY': 'secondary',
+    'JUDGMENT':         'form',
+    'MULTI_ATTACK':     'form',
+    'TECHNO_BLAST':     'form',
+    'WEATHER_BALL':     'weather',
+    'TERRAIN_PULSE':    'terrain',
+    'HIDDEN_POWER':     'iv',
 }
 
 TYPE_NAMES = {
@@ -189,7 +205,9 @@ def main():
 
         name     = info.get('name', move_key.replace('_', ' ').title())
         is_smitty  = 1 if move_key in SMITTY_KEYS else 0
-        is_dynamic = 1 if move_key in DYNAMIC_TYPE_KEYS else 0
+        is_dynamic    = 1 if move_key in DYNAMIC_TYPE_KEYS else 0
+        dyn_behaviour = DYNAMIC_TYPE_BEHAVIOUR.get(move_key)
+        dyn_beh_sql   = f"'{escape(dyn_behaviour)}'" if dyn_behaviour else 'NULL'
         data = move_data.get(move_key, {})
 
         type_int  = data.get('type')
@@ -207,13 +225,13 @@ def main():
         pp_sql       = str(pp)         if pp        is not None else 'NULL'
 
         sql = f"""
-INSERT INTO core_moves (move_key, name, is_smitty, type, type_name, category, power, accuracy, pp, is_dynamic_type, created_at, updated_at)
-VALUES ('{escape(move_key)}', '{escape(name)}', {is_smitty}, {type_sql}, {type_name_sql}, {category_sql}, {power_sql}, {accuracy_sql}, {pp_sql}, {is_dynamic}, NOW(), NOW())
+INSERT INTO core_moves (move_key, name, is_smitty, type, type_name, category, power, accuracy, pp, is_dynamic_type, dynamic_type_behaviour, created_at, updated_at)
+VALUES ('{escape(move_key)}', '{escape(name)}', {is_smitty}, {type_sql}, {type_name_sql}, {category_sql}, {power_sql}, {accuracy_sql}, {pp_sql}, {is_dynamic}, {dyn_beh_sql}, NOW(), NOW())
 ON DUPLICATE KEY UPDATE
     name=VALUES(name), is_smitty=VALUES(is_smitty),
     type=VALUES(type), type_name=VALUES(type_name), category=VALUES(category),
     power=VALUES(power), accuracy=VALUES(accuracy), pp=VALUES(pp),
-    is_dynamic_type=VALUES(is_dynamic_type), updated_at=NOW();
+    is_dynamic_type=VALUES(is_dynamic_type), dynamic_type_behaviour=VALUES(dynamic_type_behaviour), updated_at=NOW();
 """
         run_sql(sql)
         inserted += 1

@@ -13,6 +13,8 @@ class CoreMove extends Model
         'is_dynamic_type' => 'boolean',
     ];
 
+    // dynamic_type_behaviour values: 'primary', 'secondary', 'form', 'weather', 'terrain', 'iv'
+
     const TYPE_NAMES = [
         -1=>'Unknown',0=>'Normal',1=>'Fighting',2=>'Flying',3=>'Poison',
         4=>'Ground',5=>'Rock',6=>'Bug',7=>'Ghost',8=>'Steel',9=>'Fire',
