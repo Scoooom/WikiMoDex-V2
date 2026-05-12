@@ -65,6 +65,7 @@
                     @if(!empty($slot['dex_number']))
                         <canvas class="build-slot-sprite build-slot-sprite--canvas"
                                 data-dex="{{ $slot['dex_number'] }}"
+                                data-palette="{{ json_encode($slotPalette) }}"
                                 width="80" height="80"></canvas>
                     @else
                         <img
@@ -440,17 +441,43 @@ function toggleSection(label) {
         });
     }
 
+    function softLight(bg, fg) {
+        return bg <= 0.5 ? 2 * bg * fg : 1 - 2 * (1 - bg) * (1 - fg);
+    }
+    function hexToRgb(hex) {
+        return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
+    }
+    function applyGrayscaleOverlay(imageData, palette) {
+        const data = imageData.data;
+        const targets = palette.map(hexToRgb);
+        for (let i = 0; i < data.length; i += 4) {
+            if (data[i+3] === 0) continue;
+            const lum = (data[i]/255 + data[i+1]/255 + data[i+2]/255) / 3;
+            const [tr, tg, tb] = targets[Math.min(Math.floor(lum * targets.length), targets.length-1)].map(c => c/255);
+            data[i]   = Math.round(softLight(lum, tr) * 255);
+            data[i+1] = Math.round(softLight(lum, tg) * 255);
+            data[i+2] = Math.round(softLight(lum, tb) * 255);
+        }
+        return imageData;
+    }
+
     document.querySelectorAll('.build-slot-sprite--canvas').forEach(async canvas => {
-        const dex = canvas.dataset.dex;
+        const dex     = canvas.dataset.dex;
+        const palette = JSON.parse(canvas.dataset.palette || '[]');
         if (!dex) return;
         const frame = await extractFirstFrame(dex);
         if (!frame) { canvas.style.display = 'none'; return; }
-        const ctx = canvas.getContext('2d');
+        const ctx   = canvas.getContext('2d', { willReadFrequently: palette.length > 0 });
         const scale = Math.min(canvas.width / frame.width, canvas.height / frame.height);
-        const dx = (canvas.width  - frame.width  * scale) / 2;
-        const dy = (canvas.height - frame.height * scale) / 2;
+        const dx    = (canvas.width  - frame.width  * scale) / 2;
+        const dy    = (canvas.height - frame.height * scale) / 2;
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(frame, dx, dy, frame.width * scale, frame.height * scale);
+        if (palette.length > 0) {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            applyGrayscaleOverlay(imageData, palette);
+            ctx.putImageData(imageData, 0, 0);
+        }
     });
 })();
 </script>

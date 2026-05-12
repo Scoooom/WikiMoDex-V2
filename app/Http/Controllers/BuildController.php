@@ -43,11 +43,20 @@ class BuildController extends Controller
         $voted  = $build->hasVotedBy(Auth::id());
         $items  = GameItem::orderBy('name')->get()->keyBy('key');
 
-        // Resolve stats and typing for each slot
+        // Resolve stats, typing, and alt build palette for each slot
         $slotStats = [];
         foreach ($build->team as $i => $slot) {
             $slotStats[$i] = StatService::resolveSlot($slot);
             $slotStats[$i]['types'] = StatService::resolveTypes($slot);
+            // Attach alt build palette if applicable
+            $altBuild = \App\Models\AltBuild::where('name', $slot['species'] ?? '')->first();
+            if ($altBuild) {
+                $rank = (int)($slot['alt_build_rank'] ?? 1);
+                $useDark = $rank >= 6 && !empty($altBuild->dark_palette);
+                $slotStats[$i]['palette'] = $useDark ? $altBuild->dark_palette : ($altBuild->target_palette ?? []);
+            } else {
+                $slotStats[$i]['palette'] = [];
+            }
             // Calculate effective stats if level is set
             $level = (int) ($slot['level'] ?? 0);
             if ($level > 0 && !empty($slotStats[$i]['stats'])) {
