@@ -50,7 +50,8 @@
             $statError     = $slotStat['error'] ?? null;
             $statSource = $slotStat['source'] ?? null;
             $slotTypes   = $slotStat['types'] ?? ['type1'=>null,'type2'=>null,'type1_name'=>null,'type2_name'=>null];
-            $slotPalette = $slotStat['palette'] ?? [];
+            $slotPalette  = $slotStat['palette'] ?? [];
+                $slotGlitchId = $slotStat['glitch_id'] ?? null;
             $statFocus  = '';
             if ($statSource === 'alt_build') {
                 $ab = \App\Models\AltBuild::where('name', $slot['species'])->first();
@@ -68,6 +69,13 @@
                                 data-dex="{{ $slot['dex_number'] }}"
                                 data-palette="{{ json_encode($slotPalette) }}"
                                 width="80" height="80"></canvas>
+                    @elseif($slotGlitchId)
+                        <img
+                            src="/front:{{ $slotGlitchId }}.png"
+                            class="build-slot-sprite"
+                            alt="{{ $slot['species'] }}"
+                            onerror="this.src='/avatars/default.svg'"
+                        >
                     @else
                         <img
                             src="/cFront:{{ $slot['species'] }}.png"

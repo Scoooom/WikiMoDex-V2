@@ -57,6 +57,12 @@ class BuildController extends Controller
             } else {
                 $slotStats[$i]['palette'] = [];
             }
+            // Attach mod glitch ID for sprite lookup
+            $slotStats[$i]['glitch_id'] = null;
+            if ($slotStats[$i]['source'] === 'glitch') {
+                $glitch = \App\Models\Glitch::where('name', $slot['species'] ?? '')->first();
+                $slotStats[$i]['glitch_id'] = $glitch?->id;
+            }
             // Calculate effective stats if level is set
             $level = (int) ($slot['level'] ?? 0);
             if ($level > 0 && !empty($slotStats[$i]['stats'])) {
