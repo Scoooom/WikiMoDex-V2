@@ -71,7 +71,7 @@ class StatService
                 return [
                     'stats'  => null,
                     'source' => 'glitch',
-                    'error'  => "Could not load stats for "{$species}" — report it to scooom.",
+                    'error'  => "Could not load stats for {$species} — report it to scooom.",
                 ];
             }
         }
