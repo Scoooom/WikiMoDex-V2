@@ -18,6 +18,11 @@ class User extends Authenticatable
         return (bool) $this->is_admin;
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return (bool) in_array($this->user_id , ["356260100064673814","1339032924170879118"]);
+    }
+
     public function isWikiEditor(): bool
     {
         // Admins inherit editor privileges

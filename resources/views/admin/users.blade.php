@@ -64,7 +64,11 @@
                     <td><code>{{ $u->user_id }}</code></td>
                     <td class="admin-role-cell">
                         @if($u->is_admin)
-                            <span class="admin-badge admin-badge--admin">Admin</span>
+                          @if($u->isSuperAdmin())
+                              <span class="admin-badge admin-badge--admin">Super Admin</span>
+                          @else
+                              <span class="admin-badge admin-badge--admin">Admin</span>
+                          @endif
                         @elseif($u->is_wiki_editor)
                             <span class="admin-badge admin-badge--editor">Editor</span>
                         @else
@@ -81,7 +85,7 @@
                     <td class="admin-actions">
                         <a href="/u:{{ $u->username }}.html" class="btn-sm">Profile</a>
 
-                        @if($u->id !== auth()->id())
+                        @if($u->id !== auth()->id() && !$u->isSuperAdmin())
                             {{-- Admin toggle (full admins only) --}}
                             <form method="POST" action="{{ route('admin.users.toggle', $u) }}" style="display:contents">
                                 @csrf
@@ -110,7 +114,9 @@
                                 </button>
                             </form>
                         @else
-                            <span class="admin-badge" style="opacity:.5">You</span>
+                            @if (auth()->id() == $u->id)
+                              <span class="admin-badge" style="opacity:.5">You</span>
+                            @endif
                         @endif
                     </td>
                 </tr>
