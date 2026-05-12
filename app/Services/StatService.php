@@ -94,9 +94,31 @@ class StatService
         // Flip type name -> int
         $nameToInt = array_flip(self::TYPE_NAMES);
 
-        // Resolve override types first
+        // Resolve override types first (slot-level overrides take top priority)
         $ot1 = $overrideType1 ? ($nameToInt[$overrideType1] ?? null) : null;
         $ot2 = $overrideType2 ? ($nameToInt[$overrideType2] ?? null) : null;
+
+        // If no slot-level override, check type switcher item params
+        if ($ot1 === null && $ot2 === null) {
+            foreach ($slot['items'] ?? [] as $item) {
+                $key    = $item['key'] ?? '';
+                $params = $item['params'] ?? [];
+                if (!in_array($key, ['TYPE_SWITCHER', 'PRIMARY_TYPE_SWITCHER', 'SECONDARY_TYPE_SWITCHER', 'TYPE_SACRIFICE'])) continue;
+                $pt1 = !empty($params['type1']) ? ($nameToInt[$params['type1']] ?? null) : null;
+                $pt2 = !empty($params['type2']) ? ($nameToInt[$params['type2']] ?? null) : null;
+                if ($key === 'SECONDARY_TYPE_SWITCHER') {
+                    // Only changes type2
+                    if ($pt2 !== null) $ot2 = $pt2;
+                } elseif ($key === 'PRIMARY_TYPE_SWITCHER') {
+                    // Only changes type1
+                    if ($pt1 !== null) $ot1 = $pt1;
+                } else {
+                    // TYPE_SWITCHER / TYPE_SACRIFICE — changes whichever are set
+                    if ($pt1 !== null) $ot1 = $pt1;
+                    if ($pt2 !== null) $ot2 = $pt2;
+                }
+            }
+        }
 
         // Get base types from DB
         $dbType1 = null;
