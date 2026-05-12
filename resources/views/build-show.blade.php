@@ -305,7 +305,6 @@ function copyBuildLink() {
         setTimeout(() => btn.textContent = orig, 1800);
     });
 }
-}
 
 // ── Sprite rendering ──────────────────────────────────────────────
 (function() {
