@@ -79,3 +79,5 @@ titleInput.addEventListener('input', () => { titleInput.dataset.userEdited = '1'
 document.querySelectorAll('input[name="slot"]').forEach(r => r.addEventListener('change', updateTitle));
 updateTitle();
 </script>
+
+@endsection

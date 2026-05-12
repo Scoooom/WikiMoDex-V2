@@ -110,3 +110,5 @@ fetch('/me.json', { credentials: 'same-origin' })
         }
     }).catch(() => {});
 </script>
+
+@endsection

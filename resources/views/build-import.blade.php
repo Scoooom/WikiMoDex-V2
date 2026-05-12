@@ -61,3 +61,5 @@ function showFile(name) {
     selected.style.display = '';
 }
 </script>
+
+@endsection
