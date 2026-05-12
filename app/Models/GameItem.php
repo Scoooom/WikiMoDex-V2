@@ -88,3 +88,4 @@ class GameItem extends Model
         $filename = self::ICON_MAP[$this->key] ?? null;
         return $filename ? "/item-icon/{$filename}.png" : null;
     }
+}
