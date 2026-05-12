@@ -412,21 +412,46 @@ class StatService
         ));
     }
 
+    // Nature -> [boosted_stat_idx, nerfed_stat_idx] (null = neutral)
+    const NATURE_EFFECTS = [
+        'Lonely'=>[1,2],'Brave'=>[1,5],'Adamant'=>[1,3],'Naughty'=>[1,4],
+        'Bold'=>[2,1],'Relaxed'=>[2,5],'Impish'=>[2,3],'Lax'=>[2,4],
+        'Modest'=>[3,1],'Mild'=>[3,2],'Quiet'=>[3,5],'Rash'=>[3,4],
+        'Calm'=>[4,1],'Gentle'=>[4,2],'Sassy'=>[4,5],'Careful'=>[4,3],
+        'Timid'=>[5,1],'Hasty'=>[5,2],'Jolly'=>[5,3],'Naive'=>[5,4],
+    ];
+
     /**
-     * Format stats for display — returns array of [label, value, pct, is_focus]
+     * Returns [boosted_idx, nerfed_idx] or null for neutral natures.
      */
-    public static function formatForDisplay(array $stats, array $items = [], string $statFocus = ''): array
+    public static function getNatureEffect(string $nature): ?array
+    {
+        return self::NATURE_EFFECTS[$nature] ?? null;
+    }
+
+    /**
+     * Format stats for display — returns array of [label, value, pct, is_focus, nature_mod]
+     * nature_mod: 'boost' | 'nerf' | null
+     */
+    public static function formatForDisplay(array $stats, array $items = [], string $statFocus = '', string $nature = ''): array
     {
         $focusIdxs = self::getFocusIndices($statFocus);
+        $natureEffect = self::getNatureEffect($nature);
         $result = [];
         foreach (self::STAT_LABELS as $i => $label) {
             $val      = $stats[$i];
             $pct      = min(100, (int) round(($val / 255) * 100));
+            $natureMod = null;
+            if ($natureEffect && $i > 0) { // HP never affected by nature
+                if ($i === $natureEffect[0]) $natureMod = 'boost';
+                elseif ($i === $natureEffect[1]) $natureMod = 'nerf';
+            }
             $result[] = [
-                'label'    => $label,
-                'value'    => $val,
-                'pct'      => $pct,
-                'is_focus' => in_array($i, $focusIdxs),
+                'label'      => $label,
+                'value'      => $val,
+                'pct'        => $pct,
+                'is_focus'   => in_array($i, $focusIdxs),
+                'nature_mod' => $natureMod,
             ];
         }
         return $result;

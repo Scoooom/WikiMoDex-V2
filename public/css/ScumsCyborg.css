@@ -3776,3 +3776,7 @@ img { max-width: 100%; display: block; }
     image-rendering: pixelated;
     flex-shrink: 0;
 }
+
+/* ── Nature stat highlights ── */
+.build-stat-nature-boost { color: #f87171; } /* red  */
+.build-stat-nature-nerf  { color: #60a5fa; } /* blue */

@@ -58,7 +58,7 @@
                 $statFocus = $ab->stat_focus ?? '';
             }
             $displayStats = $statValues
-                ? \App\Services\StatService::formatForDisplay($statValues, $slot['items'] ?? [], $statFocus)
+                ? \App\Services\StatService::formatForDisplay($statValues, $slot['items'] ?? [], $statFocus, $slot['nature'] ?? '')
                 : null;
         @endphp
         <div class="build-slot">
@@ -283,7 +283,7 @@
                     <div class="build-stat-bars build-slot-collapsible-body" style="display:none">
                         @foreach($displayStats as $stat)
                         <div class="build-stat-row">
-                            <span class="build-stat-label {{ $stat['is_focus'] ? 'build-stat-focus' : '' }}">{{ $stat['label'] }}</span>
+                            <span class="build-stat-label {{ $stat['is_focus'] ? 'build-stat-focus' : '' }} {{ $stat['nature_mod'] === 'boost' ? 'build-stat-nature-boost' : ($stat['nature_mod'] === 'nerf' ? 'build-stat-nature-nerf' : '') }}">{{ $stat['label'] }}</span>
                             <div class="build-stat-bar-wrap">
                                 <div class="build-stat-bar {{ $stat['is_focus'] ? 'build-stat-bar--focus' : '' }}"
                                      style="width:{{ $stat['pct'] }}%"></div>
