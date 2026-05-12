@@ -13,9 +13,8 @@ OUT_DIR     = Path('/var/www/void.scooom.com/storage/app/item-icons')
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 ATLASES = [
-    (POKEVOID / 'public/images/items.png',          POKEVOID / 'public/images/items.json'),
-    (POKEVOID / 'public/images/olditems.png',       None),   # no atlas — skip
-    (POKEVOID / 'src/notes/smitems_32.png',         POKEVOID / 'src/notes/smitems_32.json'),
+    (POKEVOID / 'public/images/items.png',                    POKEVOID / 'public/images/items.json'),
+    (POKEVOID / 'public/images/smitems/smitems_192.png',      POKEVOID / 'public/images/smitems/smitems_32.json'),
 ]
 
 def extract_atlas(img_path: Path, atlas_path: Path):
