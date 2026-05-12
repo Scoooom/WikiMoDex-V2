@@ -49,19 +49,17 @@
     </form>
 </div>
 
-{{-- Item select datalist --}}
-<datalist id="itemOptions">
-    @foreach($items as $item)
-    <option value="{{ $item->name }}" data-key="{{ $item->key }}" data-tier="{{ $item->tier }}">
-    @endforeach
-</datalist>
-
 <script>
 const ITEM_MAP = {
     @foreach($items as $item)
     {!! json_encode($item->name) !!}: {!! json_encode($item->key) !!},
     @endforeach
 };
+const ITEM_LIST = [
+    @foreach($items as $item)
+    { label: {!! json_encode($item->name) !!}, value: {!! json_encode($item->name) !!}, key: {!! json_encode($item->key) !!}, category: {!! json_encode(ucfirst(strtolower($item->tier))) !!} },
+    @endforeach
+];
 
 const TYPES   = ['Normal','Fighting','Flying','Poison','Ground','Rock','Bug','Ghost','Steel','Fire','Water','Grass','Electric','Psychic','Ice','Dragon','Dark','Fairy'];
 const NATURES = ['Hardy','Lonely','Brave','Adamant','Naughty','Bold','Docile','Relaxed','Impish','Lax','Timid','Hasty','Serious','Jolly','Naive','Modest','Mild','Quiet','Bashful','Rash','Calm','Gentle','Sassy','Careful','Quirky'];
@@ -255,7 +253,7 @@ function addItemRow(slot, nameVal, keyVal, stackVal, params) {
             <div class="build-item-row-top">
                 <input type="text" name="${base}[name]" value="${currentName}"
                        class="build-form-input build-item-name-input"
-                       placeholder="Item name" list="itemOptions" autocomplete="off">
+                       placeholder="Item name" autocomplete="off" data-typeahead="item">
                 <input type="hidden" name="${base}[key]" class="build-item-key-input" value="${key}">
                 <input type="number" name="${base}[stack]" value="${stackVal}"
                        class="build-form-input build-item-stack-input" min="1" max="99" placeholder="x">
@@ -263,13 +261,19 @@ function addItemRow(slot, nameVal, keyVal, stackVal, params) {
             </div>
             ${paramHtml}
         `;
-        row.querySelector('.build-item-name-input').addEventListener('input', function() {
-            const newKey = (ITEM_MAP[this.value] !== undefined) ? ITEM_MAP[this.value] : '';
-            const curName = this.value;
-            render(newKey, curName, {});
-            // Restore focus to name input after re-render
-            row.querySelector('.build-item-name-input').focus();
-        });
+        const nameInput = row.querySelector('.build-item-name-input');
+        const keyInput  = row.querySelector('.build-item-key-input');
+        // Item typeahead — filters ITEM_LIST locally, no network call
+        makeTypeahead(nameInput, null, r => {
+            const prevKey  = keyInput.value;
+            const prevName = nameInput.value;
+            nameInput.value = r.value;
+            keyInput.value  = r.key;
+            // Only re-render params if key changed
+            if (r.key !== prevKey) {
+                render(r.key, r.value, {});
+            }
+        }, ITEM_LIST);
     }
 
     render(keyVal, nameVal, params);
@@ -284,7 +288,7 @@ const CATEGORY_COLORS = {
     'Move':'var(--dim)', 'SMITTY Move':'#a8e6cf',
 };
 
-function makeTypeahead(input, fetchUrl, onSelect) {
+function makeTypeahead(input, fetchUrl, onSelect, localData) {
     const wrap = input.parentNode;
     wrap.style.position = 'relative';
     const dd = document.createElement('div');
@@ -311,9 +315,24 @@ function makeTypeahead(input, fetchUrl, onSelect) {
         activeIdx = -1;
     }
 
+    function filterLocal(q) {
+        const ql = q.toLowerCase();
+        return (localData || []).filter(r => r.label.toLowerCase().includes(ql))
+            .sort((a, b) => {
+                const ai = a.label.toLowerCase().indexOf(ql);
+                const bi = b.label.toLowerCase().indexOf(ql);
+                return ai - bi;
+            });
+    }
+
     input.addEventListener('input', () => {
         clearTimeout(debounce);
         const q = input.value.trim();
+        if (q.length < 1) { close(); return; }
+        if (localData) {
+            render(filterLocal(q));
+            return;
+        }
         if (q.length < 2) { close(); return; }
         debounce = setTimeout(() => {
             fetch(`${fetchUrl}?q=${encodeURIComponent(q)}`)
