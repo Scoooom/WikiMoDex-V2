@@ -3125,8 +3125,11 @@ img { max-width: 100%; display: block; }
 /* ── Team slots ── */
 .build-team {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+}
+@media (max-width: 600px) {
+    .build-team { grid-template-columns: 1fr; }
 }
 .build-slot {
     background: var(--card);
