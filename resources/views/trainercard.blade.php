@@ -1,9 +1,5 @@
 @extends('layouts.app')
 
-@push('head')
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-@endpush
-
 @section('content')
 @php
     $save = $user->getSave();
@@ -12,209 +8,180 @@
         return;
     }
     if ($save->getSystemData() === null) {
-        echo '<div class="alert alert-danger">Trainer Card Error [0002] — Save file appears invalid or corrupt. Please re-upload your system save file.</div>';
+        echo '<div class="alert alert-danger">Trainer Card Error [0002] — Save file appears invalid or corrupt. Please re-upload your system save file, or DM scooom on Discord.</div>';
         return;
     }
-
     $defeatedRivals  = $save->getDefeatedRivals();
     $glitchUnlocks   = $save->getGlitchUnlocks();
     $smittyUnlocks   = $save->getSmittyUnlocks();
     $formUnlocks     = $save->getFormUnlocks();
-
-    $totalRivals  = count(array_filter($defeatedRivals, fn($r) => !is_string(array_search($r, $defeatedRivals))));
-    $beatenRivals = count(array_filter($defeatedRivals, fn($r) => !is_string(array_search($r, $defeatedRivals)) && $r['defeated'] === 'true'));
-    $glitchCount  = count($glitchUnlocks);
-    $smittyCount  = count($smittyUnlocks);
-    $submittedCount = $user->glitches()->count();
-
-    $modForms = collect($formUnlocks['modFormsUnlocked'])->map(function($unlock) {
-        $name = preg_replace('/(.*)_(.*)/', '$2', $unlock);
-        $name = str_replace(' ', '', $name);
-        return \App\Models\Glitch::where('name', $name)->first();
-    })->filter();
-    $modCount = $modForms->count();
-
-    $uniSmitty = collect($formUnlocks['uniSmittyUnlocks'])->filter()->map(function($unlock) {
-        $name = preg_replace('/(.*?)_(.*)/', '$2', $unlock);
-        $name = str_replace(' ', '', $name);
-        return \App\Services\BuiltInService::loadSmitty($name);
-    })->filter();
-    $uniSmittyCount = $uniSmitty->count();
-
-    $color = $user->tc_color ?? 'blue';
-
-    $schemes = [
-        'blue'   => ['bg1'=>'#4a90c8','bg2'=>'#2a5a8a','header'=>'#1a3a5a','field'=>'#8ec8f0','text'=>'#ffffff','dark'=>'#0a1a2a','bar'=>'#4caf7d','barBg'=>'#1a3a5a'],
-        'red'    => ['bg1'=>'#c84a4a','bg2'=>'#8a2a2a','header'=>'#5a1a1a','field'=>'#f08e8e','text'=>'#ffffff','dark'=>'#2a0a0a','bar'=>'#f0c040','barBg'=>'#5a1a1a'],
-        'green'  => ['bg1'=>'#4a9a5a','bg2'=>'#2a6a3a','header'=>'#1a4a2a','field'=>'#8ef0a0','text'=>'#ffffff','dark'=>'#0a2a10','bar'=>'#f0e040','barBg'=>'#1a4a2a'],
-        'gold'   => ['bg1'=>'#c8a030','bg2'=>'#8a6a10','header'=>'#5a4a08','field'=>'#f0d880','text'=>'#ffffff','dark'=>'#2a1a00','bar'=>'#4caf7d','barBg'=>'#5a4a08'],
-        'purple' => ['bg1'=>'#7a4ac8','bg2'=>'#4a1a8a','header'=>'#2a0a5a','field'=>'#c08ef0','text'=>'#ffffff','dark'=>'#100a2a','bar'=>'#f0a0e0','barBg'=>'#2a0a5a'],
-        'black'  => ['bg1'=>'#444444','bg2'=>'#222222','header'=>'#111111','field'=>'#888888','text'=>'#ffffff','dark'=>'#000000','bar'=>'#4caf7d','barBg'=>'#111111'],
-    ];
-    $s = $schemes[$color] ?? $schemes['blue'];
-
-    $isOwner = Auth::check() && Auth::user()->username === $user->username;
-    $rivalPct = $totalRivals > 0 ? round(($beatenRivals / $totalRivals) * 100) : 0;
 @endphp
 
 <style>
-.tc-wrap { display:flex; flex-direction:column; align-items:center; gap:24px; padding:24px 0; }
-
-.tc-card {
-    width:480px; max-width:calc(100vw - 32px);
-    border-radius:12px; overflow:hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
-    font-family:'Press Start 2P',monospace;
-    border:3px solid {{ $s['dark'] }};
-}
-
-.tc-header {
-    background:{{ $s['header'] }};
-    padding:6px 12px;
-    display:flex; justify-content:space-between; align-items:center;
-    border-bottom:2px solid {{ $s['dark'] }};
-}
-.tc-header-title { font-size:9px; color:{{ $s['field'] }}; letter-spacing:1px; }
-.tc-header-id    { font-size:8px; color:{{ $s['field'] }}; }
-
-.tc-body {
-    background:linear-gradient(160deg, {{ $s['bg1'] }} 0%, {{ $s['bg2'] }} 100%);
-    padding:14px;
-    display:grid; grid-template-columns:1fr 96px; gap:12px;
-}
-
-.tc-fields { display:flex; flex-direction:column; gap:7px; }
-
-.tc-field {
-    display:flex; align-items:center; gap:8px;
-    background:rgba(0,0,0,.18); border-radius:3px; padding:5px 8px;
-}
-.tc-field-label { font-size:6px; color:{{ $s['field'] }}; min-width:60px; letter-spacing:.5px; }
-.tc-field-value { font-size:8px; color:{{ $s['text'] }}; text-shadow:1px 1px 0 {{ $s['dark'] }}; }
-
-.tc-avatar-col { display:flex; align-items:flex-start; justify-content:center; }
-.tc-avatar {
-    width:80px; height:80px; border-radius:4px;
-    border:3px solid {{ $s['dark'] }}; box-shadow:3px 3px 0 {{ $s['dark'] }};
-    object-fit:cover;
-}
-
-.tc-rivals-section {
-    background:{{ $s['header'] }};
-    padding:10px 14px;
-    border-top:2px solid {{ $s['dark'] }};
-}
-.tc-rivals-label { font-size:6px; color:{{ $s['field'] }}; letter-spacing:1px; margin-bottom:7px; }
-
-.tc-bar-track {
-    background:{{ $s['barBg'] }}; border-radius:2px; height:10px;
-    border:1px solid {{ $s['dark'] }}; overflow:hidden;
-}
-.tc-bar-fill {
-    background:{{ $s['bar'] }}; height:100%; width:{{ $rivalPct }}%;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.3);
-}
-.tc-bar-count { font-size:7px; color:{{ $s['field'] }}; margin-top:5px; text-align:right; }
-
-.tc-rival-sprites { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
-.tc-rival-pip {
-    width:24px; height:24px; border-radius:50%; overflow:hidden;
-    border:1px solid {{ $s['dark'] }}; opacity:.3; filter:grayscale(1);
-}
-.tc-rival-pip.beaten { opacity:1; filter:none; box-shadow:0 0 5px {{ $s['bar'] }}; }
-.tc-rival-pip img { width:100%; height:100%; object-fit:cover; }
-
-.tc-color-btn {
-    width:28px; height:28px; border-radius:50%; border:3px solid transparent;
-    cursor:pointer; transition:transform .15s, border-color .15s;
-}
-.tc-color-btn:hover { transform:scale(1.15); }
-.tc-color-btn.active { border-color:var(--accent); }
-.tc-color-btn[data-color="blue"]   { background:#4a90c8; }
-.tc-color-btn[data-color="red"]    { background:#c84a4a; }
-.tc-color-btn[data-color="green"]  { background:#4a9a5a; }
-.tc-color-btn[data-color="gold"]   { background:#c8a030; }
-.tc-color-btn[data-color="purple"] { background:#7a4ac8; }
-.tc-color-btn[data-color="black"]  { background:#444444; }
+.tc-grid { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
+.tc-section { margin-bottom: 20px; }
+.tc-section-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+.tc-mon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.tc-mon-item { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 10px 8px; text-align: center; transition: border-color .15s; }
+.tc-mon-item:hover { border-color: var(--accent); }
+.tc-mon-item a { display: block; }
+.tc-mon-item a img { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; display: block; margin: 0 auto; background: var(--surface); border-radius: 50%; padding: 4px; border: 1px solid var(--border); }
+.tc-mon-item span { font-size: 11px; color: var(--accent2); display: block; margin-top: 5px; }
+.rival-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+.rival-item { text-align: center; }
+.rival-wrap { position: relative; width: 72px; height: 72px; margin: 0 auto 5px; }
+.rival-wrap img.rival-sprite { width: 72px; height: 72px; border-radius: 50%; background: var(--surface); object-fit: cover; }
+.rival-wrap img.rival-sprite.gray { filter: grayscale(1); opacity: .5; }
+.rival-status { position: absolute; bottom: 2px; right: 2px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--card); }
+.rival-status.defeated { background: #4caf7d; }
+.rival-status.not-defeated { background: var(--dim); }
+.rival-name { font-size: 10px; color: var(--muted); }
 </style>
 
-<div class="tc-wrap">
+<div class="container mt-2">
+    <div class="tc-grid">
 
-    <div class="tc-card">
-        <div class="tc-header">
-            <span class="tc-header-title">TRAINER CARD</span>
-            <span class="tc-header-id">ID No.{{ str_pad($user->id, 5, '0', STR_PAD_LEFT) }}</span>
-        </div>
-
-        <div class="tc-body">
-            <div class="tc-fields">
-                <div class="tc-field">
-                    <span class="tc-field-label">■ NAME</span>
-                    <span class="tc-field-value">{{ strtoupper($user->username) }}</span>
+        {{-- Sidebar --}}
+        <div>
+            <div class="card">
+                <div class="card-body" style="text-align:center">
+                    <img src="{{ $user->getAvatarURL() }}" class="profile-avatar mb-3" alt="{{ $user->username }}">
+                    <div class="mon-name" style="font-size:18px">{{ $user->username }}</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:4px">Trainer Card</div>
                 </div>
-                <div class="tc-field">
-                    <span class="tc-field-label">■ GLITCHES</span>
-                    <span class="tc-field-value">{{ $glitchCount + $modCount }}</span>
-                </div>
-                <div class="tc-field">
-                    <span class="tc-field-label">■ SMITTY</span>
-                    <span class="tc-field-value">{{ $smittyCount + $uniSmittyCount }}</span>
-                </div>
-                <div class="tc-field">
-                    <span class="tc-field-label">■ SUBMITTED</span>
-                    <span class="tc-field-value">{{ $submittedCount }}</span>
-                </div>
-            </div>
-            <div class="tc-avatar-col">
-                <img src="{{ $user->getAvatarURL() }}" class="tc-avatar" alt="{{ $user->username }}">
             </div>
         </div>
 
-        <div class="tc-rivals-section">
-            <div class="tc-rivals-label">■ RIVALS DEFEATED</div>
-            <div class="tc-bar-track"><div class="tc-bar-fill"></div></div>
-            <div class="tc-bar-count">{{ $beatenRivals }} / {{ $totalRivals }}</div>
-            <div class="tc-rival-sprites">
-                @foreach($defeatedRivals as $i => $rival)
-                    @if(!is_string($i))
-                    @php
-                        $beaten   = $rival['defeated'] === 'true';
-                        $rivalImg = strtolower(str_replace(' ', '_', $rival['name']));
-                    @endphp
-                    <div class="tc-rival-pip {{ $beaten ? 'beaten' : '' }}" title="{{ $rival['name'] }}">
-                        <img src="/rivals/{{ $rivalImg }}.png" alt="{{ $rival['name'] }}" onerror="this.parentElement.style.display='none'">
+        {{-- Main --}}
+        <div>
+
+            {{-- Rivals --}}
+            <div class="card tc-section">
+                <div class="card-header">Rivals defeated</div>
+                <div class="card-body">
+                    <div class="rival-grid">
+                        @foreach($defeatedRivals as $i => $rival)
+                            @if(!is_string($i))
+                            @php
+                                $defeated = $rival['defeated'] === 'true';
+                                $rivalImg = strtolower(str_replace(' ', '_', $rival['name']));
+                            @endphp
+                            <div class="rival-item">
+                                <div class="rival-wrap">
+                                    <img class="rival-sprite{{ $defeated ? '' : ' gray' }}" src="/rivals/{{ $rivalImg }}.png" alt="{{ $rival['name'] }}">
+                                    <span class="rival-status {{ $defeated ? 'defeated' : 'not-defeated' }}"></span>
+                                </div>
+                                <div class="rival-name">{{ $rival['name'] }}</div>
+                            </div>
+                            @endif
+                        @endforeach
                     </div>
-                    @endif
-                @endforeach
+                </div>
             </div>
+
+            {{-- Core Glitch Unlocks --}}
+            @if(count($glitchUnlocks) > 0)
+            <div class="card tc-section">
+                <div class="card-header">Unlocked core glitches</div>
+                <div class="card-body">
+                    <div class="tc-mon-grid">
+                        @foreach($glitchUnlocks as $un)
+                        <div class="tc-mon-item">
+                            <a href="/core:{{ urlencode($un->name) }}.html">
+                                <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
+                                <span>{{ ucwords($un->name) }}</span>
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            {{-- Mod Glitch Unlocks --}}
+            @php
+                $modForms = collect($formUnlocks['modFormsUnlocked'])->map(function($unlock) {
+                    $name = preg_replace('/(.*)_(.*)/', '$2', $unlock);
+                    $name = str_replace(' ', '', $name);
+                    return \App\Models\Glitch::where('name', $name)->first();
+                })->filter();
+            @endphp
+            @if($modForms->count() > 0)
+            <div class="card tc-section">
+                <div class="card-header">Unlocked mod glitches</div>
+                <div class="card-body">
+                    <div class="tc-mon-grid">
+                        @foreach($modForms as $un)
+                        <div class="tc-mon-item">
+                            <a href="/g:{{ urlencode($un->name) }}:{{ $un->id }}.html">
+                                <img src="/front:{{ $un->id }}.png" alt="{{ $un->name }}">
+                                <span>{{ $un->name }}</span>
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            {{-- Smitty Form Unlocks --}}
+            @if(count($smittyUnlocks) > 0)
+            <div class="card tc-section">
+                <div class="card-header">Unlocked SMITTY forms</div>
+                <div class="card-body">
+                    <div class="tc-mon-grid">
+                        @foreach($smittyUnlocks as $un)
+                        @php $smittyItems = \App\Services\BuiltInService::getSmittyItemsWithIcons($un->name); @endphp
+                        <div class="tc-mon-item">
+                            <a href="/smittyForm:{{ urlencode($un->name) }}.html">
+                                <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
+                                <span>{{ ucwords($un->name) }}</span>
+                            </a>
+                            @if($smittyItems)
+                            <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:3px;margin-top:5px">
+                                @foreach($smittyItems as $item)
+                                <img src="/item-icon/{{ $item['icon'] }}.png"
+                                     alt="{{ $item['name'] }}"
+                                     title="{{ $item['name'] }}"
+                                     style="width:20px;height:20px;image-rendering:pixelated"
+                                     onerror="this.style.display='none'">
+                                @endforeach
+                            </div>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            {{-- UniSMITTY Unlocks --}}
+            @php
+                $uniSmitty = collect($formUnlocks['uniSmittyUnlocks'])->filter()->map(function($unlock) {
+                    $name = preg_replace('/(.*?)_(.*)/', '$2', $unlock);
+                    $name = str_replace(' ', '', $name);
+                    return \App\Services\BuiltInService::loadSmitty($name);
+                })->filter();
+            @endphp
+            @if($uniSmitty->count() > 0)
+            <div class="card tc-section">
+                <div class="card-header">Unlocked UniSMITTY forms</div>
+                <div class="card-body">
+                    <div class="tc-mon-grid">
+                        @foreach($uniSmitty as $un)
+                        <div class="tc-mon-item">
+                            <a href="/smitty:{{ urlencode($un->name) }}.html">
+                                <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
+                                <span>{{ ucwords($un->name) }}</span>
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
         </div>
     </div>
-
-    @if($isOwner)
-    <div>
-        <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:10px">Card colour</div>
-        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-            @foreach(['blue','red','green','gold','purple','black'] as $c)
-            <button class="tc-color-btn {{ $color === $c ? 'active' : '' }}"
-                    data-color="{{ $c }}"
-                    title="{{ ucfirst($c) }}"
-                    onclick="setColor('{{ $c }}')"></button>
-            @endforeach
-        </div>
-    </div>
-
-    <form id="tc-color-form" method="POST" action="/u:{{ $user->username }}.html" style="display:none">
-        @csrf
-        <input type="hidden" name="action" value="setTcColor">
-        <input type="hidden" name="tc_color" id="tc-color-input" value="{{ $color }}">
-    </form>
-    <script>
-    function setColor(c) {
-        document.getElementById('tc-color-input').value = c;
-        document.getElementById('tc-color-form').submit();
-    }
-    </script>
-    @endif
-
 </div>
 @endsection

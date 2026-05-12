@@ -87,6 +87,7 @@ Route::get('/me.json', function () {
 Route::get('/u:{username}.html', [UserController::class, 'profile'])->middleware('cache:no-store');
 Route::post('/u:{username}.html', [UserController::class, 'handleProfilePost']);
 Route::get('/trainercard:{username}.html', [UserController::class, 'trainerCard'])->middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, stale-while-revalidate=30']);
+Route::get('/trainercard-img:{username}.png', [UserController::class, 'trainerCardImage'])->middleware(['nosession', 'cache:public, max-age=0, s-maxage=86400, stale-while-revalidate=60']);
 
 // Static pages — 1 hour
 Route::middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, stale-while-revalidate=30'])->group(function () {

@@ -51,8 +51,14 @@ class UserController extends Controller
         $user->b64_prsv = base64_encode(json_encode($decrypt));
         $user->save();
 
+        $imgPath = storage_path('app/trainer-cards/' . $username . '.png');
+        if (file_exists($imgPath)) unlink($imgPath);
+
         \Illuminate\Support\Facades\Artisan::call('cf:purge', [
-            '--url' => [rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html'],
+            '--url' => [
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html',
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-img:' . $username . '.png',
+            ],
         ]);
 
         return redirect('/u:' . $username . '.html')->with('success', 'Save File Uploaded');
@@ -70,8 +76,14 @@ class UserController extends Controller
         $user->b64_prsv = null;
         $user->save();
 
+        $imgPath = storage_path('app/trainer-cards/' . $username . '.png');
+        if (file_exists($imgPath)) unlink($imgPath);
+
         \Illuminate\Support\Facades\Artisan::call('cf:purge', [
-            '--url' => [rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html'],
+            '--url' => [
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html',
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-img:' . $username . '.png',
+            ],
         ]);
 
         return redirect('/u:' . $username . '.html')->with('success', 'Save File Deleted');
@@ -121,17 +133,99 @@ class UserController extends Controller
         $user = User::where('username', $username)->firstOrFail();
         if (!$this->isOwner($user)) return redirect('/');
 
-        $allowed = ['blue', 'red', 'green', 'gold', 'purple', 'black'];
+        $allowed = ['blue', 'red', 'green', 'gold', 'purple', 'black', 'maroon'];
         $color = $request->input('tc_color');
-        if (!in_array($color, $allowed)) $color = 'blue';
+        if (!in_array($color, $allowed)) $color = 'maroon';
 
         $user->tc_color = $color;
         $user->save();
 
+        // Purge cached image
+        $imgPath = storage_path('app/trainer-cards/' . $username . '.png');
+        if (file_exists($imgPath)) unlink($imgPath);
+
         \Illuminate\Support\Facades\Artisan::call('cf:purge', [
-            '--url' => [rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html'],
+            '--url' => [
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html',
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-img:' . $username . '.png',
+            ],
         ]);
 
         return redirect('/u:' . $username . '.html')->with('success', 'Trainer card color updated!');
+    }
+
+    public function trainerCardImage($username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+
+        $outDir = storage_path('app/trainer-cards');
+        if (!is_dir($outDir)) mkdir($outDir, 0755, true);
+        $outPath = $outDir . '/' . $username . '.png';
+
+        if (!file_exists($outPath)) {
+            $save = $user->getSave();
+            if (is_array($save) || $save->getSystemData() === null) {
+                abort(404);
+            }
+
+            $defeatedRivals = $save->getDefeatedRivals();
+            $glitchUnlocks  = $save->getGlitchUnlocks();
+            $smittyUnlocks  = $save->getSmittyUnlocks();
+            $formUnlocks    = $save->getFormUnlocks();
+
+            $totalRivals  = count(array_filter($defeatedRivals, fn($r) => !is_string(array_search($r, $defeatedRivals))));
+            $beatenRivals = count(array_filter($defeatedRivals, fn($r) => !is_string(array_search($r, $defeatedRivals)) && $r['defeated'] === 'true'));
+
+            $modCount = collect($formUnlocks['modFormsUnlocked'])->map(function($unlock) {
+                $name = preg_replace('/(.*)_(.*)/', '$2', $unlock);
+                return \App\Models\Glitch::where('name', str_replace(' ', '', $name))->first();
+            })->filter()->count();
+
+            $uniSmittyCount = collect($formUnlocks['uniSmittyUnlocks'])->filter()->map(function($unlock) {
+                $name = preg_replace('/(.*?)_(.*)/', '$2', $unlock);
+                return \App\Services\BuiltInService::loadSmitty(str_replace(' ', '', $name));
+            })->filter()->count();
+
+            $baseUrl = rtrim(config('services.cloudflare.base_url'), '/');
+
+            $rivals = array_values(array_filter($defeatedRivals, fn($r) => !is_string(array_search($r, $defeatedRivals))));
+            $rivals = array_map(fn($r) => [
+                'name'   => $r['name'],
+                'beaten' => $r['defeated'] === 'true',
+                'imgUrl' => $baseUrl . '/rivals/' . strtolower(str_replace(' ', '_', $r['name'])) . '.png',
+            ], $rivals);
+
+            $cardData = json_encode([
+                'username'      => $user->username,
+                'userId'        => $user->id,
+                'avatarUrl'     => $user->getAvatarURL(),
+                'color'         => $user->tc_color ?? 'maroon',
+                'glitchCount'   => count($glitchUnlocks) + $modCount,
+                'smittyCount'   => count($smittyUnlocks) + $uniSmittyCount,
+                'submittedCount'=> $user->glitches()->count(),
+                'beatenRivals'  => $beatenRivals,
+                'totalRivals'   => $totalRivals,
+                'rivals'        => $rivals,
+            ]);
+
+            $script = base_path('scripts/render_trainer_card.js');
+            $cmd = 'node ' . escapeshellarg($script)
+                 . ' ' . escapeshellarg($username)
+                 . ' ' . escapeshellarg($outPath)
+                 . ' ' . escapeshellarg($cardData)
+                 . ' 2>&1';
+
+            exec($cmd, $output, $exit);
+
+            if ($exit !== 0 || !file_exists($outPath)) {
+                \Illuminate\Support\Facades\Log::error('Trainer card render failed for ' . $username . ': ' . implode("\n", $output));
+                abort(500);
+            }
+        }
+
+        return response()->file($outPath, [
+            'Content-Type'  => 'image/png',
+            'Cache-Control' => 'public, max-age=0, s-maxage=86400, stale-while-revalidate=60',
+        ]);
     }
 }
