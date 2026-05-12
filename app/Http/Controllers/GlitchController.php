@@ -168,11 +168,12 @@ class GlitchController extends Controller
             $mons = rtrim(trim($mons), ',');
         }
 
-        $items = \App\Services\BuiltInService::getSmittyItems($form);
-        $items = $items !== false ? implode(', ', $items) : 'Unknown! Please contact scooom on Discord!';
+        $itemsRaw = \App\Services\BuiltInService::getSmittyItemsWithIcons($form);
+        $items = $itemsRaw !== false ? implode(', ', array_column($itemsRaw, 'name')) : 'Unknown! Please contact scooom on Discord!';
+        $itemsWithIcons = $itemsRaw ?: [];
         $code = $mon->form_code ?? '';
 
-        return view('smittyMon', compact('mon', 'mons', 'items', 'code'));
+        return view('smittyMon', compact('mon', 'mons', 'items', 'itemsWithIcons', 'code'));
     }
 
     public function smittyFormMon($form)
@@ -195,10 +196,11 @@ class GlitchController extends Controller
             $mons = rtrim(trim($mons), ',');
         }
 
-        $items = \App\Services\BuiltInService::getSmittyItems($form);
-        $items = $items !== false ? implode(', ', $items) : 'Unknown! Please contact scooom on Discord!';
+        $itemsRaw = \App\Services\BuiltInService::getSmittyItemsWithIcons($form);
+        $items = $itemsRaw !== false ? implode(', ', array_column($itemsRaw, 'name')) : 'Unknown! Please contact scooom on Discord!';
+        $itemsWithIcons = $itemsRaw ?: [];
         $code = $mon->form_code ?? '';
 
-        return view('smittyFormMon', compact('mon', 'mons', 'items', 'code'));
+        return view('smittyFormMon', compact('mon', 'mons', 'items', 'itemsWithIcons', 'code'));
     }
 }

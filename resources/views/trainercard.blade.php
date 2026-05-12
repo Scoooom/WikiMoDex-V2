@@ -131,7 +131,7 @@
                 <div class="card-body">
                     <div class="tc-mon-grid">
                         @foreach($smittyUnlocks as $un)
-                        @php $smittyItems = \App\Services\BuiltInService::getSmittyItems($un->name); @endphp
+                        @php $smittyItems = \App\Services\BuiltInService::getSmittyItemsWithIcons($un->name); @endphp
                         <div class="tc-mon-item">
                             <a href="/smittyForm:{{ urlencode($un->name) }}.html">
                                 <img src="/cFront:{{ urlencode($un->name) }}.png" alt="{{ $un->name }}">
@@ -139,10 +139,10 @@
                             </a>
                             @if($smittyItems)
                             <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:3px;margin-top:5px">
-                                @foreach($smittyItems as $itemName)
-                                <img src="/item-icon/{{ urlencode(str_replace(' ', '_', strtolower(trim($itemName)))) }}.png"
-                                     alt="{{ trim($itemName) }}"
-                                     title="{{ trim($itemName) }}"
+                                @foreach($smittyItems as $item)
+                                <img src="/item-icon/{{ $item['icon'] }}.png"
+                                     alt="{{ $item['name'] }}"
+                                     title="{{ $item['name'] }}"
                                      style="width:20px;height:20px;image-rendering:pixelated"
                                      onerror="this.style.display='none'">
                                 @endforeach

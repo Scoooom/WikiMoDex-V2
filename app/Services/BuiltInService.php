@@ -86,6 +86,21 @@ class BuiltInService
         return $items->toArray();
     }
 
+    public static function getSmittyItemsWithIcons(string $form)
+    {
+        $items = \App\Models\SmittyItem::where('form_name', strtolower($form))
+            ->orderBy('sort_order')
+            ->get(['item_name', 'enum_name']);
+
+        if ($items->isEmpty()) return false;
+
+        return $items->map(function ($item) {
+            // SMITTY_METAL -> smittyMetal
+            $icon = lcfirst(str_replace('_', '', ucwords(strtolower($item->enum_name), '_')));
+            return ['name' => $item->item_name, 'icon' => $icon];
+        })->toArray();
+    }
+
     public static function getNumType(string $id): int
     {
         return match(strtolower($id)) {

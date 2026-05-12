@@ -30,12 +30,18 @@
                         </span>
                         @endif
                     </div>
-                    @if($items)
+                    @if($itemsWithIcons)
                     <div style="margin-top:8px;font-size:12px;color:var(--muted)">
                         <div style="margin-bottom:4px;font-weight:600">Required items</div>
-                        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center">
-                            @foreach(explode(',', $items) as $item)
-                            <span class="smitty-item">{{ trim($item) }}</span>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
+                            @foreach($itemsWithIcons as $item)
+                            <span class="smitty-item" title="{{ $item['name'] }}" style="display:flex;align-items:center;gap:4px">
+                                <img src="/item-icon/{{ $item['icon'] }}.png"
+                                     alt="{{ $item['name'] }}"
+                                     style="width:20px;height:20px;image-rendering:pixelated"
+                                     onerror="this.style.display='none'">
+                                {{ $item['name'] }}
+                            </span>
                             @endforeach
                         </div>
                     </div>
