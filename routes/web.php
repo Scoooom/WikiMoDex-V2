@@ -191,6 +191,18 @@ Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {
     return response()->file($outPath, ['Content-Type' => 'image/png', 'Cache-Control' => 'public, max-age=3600']);
 });
 
+// ── Item icons ───────────────────────────────────────────────────
+Route::get('/item-icon/{name}.png', function (string $name) {
+    // Sanitise — only allow alphanumeric + underscore
+    if (!preg_match('/^[a-zA-Z0-9_]+$/', $name)) abort(404);
+    $path = storage_path('app/item-icons/' . $name . '.png');
+    if (!file_exists($path)) abort(404);
+    return response()->file($path, [
+        'Content-Type'  => 'image/png',
+        'Cache-Control' => 'public, max-age=0, s-maxage=31536000, stale-while-revalidate=60',
+    ]);
+})->middleware('nosession');
+
 // ── Ability search ───────────────────────────────────────────────
 Route::get('/ability-search.json', [App\Http\Controllers\AbilitySearchController::class, 'search'])
     ->middleware('cache:no-store');

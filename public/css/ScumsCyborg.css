@@ -3767,3 +3767,12 @@ img { max-width: 100%; display: block; }
 
 /* ── Effective stat range bar ── */
 .build-stat-bar--range { opacity: 0.7; }
+
+/* ── Build item icons ── */
+.build-item-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
