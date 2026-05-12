@@ -3167,6 +3167,7 @@ img { max-width: 100%; display: block; }
 .build-slot-badge--biome { background: rgba(80,180,120,0.12); color: #7dd4a8; border: 1px solid rgba(80,180,120,0.25); }
 .build-slot-ability { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }
 .build-slot-ability span { color: var(--text); }
+.build-slot-ability--none span { color: var(--muted); font-style: italic; }
 .build-slot-nature { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }
 .build-slot-nature span { color: var(--text); }
 .build-slot-body { padding: 0.75rem 1rem; display: flex; flex-direction: column; gap: 0.65rem; }
