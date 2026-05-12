@@ -7,6 +7,8 @@
 
 const puppeteer = require('puppeteer');
 
+const CHROME_PATH = '/root/.cache/puppeteer/chrome/linux-148.0.7778.97/chrome-linux64/chrome';
+
 const [,, username, outputPath, cardDataJson] = process.argv;
 
 if (!username || !outputPath || !cardDataJson) {
@@ -149,6 +151,7 @@ body { background:transparent; width:480px; }
 
 (async () => {
     const browser = await puppeteer.launch({
+        executablePath: CHROME_PATH,
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
     });
     const page = await browser.newPage();
