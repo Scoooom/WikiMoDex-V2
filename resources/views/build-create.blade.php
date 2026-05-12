@@ -317,7 +317,7 @@ function makeTypeahead(input, fetchUrl, onSelect, localData) {
         if (!results.length) { close(); return; }
         dd.innerHTML = '';
         dd.style.display = 'block';
-        results.slice(0, 12).forEach((r, i) => {
+        results.slice(0, 20).forEach((r, i) => {
             const item = document.createElement('div');
             item.className = 'pokemon-typeahead-item';
             const color = CATEGORY_COLORS[r.category] || 'var(--dim)';

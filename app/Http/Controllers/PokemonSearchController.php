@@ -27,7 +27,7 @@ class PokemonSearchController extends Controller
         // 1. Official Pokémon + forms (core_pokemon)
         CorePokemon::where('name', 'like', $like)
             ->orderByRaw("CASE WHEN name LIKE ? THEN 0 ELSE 1 END", ["{$q}%"])
-            ->limit(20)
+            ->limit(8)
             ->get()
             ->each(fn($p) => $results->push([
                 'label'    => $p->name,
