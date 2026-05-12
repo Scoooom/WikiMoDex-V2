@@ -40,25 +40,29 @@ class PokemonSearchController extends Controller
             ]));
 
         // 2. Core glitches + smitty forms (builtin_forms)
-        BuiltinForm::with(['ab1', 'ab2', 'ha'])
-            ->where('name', 'like', $like)
-            ->orderByRaw("CASE WHEN name LIKE ? THEN 0 ELSE 1 END", ["{$q}%"])
-            ->limit(15)
-            ->get()
-            ->each(fn($f) => $results->push([
-                'label'    => $f->name,
-                'value'    => $f->name,
-                'category' => match($f->form_type) {
-                    'core'        => 'Core Glitch',
-                    'smitty'      => 'SMITTY Pokémon',
-                    'smitty_form' => 'SMITTY Form',
-                    default       => 'Custom',
-                },
-                'dex'      => null,
-                'ability1' => $f->ab1?->name,
-                'ability2' => $f->ab2?->name,
-                'abilityH' => $f->ha?->name,
-            ]));
+        try {
+            BuiltinForm::with(['ab1', 'ab2', 'ha'])
+                ->where('name', 'like', $like)
+                ->orderByRaw("CASE WHEN name LIKE ? THEN 0 ELSE 1 END", ["{$q}%"])
+                ->limit(15)
+                ->get()
+                ->each(fn($f) => $results->push([
+                    'label'    => $f->name,
+                    'value'    => $f->name,
+                    'category' => match($f->form_type) {
+                        'core'        => 'Core Glitch',
+                        'smitty'      => 'SMITTY Pokémon',
+                        'smitty_form' => 'SMITTY Form',
+                        default       => 'Custom',
+                    },
+                    'dex'      => null,
+                    'ability1' => $f->ab1?->name,
+                    'ability2' => $f->ab2?->name,
+                    'abilityH' => $f->ha?->name,
+                ]));
+        } catch (\Exception $e) {
+            \Log::warning('BuiltinForm search failed: ' . $e->getMessage());
+        }
 
         // 3. Mod glitch forms (user-uploaded)
         Glitch::where('name', 'like', $like)
