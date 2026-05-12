@@ -193,8 +193,8 @@ class ImportService
             // Ability — check ANY_ABILITY modifier first, fall back to abilityIndex
             $ability = self::resolveAbility($speciesInt, (int)($p['abilityIndex'] ?? 0), $pMods);
 
-            // Passive — from ANY_PASSIVE_ABILITY modifier
-            $passive = self::resolvePassive($pMods);
+            // Passive — altPassiveForRun on the pokemon object (alt builds) or ANY_PASSIVE_ABILITY modifier
+            $passive = self::resolvePassive($pMods, $p);
 
             // Dex number — prefer alt_builds table if applicable, else core_pokemon
             if ($altBuild) {
@@ -338,9 +338,16 @@ class ImportService
         };
     }
 
-    private static function resolvePassive(array $mods): ?string
+    private static function resolvePassive(array $mods, array $pokemon = []): ?string
     {
-        // Last ANY_PASSIVE_ABILITY wins
+        // Alt build pokemon store the passive as an ability int on the party object itself
+        if (isset($pokemon['altPassiveForRun'])) {
+            $key = self::resolveAbilityKey((int)$pokemon['altPassiveForRun']);
+            $ab  = Ability::where('enum_name', $key)->first();
+            if ($ab) return $ab->name;
+        }
+
+        // Regular passive — last ANY_PASSIVE_ABILITY modifier wins
         $passive = null;
         foreach ($mods as $mod) {
             if ($mod['typeId'] === 'ANY_PASSIVE_ABILITY') {
