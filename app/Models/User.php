@@ -55,6 +55,8 @@ class User extends Authenticatable
     {
         return $this->display_name ?? $this->username;
     }
+
+    public function glitches()
     {
         return $this->hasMany(Glitch::class, 'created_by');
     }
