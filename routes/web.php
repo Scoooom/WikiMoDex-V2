@@ -162,7 +162,7 @@ Route::get('/alt-build-stats/{buildId}.json', function ($buildId) {
 });
 
 Route::get('/pokevoid-atlas/{dex}.json', function ($dex) {
-    if (!preg_match('/^\d+$/', $dex)) abort(404);
+    if (!preg_match('/^[\d]+(-[a-z]+)?$/', $dex)) abort(404);
     $path = base_path("pokevoid/public/images/pokemon/{$dex}.png");
     if (!file_exists($path)) abort(404);
     $out = shell_exec("python3 " . escapeshellarg(base_path('scripts/extract_atlas.py')) . " " . escapeshellarg($path) . " 2>/dev/null");
@@ -170,7 +170,7 @@ Route::get('/pokevoid-atlas/{dex}.json', function ($dex) {
     return response($out)->header('Content-Type', 'application/json')
                           ->header('Access-Control-Allow-Origin', '*')
                           ->header('Cache-Control', 'public, max-age=86400');
-})->where('dex', '\d+');
+})->where('dex', '[\d]+(-[a-z]+)?');
 
 Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {
     $build = \App\Models\AltBuild::where('build_id', $buildId)->first();
