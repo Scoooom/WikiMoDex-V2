@@ -308,10 +308,8 @@ function copyBuildLink() {
         setTimeout(() => btn.textContent = orig, 1800);
     });
 }
+}
 
-</div>
-
-<script>
 // ── Sprite rendering ──────────────────────────────────────────────
 (function() {
     async function extractFirstFrame(dex) {
@@ -347,7 +345,6 @@ function copyBuildLink() {
         if (!dex) return;
         const frame = await extractFirstFrame(dex);
         if (!frame) { canvas.style.display = 'none'; return; }
-        // Scale to fit canvas
         const ctx = canvas.getContext('2d');
         const scale = Math.min(canvas.width / frame.width, canvas.height / frame.height);
         const dx = (canvas.width  - frame.width  * scale) / 2;
@@ -357,4 +354,5 @@ function copyBuildLink() {
     });
 })();
 </script>
-</script>
+
+@endsection
