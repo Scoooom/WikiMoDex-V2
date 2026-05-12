@@ -282,28 +282,25 @@ class StatService
     /**
      * Calculate effective (in-battle) stats from base stats, nature, and level.
      * Formula from pokevoid/src/field/pokemon.ts calculateStats()
-     * IVs assumed 31 (max), no EVs in this game.
+     * IVs are random per pokemon (0-31), so we return a [min, max] range.
      * Soul Dew amplifies nature multipliers: +0.1 per stack.
+     * Wonder Guard forces HP to 1.
      *
-     * Returns [HP, ATK, DEF, SPATK, SPDEF, SPD]
+     * Returns array of [min, max] pairs: [[hpMin,hpMax],[atkMin,atkMax],...]
      */
-    public static function calcEffectiveStats(array $base, string $nature, int $level, array $items = []): array
+    public static function calcEffectiveStats(array $base, string $nature, int $level, array $items = [], ?string $ability = null, ?string $passive = null): array
     {
-        // Nature multiplier table [stat_idx][nature] => multiplier
         $natureBoost = [
-            // ATK=1
             1 => ['Lonely'=>1.1,'Brave'=>1.1,'Adamant'=>1.1,'Naughty'=>1.1,'Bold'=>0.9,'Timid'=>0.9,'Modest'=>0.9,'Calm'=>0.9],
-            // DEF=2
             2 => ['Bold'=>1.1,'Relaxed'=>1.1,'Impish'=>1.1,'Lax'=>1.1,'Lonely'=>0.9,'Hasty'=>0.9,'Mild'=>0.9,'Gentle'=>0.9],
-            // SPATK=3
             3 => ['Modest'=>1.1,'Mild'=>1.1,'Quiet'=>1.1,'Rash'=>1.1,'Adamant'=>0.9,'Impish'=>0.9,'Jolly'=>0.9,'Careful'=>0.9],
-            // SPDEF=4
             4 => ['Calm'=>1.1,'Gentle'=>1.1,'Sassy'=>1.1,'Careful'=>1.1,'Naughty'=>0.9,'Lax'=>0.9,'Naive'=>0.9,'Rash'=>0.9],
-            // SPD=5
             5 => ['Timid'=>1.1,'Hasty'=>1.1,'Jolly'=>1.1,'Naive'=>1.1,'Brave'=>0.9,'Relaxed'=>0.9,'Quiet'=>0.9,'Sassy'=>0.9],
         ];
 
-        // Soul Dew soul stack — amplifies nature multiplier offset by 0.1 per stack
+        $wonderGuard = stripos($ability ?? '', 'Wonder Guard') !== false
+                    || stripos($passive ?? '', 'Wonder Guard') !== false;
+
         $soulDewStack = 0;
         foreach ($items as $item) {
             if (($item['key'] ?? '') === 'SOUL_DEW') {
@@ -311,26 +308,34 @@ class StatService
             }
         }
 
-        $iv = 31;
         $result = [];
 
         foreach ($base as $s => $baseStat) {
-            $value = (int) floor(((2 * $baseStat + $iv) * $level) / 100);
             if ($s === 0) {
-                // HP
-                $result[] = $value + $level + 10;
+                // HP — Wonder Guard forces to 1
+                if ($wonderGuard) {
+                    $result[] = [1, 1];
+                } else {
+                    $min = (int) floor(((2 * $baseStat + 0)  * $level) / 100) + $level + 10;
+                    $max = (int) floor(((2 * $baseStat + 31) * $level) / 100) + $level + 10;
+                    $result[] = [$min, $max];
+                }
             } else {
-                $value += 5;
                 $mult = $natureBoost[$s][$nature] ?? 1.0;
                 if ($mult !== 1.0 && $soulDewStack > 0) {
-                    $offset = ($mult > 1 ? 1 : -1) * 0.1 * $soulDewStack;
-                    $mult += $offset;
+                    $mult += ($mult > 1 ? 1 : -1) * 0.1 * $soulDewStack;
                 }
-                if ($mult !== 1.0) {
-                    $value = (int) ($mult > 1 ? ceil($value * $mult) : floor($value * $mult));
-                    $value = max(1, $value);
-                }
-                $result[] = $value;
+
+                $calcStat = function(int $iv) use ($baseStat, $level, $mult): int {
+                    $value = (int) floor(((2 * $baseStat + $iv) * $level) / 100) + 5;
+                    if ($mult !== 1.0) {
+                        $value = (int) ($mult > 1 ? ceil($value * $mult) : floor($value * $mult));
+                        $value = max(1, $value);
+                    }
+                    return $value;
+                };
+
+                $result[] = [$calcStat(0), $calcStat(31)];
             }
         }
 
@@ -338,14 +343,43 @@ class StatService
     }
 
     /**
+     * Format effective stats (min/max pairs) for display.
+     * Returns array of [label, min, max, pct_min, pct_max, is_focus]
+     */
+    public static function formatEffectiveForDisplay(array $effectivePairs, array $items = [], string $statFocus = ''): array
+    {
+        $focusIdxs = self::getFocusIndices($statFocus);
+        $result = [];
+        foreach (self::STAT_LABELS as $i => $label) {
+            [$min, $max] = $effectivePairs[$i];
+            $result[] = [
+                'label'    => $label,
+                'min'      => $min,
+                'max'      => $max,
+                'pct_min'  => min(100, (int) round(($min / 800) * 100)),
+                'pct_max'  => min(100, (int) round(($max / 800) * 100)),
+                'is_focus' => in_array($i, $focusIdxs),
+                'is_range' => $min !== $max,
+            ];
+        }
+        return $result;
+    }
+
+    private static function getFocusIndices(string $statFocus): array
+    {
+        $focusParts = array_filter(array_map('trim', explode('/', $statFocus)));
+        return array_values(array_filter(
+            array_map(fn($s) => self::STAT_MAP[$s] ?? null, $focusParts),
+            fn($v) => $v !== null
+        ));
+    }
+
+    /**
      * Format stats for display — returns array of [label, value, pct, is_focus]
      */
     public static function formatForDisplay(array $stats, array $items = [], string $statFocus = ''): array
     {
-        $focusMap   = self::STAT_MAP;
-        $focusParts = array_filter(array_map('trim', explode('/', $statFocus)));
-        $focusIdxs  = array_filter(array_map(fn($s) => $focusMap[$s] ?? null, $focusParts), fn($v) => $v !== null);
-
+        $focusIdxs = self::getFocusIndices($statFocus);
         $result = [];
         foreach (self::STAT_LABELS as $i => $label) {
             $val      = $stats[$i];

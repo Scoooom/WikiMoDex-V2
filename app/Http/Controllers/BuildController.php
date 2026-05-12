@@ -55,7 +55,9 @@ class BuildController extends Controller
                     $slotStats[$i]['stats'],
                     $slot['nature'] ?? 'Hardy',
                     $level,
-                    $slot['items'] ?? []
+                    $slot['items'] ?? [],
+                    $slot['ability'] ?? null,
+                    $slot['passive_ability'] ?? null
                 );
             }
         }

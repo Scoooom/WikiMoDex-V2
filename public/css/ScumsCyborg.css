@@ -3763,3 +3763,20 @@ img { max-width: 100%; display: block; }
     text-align: right;
     flex-shrink: 0;
 }
+
+/* ── Effective stat range bar ── */
+.build-stat-bar--range {
+    position: relative;
+    opacity: 0.5;
+}
+.build-stat-bar--range::after {
+    content: '';
+    position: absolute;
+    left: var(--bar-min-pct);
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: inherit;
+    opacity: 2; /* restore to full opacity for the max portion */
+    border-radius: inherit;
+}
