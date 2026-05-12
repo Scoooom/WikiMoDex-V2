@@ -54,14 +54,26 @@ class StatService
             return ['stats' => $stats, 'source' => 'builtin', 'error' => null];
         }
 
-        // 4. Try glitches (mod glitch forms) — stats too complex to compute here
+        // 4. Try glitches (mod glitch forms) — use OG mon stats + adjustStats
         $glitch = Glitch::where('name', $species)->first();
         if ($glitch) {
-            return [
-                'stats'  => null,
-                'source' => 'glitch',
-                'error'  => "Mod glitch form stats aren't available in the build planner yet. If this seems wrong, report it to scooom.",
-            ];
+            try {
+                $ogStats       = $glitch->getOGStats();          // [idx => ['value'=>X,'percent'=>Y]]
+                $bst           = array_sum(array_column($ogStats, 'value'));
+                $totalIncrease = $glitch->calculateTotalIncrease($bst);
+                $adjusted      = $glitch->adjustStats($ogStats, $totalIncrease);
+                // Convert to flat [HP,ATK,DEF,SPATK,SPDEF,SPD] array
+                ksort($adjusted);
+                $stats = array_map(fn($s) => (int) $s['value'], $adjusted);
+                $stats = self::applyItemModifiers(array_values($stats), $items);
+                return ['stats' => $stats, 'source' => 'glitch', 'error' => null];
+            } catch (\Exception $e) {
+                return [
+                    'stats'  => null,
+                    'source' => 'glitch',
+                    'error'  => "Could not load stats for "{$species}" — report it to scooom.",
+                ];
+            }
         }
 
         // 5. Not found at all
