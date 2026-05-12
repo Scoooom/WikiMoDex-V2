@@ -123,18 +123,21 @@ body { background:transparent; width:480px; }
                 <span class="tc-field-label">■ NAME</span>
                 <span class="tc-field-value">${data.username.toUpperCase()}</span>
             </div>
+            ${(data.sections.core || data.sections.mod) ? `
             <div class="tc-field">
                 <span class="tc-field-label">■ GLITCHES</span>
                 <span class="tc-field-value">${data.glitchCount}</span>
-            </div>
+            </div>` : ''}
+            ${(data.sections.smitty || data.sections.unismitty) ? `
             <div class="tc-field">
                 <span class="tc-field-label">■ SMITTY</span>
                 <span class="tc-field-value">${data.smittyCount}</span>
-            </div>
+            </div>` : ''}
+            ${data.sections.submitted ? `
             <div class="tc-field">
                 <span class="tc-field-label">■ SUBMITTED</span>
                 <span class="tc-field-value">${data.submittedCount}</span>
-            </div>
+            </div>` : ''}
         </div>
         <div style="display:flex;flex-direction:column;align-items:center">
             <img class="tc-avatar" src="${data.avatarUrl}" alt="${data.username}">
@@ -144,6 +147,7 @@ body { background:transparent; width:480px; }
             </div>` : ''}
         </div>
     </div>
+    ${data.sections.rivals ? `
     <div class="tc-rivals-section">
         <div class="tc-rivals-label">■ RIVALS DEFEATED</div>
         <div class="tc-bar-track"><div class="tc-bar-fill"></div></div>
@@ -154,7 +158,7 @@ body { background:transparent; width:480px; }
                 <img src="${r.imgUrl}" alt="${r.name}" onerror="this.parentElement.style.display='none'">
             </div>`).join('')}
         </div>
-    </div>
+    </div>` : ''}
 </div>
 </body>
 </html>`;

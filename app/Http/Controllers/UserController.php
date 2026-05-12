@@ -302,6 +302,7 @@ class UserController extends Controller
                 'favMonUrl'     => $favMonUrl,
                 'favMonName'    => $user->tc_favorite_mon,
                 'color'         => $user->tc_color ?? 'maroon',
+                'sections'      => $user->getTcSections(),
                 'glitchCount'   => count($glitchUnlocks) + $modCount,
                 'smittyCount'   => count($smittyUnlocks) + $uniSmittyCount,
                 'submittedCount'=> $user->glitches()->count(),
