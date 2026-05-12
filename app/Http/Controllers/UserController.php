@@ -51,6 +51,10 @@ class UserController extends Controller
         $user->b64_prsv = base64_encode(json_encode($decrypt));
         $user->save();
 
+        \Illuminate\Support\Facades\Artisan::call('cf:purge', [
+            '--url' => [rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html'],
+        ]);
+
         return redirect('/u:' . $username . '.html')->with('success', 'Save File Uploaded');
     }
 
@@ -65,6 +69,10 @@ class UserController extends Controller
         $user->raw_prsv = null;
         $user->b64_prsv = null;
         $user->save();
+
+        \Illuminate\Support\Facades\Artisan::call('cf:purge', [
+            '--url' => [rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html'],
+        ]);
 
         return redirect('/u:' . $username . '.html')->with('success', 'Save File Deleted');
     }
