@@ -74,19 +74,6 @@ const PARAM_ITEMS = {
     'SECONDARY_TYPE_SWITCHER': { type: 'type2secondary', label1: 'Type 1 (blank = keep)', label2: 'New secondary type' },
 };
 
-const TYPES   = ['Normal','Fighting','Flying','Poison','Ground','Rock','Bug','Ghost','Steel','Fire','Water','Grass','Electric','Psychic','Ice','Dragon','Dark','Fairy'];
-const NATURES = ['Hardy','Lonely','Brave','Adamant','Naughty','Bold','Docile','Relaxed','Impish','Lax','Timid','Hasty','Serious','Jolly','Naive','Modest','Mild','Quiet','Bashful','Rash','Calm','Gentle','Sassy','Careful','Quirky'];
-const STATS   = ['HP','ATK','DEF','SP.ATK','SP.DEF','SPD'];
-const MAX_SLOTS = 6;
-
-const PARAM_ITEMS = {
-    'STAT_SWITCHER':           { type: 'stat2', label1: 'Swap stat',        label2: 'With stat' },
-    'STAT_SACRIFICE':          { type: 'stat1', label1: 'Stat sacrificed' },
-    'TYPE_SWITCHER':           { type: 'type2', label1: 'Type 1',           label2: 'Type 2 (blank = keep existing)' },
-    'PRIMARY_TYPE_SWITCHER':   { type: 'type1', label1: 'New primary type' },
-    'SECONDARY_TYPE_SWITCHER': { type: 'type2secondary', label1: 'Type 1 (blank = keep)', label2: 'New secondary type' },
-};
-
 // ── Slot management ───────────────────────────────────────────────
 let slotCount = 0;
 
