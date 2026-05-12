@@ -88,7 +88,7 @@ class PokemonSearchController extends Controller
                 'dex'      => $a->dex_number,
                 'ability1' => $a->ability1,
                 'ability2' => $a->ability2,
-                'abilityH' => null,
+                'abilityH' => $a->passive_ability,
             ]));
 
         // Deduplicate by value, official first
