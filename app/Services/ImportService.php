@@ -116,10 +116,12 @@ class ImportService
             $preview = [];
             foreach ($party as $p) {
                 $pMods    = $previewModsByPokemon[$p['id']] ?? [];
-                $altBuild = self::resolveAltBuild($pMods);
+                $altBuild = self::resolveAltBuild($pMods, $p);
+                $nickname = !empty($p['nickname']) ? base64_decode($p['nickname']) : null;
                 $preview[] = [
-                    'species' => $altBuild ? $altBuild['name'] : self::resolveSpeciesName((int)$p['species']),
-                    'level'   => $p['level'] ?? null,
+                    'species'  => $altBuild ? $altBuild['name'] : self::resolveSpeciesName((int)$p['species']),
+                    'level'    => $p['level'] ?? null,
+                    'nickname' => $nickname ?: null,
                 ];
             }
 
@@ -175,7 +177,7 @@ class ImportService
             $pMods      = $modsByPokemon[$pokemonId] ?? [];
 
             // Alt build overrides species name and provides rank
-            $altBuild     = self::resolveAltBuild($pMods);
+            $altBuild     = self::resolveAltBuild($pMods, $p);
             $species      = $altBuild ? $altBuild['name'] : self::resolveSpeciesName($speciesInt);
             $altBuildRank = $altBuild ? $altBuild['rank'] : null;
 
@@ -234,27 +236,32 @@ class ImportService
     // ── Resolution helpers ─────────────────────────────────────────
 
     /**
-     * Check modifiers for a POKEMON_ALT_BUILD entry.
-     * Returns ['name' => 'Fireball Seahorse', 'rank' => 3] or null if not an alt build.
-     * The build_id is stored in typePregenArgs[0] (e.g. "HORSEA_FIREBALL_SEAHORSE").
+     * Resolve alt build from the party pokemon object.
+     * The game stores altBuildId and altBuildRank directly on the pokemon — no modifier scan needed.
+     * Falls back to scanning POKEMON_ALT_BUILD modifier for older save formats.
      */
-    private static function resolveAltBuild(array $mods): ?array
+    private static function resolveAltBuild(array $mods, array $pokemon = []): ?array
     {
-        foreach ($mods as $mod) {
-            if (($mod['typeId'] ?? '') !== 'POKEMON_ALT_BUILD') continue;
+        // Fast path — altBuildId is stored directly on the party pokemon object
+        $buildId = $pokemon['altBuildId'] ?? null;
+        $rank    = isset($pokemon['altBuildRank']) ? (int)$pokemon['altBuildRank'] : 1;
 
-            $buildId = $mod['typePregenArgs'][0] ?? null;
-            if (!$buildId) continue;
-
-            $altBuild = \App\Models\AltBuild::where('build_id', strtolower($buildId))->first();
-            if (!$altBuild) continue;
-
-            return [
-                'name' => $altBuild->name,
-                'rank' => (int)($mod['typePregenArgs'][1] ?? $mod['stackCount'] ?? 1),
-            ];
+        // Fallback: scan modifiers (older save format)
+        if (!$buildId) {
+            foreach ($mods as $mod) {
+                if (($mod['typeId'] ?? '') !== 'POKEMON_ALT_BUILD') continue;
+                $buildId = $mod['typePregenArgs'][0] ?? null;
+                $rank    = (int)($mod['typePregenArgs'][1] ?? $mod['stackCount'] ?? 1);
+                if ($buildId) break;
+            }
         }
-        return null;
+
+        if (!$buildId) return null;
+
+        $altBuild = \App\Models\AltBuild::where('build_id', strtolower($buildId))->first();
+        if (!$altBuild) return null;
+
+        return ['name' => $altBuild->name, 'rank' => $rank];
     }
 
     private static function resolveSpeciesKey(int $dex): string
@@ -403,7 +410,6 @@ class ImportService
 
             // Type switchers — typePregenArgs[0] = type1 int (null = keep), typePregenArgs[1] = type2 int (null = keep)
             if (in_array($typeId, ['TYPE_SWITCHER', 'PRIMARY_TYPE_SWITCHER', 'SECONDARY_TYPE_SWITCHER', 'TYPE_SACRIFICE'])) {
-                \Log::debug('ImportService type switcher modifier', ['typeId' => $typeId, 'args' => $args, 'typePregenArgs' => $pregen]);
                 $typeNames = \App\Services\StatService::TYPE_NAMES;
                 $rawT1 = $pregen[0] ?? null;
                 $rawT2 = $pregen[1] ?? null;

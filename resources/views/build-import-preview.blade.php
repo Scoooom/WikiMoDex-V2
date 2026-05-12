@@ -37,6 +37,9 @@
                         @foreach($slot['preview'] as $mon)
                         <div class="build-import-party-mon">
                             <span class="build-import-mon-name">{{ $mon['species'] }}</span>
+                            @if($mon['nickname'])
+                                <span class="build-import-mon-nickname">&ldquo;{{ $mon['nickname'] }}&rdquo;</span>
+                            @endif
                             <span class="build-import-mon-level">Lv.{{ $mon['level'] }}</span>
                         </div>
                         @endforeach
@@ -58,3 +61,21 @@
         </div>
     </form>
 </div>
+
+<script>
+const waveBySlot = @json(collect($slots)->mapWithKeys(fn($s, $i) => [$s['index'] ?? $i => $s['wave'] ?? null])->filter());
+const titleInput = document.getElementById('title');
+
+function updateTitle() {
+    const checked = document.querySelector('input[name="slot"]:checked');
+    if (!checked) return;
+    const wave = waveBySlot[checked.value];
+    if (wave && !titleInput.dataset.userEdited) {
+        titleInput.value = 'Wave ' + wave + ' Run';
+    }
+}
+
+titleInput.addEventListener('input', () => { titleInput.dataset.userEdited = '1'; });
+document.querySelectorAll('input[name="slot"]').forEach(r => r.addEventListener('change', updateTitle));
+updateTitle();
+</script>
