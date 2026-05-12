@@ -45,8 +45,9 @@
         @if(!empty($slot['species']))
         @php
             $slotStat   = $slotStats[$i] ?? null;
-            $statValues = $slotStat['stats'] ?? null;
-            $statError  = $slotStat['error'] ?? null;
+            $statValues    = $slotStat['stats'] ?? null;
+            $effectiveVals = $slotStat['effective'] ?? null;
+            $statError     = $slotStat['error'] ?? null;
             $statSource = $slotStat['source'] ?? null;
             $slotTypes  = $slotStat['types'] ?? ['type1'=>null,'type2'=>null,'type1_name'=>null,'type2_name'=>null];
             $statFocus  = '';
