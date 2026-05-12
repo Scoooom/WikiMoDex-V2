@@ -215,6 +215,7 @@ class ImportService
             $entry = [
                 'species'         => $species,
                 'dex_number'      => $dexNumber,
+                'nickname'        => !empty($p['nickname']) ? base64_decode($p['nickname']) : null,
                 'ability'         => $ability,
                 'passive_ability' => $passive,
                 'nature'          => $nature,

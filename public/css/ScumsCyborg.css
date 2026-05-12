@@ -3155,6 +3155,7 @@ img { max-width: 100%; display: block; }
 }
 .build-slot-info { flex: 1; min-width: 0; }
 .build-slot-species { font-weight: 700; font-size: 1.05rem; color: var(--accent3); }
+.build-slot-nickname { font-size: 0.8rem; color: var(--text2); font-style: italic; margin-top: 0.1rem; }
 .build-slot-ability { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }
 .build-slot-ability span { color: var(--text); }
 .build-slot-nature { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }

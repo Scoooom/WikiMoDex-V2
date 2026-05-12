@@ -95,6 +95,9 @@
                 </div>
                 <div class="build-slot-info">
                     <div class="build-slot-species">{{ $slot['species'] }} Lv. {{ $slot['level'] }}</div>
+                    @if(!empty($slot['nickname']))
+                    <div class="build-slot-nickname">&ldquo;{{ $slot['nickname'] }}&rdquo;</div>
+                    @endif
                     @if($slotTypes['type1'] !== null)
                     <div class="build-slot-types-row">
                         <span class="type-badge type-{{ $slotTypes['type1'] }}">{{ $slotTypes['type1_name'] }}</span>
