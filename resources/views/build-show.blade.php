@@ -218,7 +218,7 @@
                 {{-- Items --}}
                 <div class="build-slot-section">
                     <div class="build-slot-section-label build-slot-collapsible" onclick="toggleSection(this)">
-                        Help Items <span class="build-slot-collapse-icon">▾</span>
+                        Held Items <span class="build-slot-collapse-icon">▾</span>
                     </div>  
                     <div class="build-move-grid build-slot-collapsible-body" style="display:none">
 
@@ -268,7 +268,7 @@
                         Notes <span class="build-slot-collapse-icon">▾</span>
                     </div>  
                     <div class="build-move-grid build-slot-collapsible-body" style="display:none">
-                     <div class="build-slot-notes">{{ !empty($slot['notes']) ? slot['notes'] : 'None' }}</div>
+                     <div class="build-slot-notes">{{ !empty($slot['notes']) ? $slot['notes'] : 'None' }}</div>
                    </div>
                  </div>
                 {{-- Base Stats + Effective Stats --}}
