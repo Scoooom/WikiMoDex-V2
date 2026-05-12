@@ -32,7 +32,7 @@ class PrsvService
         ];
     }
 
-    public static function decrypt($file,$raw = false)
+    public static function decrypt($file,$returnRaw = false)
     {
         $raw = base64_decode(file_get_contents($file));
 
@@ -48,7 +48,7 @@ class PrsvService
             OPENSSL_RAW_DATA,
             $derived['iv']
         );
-        if ($raw) return $decrypted;
+        if ($returnRaw) return $decrypted;
         $data = json_decode($decrypted);
         $data->systemData = json_decode($data->systemData);
 
