@@ -160,6 +160,11 @@ function addSlot(data) {
                 <input type="number" name="team[${i}][alt_build_rank]" value="${data?.alt_build_rank||1}"
                        class="build-form-input" min="1" max="9" placeholder="1">
             </div>
+            <div class="build-form-field">
+                <label>Level <span style="color:var(--dim);font-size:0.75em">(1–10000, optional)</span></label>
+                <input type="number" name="team[${i}][level]" value="${data?.level||''}"
+                       class="build-form-input" min="1" max="10000" placeholder="e.g. 100">
+            </div>
         </div>
         <div class="build-form-subsection">
             <div class="build-form-sublabel">Moves (up to 4)</div>

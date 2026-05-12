@@ -48,6 +48,16 @@ class BuildController extends Controller
         foreach ($build->team as $i => $slot) {
             $slotStats[$i] = StatService::resolveSlot($slot);
             $slotStats[$i]['types'] = StatService::resolveTypes($slot);
+            // Calculate effective stats if level is set
+            $level = (int) ($slot['level'] ?? 0);
+            if ($level > 0 && !empty($slotStats[$i]['stats'])) {
+                $slotStats[$i]['effective'] = StatService::calcEffectiveStats(
+                    $slotStats[$i]['stats'],
+                    $slot['nature'] ?? 'Hardy',
+                    $level,
+                    $slot['items'] ?? []
+                );
+            }
         }
 
         // Resolve move data for display
@@ -67,6 +77,8 @@ class BuildController extends Controller
         $whitelist = [
             'STAT_SWITCHER', 'PRIMARY_TYPE_SWITCHER', 'SECONDARY_TYPE_SWITCHER',
             'TYPE_SWITCHER', 'STAT_SACRIFICE', 'TYPE_SACRIFICE', 'POKEMON_ALT_BUILD',
+            'HP_UP', 'PROTEIN', 'IRON', 'CALCIUM', 'ZINC', 'CARBOS',
+            'SOUL_DEW',
         ];
         $items     = GameItem::whereIn('key', $whitelist)->orderBy('name')->get();
         $species   = \App\Models\BuiltinForm::orderBy('name')->pluck('name');
@@ -98,6 +110,7 @@ class BuildController extends Controller
             'team.*.items.*.params.stat1'   => 'nullable|string|max:10',
             'team.*.items.*.params.stat2'   => 'nullable|string|max:10',
             'team.*.alt_build_rank'          => 'nullable|integer|min:1|max:9',
+            'team.*.level'                   => 'nullable|integer|min:1|max:10000',
             'team.*.override_type1'         => 'nullable|string|max:20',
             'team.*.override_type2'         => 'nullable|string|max:20',
             'team.*.notes'                  => 'nullable|string|max:500',
@@ -135,6 +148,8 @@ class BuildController extends Controller
         $whitelist = [
             'STAT_SWITCHER', 'PRIMARY_TYPE_SWITCHER', 'SECONDARY_TYPE_SWITCHER',
             'TYPE_SWITCHER', 'STAT_SACRIFICE', 'TYPE_SACRIFICE', 'POKEMON_ALT_BUILD',
+            'HP_UP', 'PROTEIN', 'IRON', 'CALCIUM', 'ZINC', 'CARBOS',
+            'SOUL_DEW',
         ];
         $items   = GameItem::whereIn('key', $whitelist)->orderBy('name')->get();
         $species = \App\Models\BuiltinForm::orderBy('name')->pluck('name');
@@ -158,6 +173,7 @@ class BuildController extends Controller
             'team.*.passive_ability'        => 'nullable|string|max:80',
             'team.*.nature'                 => 'nullable|string|max:20',
             'team.*.alt_build_rank'         => 'nullable|integer|min:1|max:9',
+            'team.*.level'                  => 'nullable|integer|min:1|max:10000',
             'team.*.moves'                  => 'nullable|array|max:4',
             'team.*.moves.*'                => 'nullable|string|max:60',
             'team.*.items'                  => 'nullable|array|max:20',

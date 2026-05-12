@@ -186,17 +186,31 @@
 
                 {{-- Base Stats --}}
                 @if($displayStats)
+                @php
+                    $effectiveDisplay = $effectiveVals
+                        ? \App\Services\StatService::formatForDisplay($effectiveVals, $slot['items'] ?? [], $statFocus)
+                        : null;
+                    $level = (int)($slot['level'] ?? 0);
+                @endphp
                 <div class="build-slot-section">
                     <div class="build-slot-section-label build-slot-collapsible" onclick="toggleSection(this)">
-                        Base Stats
-                        @if(!empty($slot['alt_build_rank']))
-                            <span style="color:var(--dim);font-weight:normal"> — Rank {{ $slot['alt_build_rank'] }}</span>
+                        @if($effectiveDisplay)
+                            Stats
+                            <span style="color:var(--dim);font-weight:normal"> — Lv.{{ $level }}</span>
+                            @if(!empty($slot['alt_build_rank']))
+                                <span style="color:var(--dim);font-weight:normal"> Rank {{ $slot['alt_build_rank'] }}</span>
+                            @endif
+                        @else
+                            Base Stats
+                            @if(!empty($slot['alt_build_rank']))
+                                <span style="color:var(--dim);font-weight:normal"> — Rank {{ $slot['alt_build_rank'] }}</span>
+                            @endif
                         @endif
                         <span class="build-stat-bst">{{ array_sum(array_column($displayStats, 'value')) }} BST</span>
                         <span class="build-slot-collapse-icon">▾</span>
                     </div>
                     <div class="build-stat-bars build-slot-collapsible-body" style="display:none">
-                        @foreach($displayStats as $stat)
+                        @foreach($displayStats as $idx => $stat)
                         <div class="build-stat-row">
                             <span class="build-stat-label {{ $stat['is_focus'] ? 'build-stat-focus' : '' }}">{{ $stat['label'] }}</span>
                             <div class="build-stat-bar-wrap">
@@ -204,6 +218,9 @@
                                      style="width:{{ $stat['pct'] }}%"></div>
                             </div>
                             <span class="build-stat-value">{{ $stat['value'] }}</span>
+                            @if($effectiveDisplay)
+                                <span class="build-stat-effective">→ {{ $effectiveDisplay[$idx]['value'] }}</span>
+                            @endif
                         </div>
                         @endforeach
                     </div>

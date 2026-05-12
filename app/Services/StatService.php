@@ -237,6 +237,16 @@ class StatService
 
     // ── Item modifier application ──────────────────────────────────
 
+    // Vitamin key -> stat index
+    const VITAMIN_MAP = [
+        'HP_UP'   => 0,
+        'PROTEIN' => 1,
+        'IRON'    => 2,
+        'CALCIUM' => 3,
+        'ZINC'    => 4,
+        'CARBOS'  => 5,
+    ];
+
     private static function applyItemModifiers(array $stats, array $items): array
     {
         foreach ($items as $item) {
@@ -258,9 +268,73 @@ class StatService
                     $stats[$s1] = (int) floor($stats[$s1] * (1 + $stack * 0.1));
                 }
             }
+
+            // Vitamins: +1% per stack to a specific base stat
+            if (isset(self::VITAMIN_MAP[$key])) {
+                $si = self::VITAMIN_MAP[$key];
+                $stats[$si] = (int) floor($stats[$si] * (1 + $stack * 0.01));
+            }
         }
 
         return $stats;
+    }
+
+    /**
+     * Calculate effective (in-battle) stats from base stats, nature, and level.
+     * Formula from pokevoid/src/field/pokemon.ts calculateStats()
+     * IVs assumed 31 (max), no EVs in this game.
+     * Soul Dew amplifies nature multipliers: +0.1 per stack.
+     *
+     * Returns [HP, ATK, DEF, SPATK, SPDEF, SPD]
+     */
+    public static function calcEffectiveStats(array $base, string $nature, int $level, array $items = []): array
+    {
+        // Nature multiplier table [stat_idx][nature] => multiplier
+        $natureBoost = [
+            // ATK=1
+            1 => ['Lonely'=>1.1,'Brave'=>1.1,'Adamant'=>1.1,'Naughty'=>1.1,'Bold'=>0.9,'Timid'=>0.9,'Modest'=>0.9,'Calm'=>0.9],
+            // DEF=2
+            2 => ['Bold'=>1.1,'Relaxed'=>1.1,'Impish'=>1.1,'Lax'=>1.1,'Lonely'=>0.9,'Hasty'=>0.9,'Mild'=>0.9,'Gentle'=>0.9],
+            // SPATK=3
+            3 => ['Modest'=>1.1,'Mild'=>1.1,'Quiet'=>1.1,'Rash'=>1.1,'Adamant'=>0.9,'Impish'=>0.9,'Jolly'=>0.9,'Careful'=>0.9],
+            // SPDEF=4
+            4 => ['Calm'=>1.1,'Gentle'=>1.1,'Sassy'=>1.1,'Careful'=>1.1,'Naughty'=>0.9,'Lax'=>0.9,'Naive'=>0.9,'Rash'=>0.9],
+            // SPD=5
+            5 => ['Timid'=>1.1,'Hasty'=>1.1,'Jolly'=>1.1,'Naive'=>1.1,'Brave'=>0.9,'Relaxed'=>0.9,'Quiet'=>0.9,'Sassy'=>0.9],
+        ];
+
+        // Soul Dew soul stack — amplifies nature multiplier offset by 0.1 per stack
+        $soulDewStack = 0;
+        foreach ($items as $item) {
+            if (($item['key'] ?? '') === 'SOUL_DEW') {
+                $soulDewStack = min(2, (int)($item['stack'] ?? 1));
+            }
+        }
+
+        $iv = 31;
+        $result = [];
+
+        foreach ($base as $s => $baseStat) {
+            $value = (int) floor(((2 * $baseStat + $iv) * $level) / 100);
+            if ($s === 0) {
+                // HP
+                $result[] = $value + $level + 10;
+            } else {
+                $value += 5;
+                $mult = $natureBoost[$s][$nature] ?? 1.0;
+                if ($mult !== 1.0 && $soulDewStack > 0) {
+                    $offset = ($mult > 1 ? 1 : -1) * 0.1 * $soulDewStack;
+                    $mult += $offset;
+                }
+                if ($mult !== 1.0) {
+                    $value = (int) ($mult > 1 ? ceil($value * $mult) : floor($value * $mult));
+                    $value = max(1, $value);
+                }
+                $result[] = $value;
+            }
+        }
+
+        return $result;
     }
 
     /**

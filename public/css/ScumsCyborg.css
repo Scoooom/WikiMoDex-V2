@@ -3752,3 +3752,14 @@ img { max-width: 100%; display: block; }
     margin-left: 0.4rem;
     transition: transform var(--transition);
 }
+
+/* ── Effective stat display ── */
+.build-stat-effective {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent2);
+    width: 42px;
+    text-align: right;
+    flex-shrink: 0;
+}
