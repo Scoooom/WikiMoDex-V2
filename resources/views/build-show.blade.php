@@ -239,8 +239,8 @@
                 }
                 return;
             }
-            const isOwner = me.username === '{{ $build->user->username }}';
-            if (isOwner || me.isAdmin) {
+            const isOwner = me.userId === {{ $build->user_id }} || me.username === '{{ $build->user->username }}';
+            if (isOwner || me.isAdmin || me.isSuperAdmin) {
                 const slot = document.getElementById('build-delete-slot');
                 // Edit button
                 const editLink = document.createElement('a');

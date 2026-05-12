@@ -76,8 +76,10 @@ Route::get('/me.json', function () {
         'username' => $user->username,
         'avatar'   => $user->getAvatarURL(),
         'profile'  => '/u:' . $user->username . '.html',
-        'isAdmin'  => $user->isAdmin(),
-        'isEditor' => $user->isWikiEditor(),
+        'isAdmin'      => $user->isAdmin(),
+        'isSuperAdmin' => $user->isSuperAdmin(),
+        'isEditor'     => $user->isWikiEditor(),
+        'userId'       => $user->id,
     ])->header('Cache-Control', 'no-store');
 })->name('me');
 
