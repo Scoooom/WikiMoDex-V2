@@ -195,10 +195,15 @@ class UserController extends Controller
                 'imgUrl' => $baseUrl . '/rivals/' . strtolower(str_replace(' ', '_', $r['name'])) . '.png',
             ], $rivals);
 
+            $avatarUrl = $user->getAvatarURL();
+            if (str_starts_with($avatarUrl, '/')) {
+                $avatarUrl = rtrim(config('services.cloudflare.base_url'), '/') . $avatarUrl;
+            }
+
             $cardData = json_encode([
                 'username'      => $user->username,
                 'userId'        => $user->id,
-                'avatarUrl'     => $user->getAvatarURL(),
+                'avatarUrl'     => $avatarUrl,
                 'color'         => $user->tc_color ?? 'maroon',
                 'glitchCount'   => count($glitchUnlocks) + $modCount,
                 'smittyCount'   => count($smittyUnlocks) + $uniSmittyCount,
