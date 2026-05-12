@@ -57,10 +57,20 @@
                 <div class="build-card-sprites">
                     @foreach(collect($build->team ?? [])->take(6) as $slot)
                         @if(!empty($slot['dex_number']))
-                            <img
-                                src="/cFront:{{ $slot['species'] ?? 'missingno' }}.png"
-                                class="build-card-sprite"
+                            <canvas
+                                class="build-card-sprite build-card-sprite--canvas {{ !empty($slot['shiny']) ? 'build-card-sprite--shiny' : '' }}"
+                                data-dex="{{ $slot['dex_number'] }}"
+                                data-shiny="{{ !empty($slot['shiny']) ? '1' : '0' }}"
+                                data-variant="{{ $slot['variant'] ?? 0 }}"
+                                width="42" height="42"
                                 alt="{{ $slot['species'] ?? '' }}"
+                            ></canvas>
+                        @elseif(!empty($slot['species']))
+                            {{-- Core glitch / SMITTY: use cFront route by name --}}
+                            <img
+                                src="/cFront:{{ $slot['species'] }}.png"
+                                class="build-card-sprite build-card-sprite--canvas"
+                                alt="{{ $slot['species'] }}"
                                 onerror="this.style.opacity='0'"
                             >
                         @else
@@ -109,6 +119,60 @@ fetch('/me.json', { credentials: 'same-origin' })
             document.getElementById('builds-header-actions').style.display = '';
         }
     }).catch(() => {});
+
+// Render first frame of each card sprite from the atlas
+(async () => {
+    async function renderCardSprite(canvas) {
+        const dex     = canvas.dataset.dex;
+        const shiny   = canvas.dataset.shiny === '1';
+        const variant = parseInt(canvas.dataset.variant || '0', 10);
+        if (!dex) return;
+
+        const suffix    = shiny ? '_'.repeat(variant) : '';
+        const imgSrc    = shiny ? `/pokevoid-sprites/shiny/${dex}${suffix}.png` : `/pokevoid-sprites/${dex}.png`;
+        const atlasUrl  = shiny ? `/pokevoid-atlas-shiny/${dex}/${variant}.json` : `/pokevoid-atlas/${dex}.json`;
+
+        const [img, atlas] = await Promise.all([
+            new Promise(res => {
+                const i = new Image(); i.crossOrigin = 'anonymous';
+                i.onload = () => res(i); i.onerror = () => res(null);
+                i.src = imgSrc;
+            }),
+            fetch(atlasUrl).then(r => r.json()).catch(() => null),
+        ]);
+
+        if (!img || !atlas) { canvas.style.opacity = '0'; return; }
+
+        const tmp = document.createElement('canvas');
+        tmp.width = img.naturalWidth; tmp.height = img.naturalHeight;
+        tmp.getContext('2d').drawImage(img, 0, 0);
+
+        const frame = atlas.textures[0].frames[0];
+        const { x, y, w, h } = frame.frame;
+        const { x: sx, y: sy } = frame.spriteSourceSize;
+        const { w: sw, h: sh } = frame.sourceSize;
+
+        // Draw first frame centred into the 42×42 canvas
+        const scale = Math.min(canvas.width / sw, canvas.height / sh);
+        const ctx   = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(tmp, x, y, w, h,
+            (canvas.width  - sw * scale) / 2 + sx * scale,
+            (canvas.height - sh * scale) / 2 + sy * scale,
+            w * scale, h * scale);
+    }
+
+    // Use IntersectionObserver so off-screen cards don't block page load
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            observer.unobserve(entry.target);
+            renderCardSprite(entry.target);
+        });
+    }, { rootMargin: '200px' });
+
+    document.querySelectorAll('canvas.build-card-sprite').forEach(c => observer.observe(c));
+})();
 </script>
 
 @endsection

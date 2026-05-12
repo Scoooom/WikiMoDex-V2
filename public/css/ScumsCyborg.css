@@ -2974,8 +2974,13 @@ img { max-width: 100%; display: block; }
     object-fit: contain;
     image-rendering: pixelated;
     flex-shrink: 0;
+    display: none; /* hidden until JS renders canvas */
+}
+.build-card-sprite--canvas {
+    display: block;
 }
 .build-card-sprite--empty {
+    display: block;
     width: 42px;
     height: 42px;
     border: 1px dashed var(--border);
@@ -2983,6 +2988,7 @@ img { max-width: 100%; display: block; }
     opacity: 0.3;
     flex-shrink: 0;
 }
+.build-card-sprite--shiny { filter: drop-shadow(0 0 3px #ffd83a88); }
 .build-card-body { padding: 0.75rem 1rem 0.9rem; flex: 1; display: flex; flex-direction: column; gap: 0.35rem; }
 .build-card-title { font-weight: 600; font-size: 1rem; color: var(--accent3); }
 .build-card-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.4; }
