@@ -202,6 +202,18 @@ function addSlot(data) {
             if (item.name) addItemRow(i, item.name, item.key||'', item.stack||1, item.params||{});
         });
     }
+
+    // If pre-populated species, check if it's an alt build and show rank field
+    if (data?.species) {
+        const rankField = el.querySelector('.build-altbuild-rank');
+        fetch(`/pokemon-search.json?q=${encodeURIComponent(data.species)}`)
+            .then(r => r.json())
+            .then(results => {
+                const match = results.find(r => r.value === data.species);
+                if (rankField) rankField.style.display = (match?.category === 'Alt Build') ? '' : 'none';
+            })
+            .catch(() => {});
+    }
 }
 
 // ── Item rows ─────────────────────────────────────────────────────
