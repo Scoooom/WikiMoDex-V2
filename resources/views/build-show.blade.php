@@ -113,23 +113,28 @@
                             @endphp
                             <div class="build-move-card {{ $typeInt !== null ? 'type-bg-' . $typeInt : 'type-bg-none' }}">
                                 <div class="build-move-card-name {{ $typeInt !== null ? 'type-text-' . $typeInt : '' }}">{{ $move }}</div>
-                                @if($typeName)
-                                <div class="build-move-card-type">
-                                    <span class="type-badge {{ $typeInt !== null ? 'type-' . $typeInt : 'type-badge--dynamic' }}">{{ $typeName }}</span>
-                                </div>
-                                @endif
-                                <div class="build-move-card-stats">
-                                    <div class="build-move-card-stat">
+                                <div class="build-move-card-grid">
+                                    <div class="build-move-card-cell">
                                         <span class="build-move-card-stat-label">POWER</span>
                                         <span class="build-move-card-stat-value">{{ $moveData?->power ?? '—' }}</span>
                                     </div>
-                                    <div class="build-move-card-stat">
-                                        <span class="build-move-card-stat-label">ACCURACY</span>
+                                    <div class="build-move-card-cell">
+                                        <span class="build-move-card-stat-label">ACC</span>
                                         <span class="build-move-card-stat-value">{{ $moveData?->accuracy ? $moveData->accuracy . '%' : '—' }}</span>
                                     </div>
-                                    <div class="build-move-card-stat">
+                                    <div class="build-move-card-cell">
                                         <span class="build-move-card-stat-label">PP</span>
                                         <span class="build-move-card-stat-value">{{ $moveData?->pp ?? '—' }}</span>
+                                    </div>
+                                    <div class="build-move-card-cell">
+                                        <span class="build-move-card-stat-label">TYPE</span>
+                                        <span class="build-move-card-stat-value build-move-card-type-val">
+                                            @if($typeName)
+                                                <span class="type-badge {{ $typeInt !== null ? 'type-' . $typeInt : 'type-badge--dynamic' }}">{{ $typeName }}</span>
+                                            @else
+                                                —
+                                            @endif
+                                        </span>
                                     </div>
                                 </div>
                             </div>
