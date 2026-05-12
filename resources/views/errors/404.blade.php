@@ -30,23 +30,6 @@
     z-index: 1;
 }
 
-.void-spinda {
-    width: 180px;
-    height: 180px;
-    image-rendering: pixelated;
-    margin-bottom: 24px;
-    animation: void-spin 8s linear infinite;
-    opacity: 0.9;
-}
-
-@keyframes void-spin {
-    0%   { transform: rotate(0deg) scale(1); }
-    25%  { transform: rotate(5deg) scale(1.03); }
-    50%  { transform: rotate(0deg) scale(1); }
-    75%  { transform: rotate(-5deg) scale(1.03); }
-    100% { transform: rotate(0deg) scale(1); }
-}
-
 .void-404-num {
     font-size: 96px;
     font-weight: 800;
@@ -95,11 +78,6 @@
 
 <div class="void-404">
     <div class="void-content">
-        {{-- Spinda placeholder — drop spinda.png into public/images/ to activate --}}
-        @if(file_exists(public_path('images/spinda-404.png')))
-        <img src="/images/spinda-404.png" class="void-spinda" alt="Spinda">
-        @endif
-
         <div class="void-404-num">404</div>
         <div class="void-404-title">Lost in the Void</div>
         <p class="void-404-messages">{!! $msg !!}</p>
