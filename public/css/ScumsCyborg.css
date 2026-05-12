@@ -3685,24 +3685,29 @@ img { max-width: 100%; display: block; }
 
 .build-move-card-stats {
     display: flex;
-    gap: 0.75rem;
-    margin-top: 0.25rem;
+    gap: 0;
+    margin-top: 0.35rem;
+    flex-wrap: nowrap;
 }
 .build-move-card-stat {
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
+    flex: 1;
+    min-width: 0;
 }
 .build-move-card-stat-label {
     font-family: var(--font-mono);
-    font-size: 0.62rem;
+    font-size: 0.58rem;
     color: var(--dim);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 .build-move-card-stat-value {
     font-family: var(--font-mono);
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--text);
+    white-space: nowrap;
 }
