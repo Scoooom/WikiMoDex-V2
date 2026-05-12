@@ -109,8 +109,29 @@ class UserController extends Controller
                 return $this->deleteSave($username);
             case 'dlSave':
                 return $this->downloadSave($username);
+            case 'setTcColor':
+                return $this->setTcColor($request, $username);
             default:
                 return redirect('/u:' . $username . '.html');
         }
+    }
+
+    public function setTcColor(Request $request, $username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+        if (!$this->isOwner($user)) return redirect('/');
+
+        $allowed = ['blue', 'red', 'green', 'gold', 'purple', 'black'];
+        $color = $request->input('tc_color');
+        if (!in_array($color, $allowed)) $color = 'blue';
+
+        $user->tc_color = $color;
+        $user->save();
+
+        \Illuminate\Support\Facades\Artisan::call('cf:purge', [
+            '--url' => [rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html'],
+        ]);
+
+        return redirect('/u:' . $username . '.html')->with('success', 'Trainer card color updated!');
     }
 }
