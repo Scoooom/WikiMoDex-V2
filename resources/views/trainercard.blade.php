@@ -11,16 +11,31 @@
         echo '<div class="alert alert-danger">Trainer Card Error [0002] — Save file appears invalid or corrupt. Please re-upload your system save file, or DM scooom on Discord.</div>';
         return;
     }
-    $defeatedRivals  = $save->getDefeatedRivals();
-    $glitchUnlocks   = $save->getGlitchUnlocks();
-    $smittyUnlocks   = $save->getSmittyUnlocks();
-    $formUnlocks     = $save->getFormUnlocks();
+
+    $isOwner = Auth::check() && Auth::user()->id === $user->id && !request()->boolean('public');
+    $sections = $isOwner ? array_fill_keys(['rivals','core','mod','smitty','unismitty','submitted'], true) : $user->getTcSections();
+
+    $defeatedRivals = $save->getDefeatedRivals();
+    $glitchUnlocks  = $save->getGlitchUnlocks();
+    $smittyUnlocks  = $save->getSmittyUnlocks();
+    $formUnlocks    = $save->getFormUnlocks();
+
+    $modForms = collect($formUnlocks['modFormsUnlocked'])->map(function($unlock) {
+        $name = preg_replace('/(.*)_(.*)/', '$2', $unlock);
+        $name = str_replace(' ', '', $name);
+        return \App\Models\Glitch::where('name', $name)->first();
+    })->filter();
+
+    $uniSmitty = collect($formUnlocks['uniSmittyUnlocks'])->filter()->map(function($unlock) {
+        $name = preg_replace('/(.*?)_(.*)/', '$2', $unlock);
+        $name = str_replace(' ', '', $name);
+        return \App\Services\BuiltInService::loadSmitty($name);
+    })->filter();
 @endphp
 
 <style>
 .tc-grid { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
 .tc-section { margin-bottom: 20px; }
-.tc-section-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
 .tc-mon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
 .tc-mon-item { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 10px 8px; text-align: center; transition: border-color .15s; }
 .tc-mon-item:hover { border-color: var(--accent); }
@@ -36,9 +51,17 @@
 .rival-status.defeated { background: #4caf7d; }
 .rival-status.not-defeated { background: var(--dim); }
 .rival-name { font-size: 10px; color: var(--muted); }
+.tc-owner-notice { font-size: 12px; color: var(--muted); margin-bottom: 16px; display:flex; align-items:center; gap:8px; }
 </style>
 
 <div class="container mt-2">
+
+    @if($isOwner)
+    <div class="tc-owner-notice">
+        <span>👁 You're viewing your full trainer card. <a href="/trainercard:{{ $user->username }}.html?public=1" style="color:var(--accent)">Preview public view</a> · <a href="/settings.html" style="color:var(--accent)">Edit settings</a></span>
+    </div>
+    @endif
+
     <div class="tc-grid">
 
         {{-- Sidebar --}}
@@ -46,7 +69,10 @@
             <div class="card">
                 <div class="card-body" style="text-align:center">
                     <img src="{{ $user->getAvatarURL() }}" class="profile-avatar mb-3" alt="{{ $user->username }}">
-                    <div class="mon-name" style="font-size:18px">{{ $user->username }}</div>
+                    <div class="mon-name" style="font-size:18px">{{ $user->getDisplayName() }}</div>
+                    @if($user->pronouns)
+                    <div style="font-size:12px;color:var(--muted);margin-top:2px">{{ $user->pronouns }}</div>
+                    @endif
                     <div style="font-size:12px;color:var(--muted);margin-top:4px">Trainer Card</div>
                 </div>
             </div>
@@ -56,6 +82,7 @@
         <div>
 
             {{-- Rivals --}}
+            @if($sections['rivals'])
             <div class="card tc-section">
                 <div class="card-header">Rivals defeated</div>
                 <div class="card-body">
@@ -78,9 +105,10 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             {{-- Core Glitch Unlocks --}}
-            @if(count($glitchUnlocks) > 0)
+            @if($sections['core'] && count($glitchUnlocks) > 0)
             <div class="card tc-section">
                 <div class="card-header">Unlocked core glitches</div>
                 <div class="card-body">
@@ -99,14 +127,7 @@
             @endif
 
             {{-- Mod Glitch Unlocks --}}
-            @php
-                $modForms = collect($formUnlocks['modFormsUnlocked'])->map(function($unlock) {
-                    $name = preg_replace('/(.*)_(.*)/', '$2', $unlock);
-                    $name = str_replace(' ', '', $name);
-                    return \App\Models\Glitch::where('name', $name)->first();
-                })->filter();
-            @endphp
-            @if($modForms->count() > 0)
+            @if($sections['mod'] && $modForms->count() > 0)
             <div class="card tc-section">
                 <div class="card-header">Unlocked mod glitches</div>
                 <div class="card-body">
@@ -125,7 +146,7 @@
             @endif
 
             {{-- Smitty Form Unlocks --}}
-            @if(count($smittyUnlocks) > 0)
+            @if($sections['smitty'] && count($smittyUnlocks) > 0)
             <div class="card tc-section">
                 <div class="card-header">Unlocked SMITTY forms</div>
                 <div class="card-body">
@@ -141,8 +162,7 @@
                             <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:3px;margin-top:5px">
                                 @foreach($smittyItems as $item)
                                 <img src="/item-icon/{{ $item['icon'] }}.png"
-                                     alt="{{ $item['name'] }}"
-                                     title="{{ $item['name'] }}"
+                                     alt="{{ $item['name'] }}" title="{{ $item['name'] }}"
                                      style="width:20px;height:20px;image-rendering:pixelated"
                                      onerror="this.style.display='none'">
                                 @endforeach
@@ -156,14 +176,7 @@
             @endif
 
             {{-- UniSMITTY Unlocks --}}
-            @php
-                $uniSmitty = collect($formUnlocks['uniSmittyUnlocks'])->filter()->map(function($unlock) {
-                    $name = preg_replace('/(.*?)_(.*)/', '$2', $unlock);
-                    $name = str_replace(' ', '', $name);
-                    return \App\Services\BuiltInService::loadSmitty($name);
-                })->filter();
-            @endphp
-            @if($uniSmitty->count() > 0)
+            @if($sections['unismitty'] && $uniSmitty->count() > 0)
             <div class="card tc-section">
                 <div class="card-header">Unlocked UniSMITTY forms</div>
                 <div class="card-body">

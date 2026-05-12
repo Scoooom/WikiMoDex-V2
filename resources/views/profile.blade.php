@@ -17,10 +17,25 @@
             <div class="card mb-3">
                 <div class="card-body" style="text-align:center">
                     <img src="{{ $user->getAvatarURL() }}" class="profile-avatar mb-3" alt="{{ $user->username }}">
-                    <div class="mon-name" style="font-size:18px">{{ $user->username }}</div>
+                    <div class="mon-name" style="font-size:18px">{{ $user->getDisplayName() }}</div>
+                    @if($user->username !== $user->getDisplayName())
+                    <div style="font-size:11px;color:var(--muted);margin-top:2px">@{{ $user->username }}</div>
+                    @endif
+                    @if($user->pronouns)
+                    <div style="font-size:12px;color:var(--muted);margin-top:2px">{{ $user->pronouns }}</div>
+                    @endif
                     <div style="font-size:12px;color:var(--muted);margin-top:4px">
                         Joined {{ date('F Y', $user->join_date) }}
                     </div>
+                    @if($user->bio)
+                    <div style="font-size:13px;color:var(--text);margin-top:10px;line-height:1.5;text-align:left">{{ $user->bio }}</div>
+                    @endif
+
+                    @if($isOwner ?? false)
+                    <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+                        <a href="/settings.html" class="btn btn-secondary btn-sm">⚙ Settings</a>
+                    </div>
+                    @endif
 
                     @auth
                     <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
