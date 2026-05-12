@@ -100,8 +100,10 @@
                 {{-- Moves --}}
                 @if(!empty(array_filter($slot['moves'] ?? [])))
                 <div class="build-slot-section">
-                    <div class="build-slot-section-label">Moves</div>
-                    <div class="build-move-grid">
+                    <div class="build-slot-section-label build-slot-collapsible" onclick="toggleSection(this)">
+                        Moves <span class="build-slot-collapse-icon">▾</span>
+                    </div>
+                    <div class="build-move-grid build-slot-collapsible-body" style="display:none">
                         @foreach(array_filter($slot['moves'] ?? []) as $move)
                             @php
                                 $moveData = $moveCache->get($move);
@@ -185,14 +187,15 @@
                 {{-- Base Stats --}}
                 @if($displayStats)
                 <div class="build-slot-section">
-                    <div class="build-slot-section-label">
+                    <div class="build-slot-section-label build-slot-collapsible" onclick="toggleSection(this)">
                         Base Stats
                         @if(!empty($slot['alt_build_rank']))
                             <span style="color:var(--dim);font-weight:normal"> — Rank {{ $slot['alt_build_rank'] }}</span>
                         @endif
                         <span class="build-stat-bst">{{ array_sum(array_column($displayStats, 'value')) }} BST</span>
+                        <span class="build-slot-collapse-icon">▾</span>
                     </div>
-                    <div class="build-stat-bars">
+                    <div class="build-stat-bars build-slot-collapsible-body" style="display:none">
                         @foreach($displayStats as $stat)
                         <div class="build-stat-row">
                             <span class="build-stat-label {{ $stat['is_focus'] ? 'build-stat-focus' : '' }}">{{ $stat['label'] }}</span>
@@ -304,6 +307,16 @@ function copyBuildLink() {
         btn.textContent = '✓ Copied!';
         setTimeout(() => btn.textContent = orig, 1800);
     });
+}
+
+// ── Collapsible sections ─────────────────────────────────────────
+function toggleSection(label) {
+    const body = label.parentElement.querySelector('.build-slot-collapsible-body');
+    const icon = label.querySelector('.build-slot-collapse-icon');
+    if (!body) return;
+    const open = body.style.display !== 'none';
+    body.style.display = open ? 'none' : '';
+    if (icon) icon.textContent = open ? '▾' : '▴';
 }
 
 // ── Sprite rendering ──────────────────────────────────────────────

@@ -3735,3 +3735,19 @@ img { max-width: 100%; display: block; }
     font-size: 0.7rem;
     padding: 2px 7px;
 }
+
+/* ── Collapsible slot sections ── */
+.build-slot-collapsible {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.build-slot-collapsible:hover { color: var(--accent2); }
+.build-slot-collapse-icon {
+    font-size: 0.7rem;
+    color: var(--dim);
+    margin-left: 0.4rem;
+    transition: transform var(--transition);
+}
