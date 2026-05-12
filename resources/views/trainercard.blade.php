@@ -12,8 +12,8 @@
         return;
     }
 
-    $isOwner = Auth::check() && Auth::user()->id === $user->id && !request()->boolean('public');
-    $sections = $isOwner ? array_fill_keys(['rivals','core','mod','smitty','unismitty','submitted'], true) : $user->getTcSections();
+    $isOwner = false; // Always false server-side due to nosession — owner UI injected via JS
+    $sections = $user->getTcSections();
 
     $defeatedRivals = $save->getDefeatedRivals();
     $glitchUnlocks  = $save->getGlitchUnlocks();
@@ -56,11 +56,7 @@
 
 <div class="container mt-2">
 
-    @if($isOwner)
-    <div class="tc-owner-notice">
-        <span>👁 You're viewing your full trainer card. <a href="/trainercard:{{ $user->username }}.html?public=1" style="color:var(--accent)">Preview public view</a> · <a href="/settings.html" style="color:var(--accent)">Edit settings</a></span>
-    </div>
-    @endif
+    <div id="tc-owner-notice" style="display:none" class="tc-owner-notice"></div>
 
     <div class="tc-grid">
 
@@ -197,4 +193,15 @@
         </div>
     </div>
 </div>
+<script>
+fetch('/me.json', { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(me => {
+        if (!me.authed) return;
+        if (me.profile !== '/u:{{ $user->username }}.html') return;
+        const notice = document.getElementById('tc-owner-notice');
+        notice.innerHTML = `👁 You're viewing your full trainer card. <a href="/trainercard:{{ $user->username }}.html?public=1" style="color:var(--accent)">Preview public view</a> · <a href="/settings.html" style="color:var(--accent)">Edit settings</a> · <a href="/trainercard-img:{{ $user->username }}.png" target="_blank" style="color:var(--accent)">🖼 Share image</a>`;
+        notice.style.display = '';
+    });
+</script>
 @endsection
