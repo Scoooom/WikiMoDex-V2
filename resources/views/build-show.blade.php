@@ -49,7 +49,8 @@
             $effectiveVals = $slotStat['effective'] ?? null;
             $statError     = $slotStat['error'] ?? null;
             $statSource = $slotStat['source'] ?? null;
-            $slotTypes  = $slotStat['types'] ?? ['type1'=>null,'type2'=>null,'type1_name'=>null,'type2_name'=>null];
+            $slotTypes   = $slotStat['types'] ?? ['type1'=>null,'type2'=>null,'type1_name'=>null,'type2_name'=>null];
+            $slotPalette = $slotStat['palette'] ?? [];
             $statFocus  = '';
             if ($statSource === 'alt_build') {
                 $ab = \App\Models\AltBuild::where('name', $slot['species'])->first();
