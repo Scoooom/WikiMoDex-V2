@@ -3533,9 +3533,10 @@ img { max-width: 100%; display: block; }
     font-family: var(--font-mono);
     font-size: 0.72rem;
     color: var(--muted);
-    width: 30px;
+    min-width: 55px;
     text-align: right;
     flex-shrink: 0;
+    white-space: nowrap;
 }
 .build-stat-error {
     font-size: 0.82rem;
@@ -3765,18 +3766,4 @@ img { max-width: 100%; display: block; }
 }
 
 /* ── Effective stat range bar ── */
-.build-stat-bar--range {
-    position: relative;
-    opacity: 0.5;
-}
-.build-stat-bar--range::after {
-    content: '';
-    position: absolute;
-    left: var(--bar-min-pct);
-    top: 0;
-    bottom: 0;
-    right: 0;
-    background: inherit;
-    opacity: 2; /* restore to full opacity for the max portion */
-    border-radius: inherit;
-}
+.build-stat-bar--range { opacity: 0.7; }
