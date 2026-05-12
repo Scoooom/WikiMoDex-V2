@@ -208,7 +208,15 @@ Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {
     return response()->file($outPath, ['Content-Type' => 'image/png', 'Cache-Control' => 'public, max-age=3600']);
 });
 
-// ── Item icons ───────────────────────────────────────────────────
+Route::get('/pokevoid-title-bg/{n}.png', function ($n) {
+    if (!in_array($n, ['0', '1'])) abort(404);
+    $path = base_path('pokevoid/public/images/title_bg' . ($n === '0' ? '' : $n) . '.png');
+    if (!file_exists($path)) abort(404);
+    return response()->file($path, [
+        'Content-Type'  => 'image/png',
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->middleware('nosession')->where('n', '[01]');
 Route::get('/item-icon/{name}.png', function (string $name) {
     // Sanitise — only allow alphanumeric + underscore
     if (!preg_match('/^[a-zA-Z0-9_]+$/', $name)) abort(404);
