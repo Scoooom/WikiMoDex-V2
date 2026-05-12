@@ -218,11 +218,18 @@
                         @if(!empty($item['name']))
                         <div class="build-item-chip">
                             @php
-                                $gameItem = $items->get($item['key'] ?? '');
+                                $gameItem  = $items->get($item['key'] ?? '');
                                 $tierColor = $gameItem ? \App\Models\GameItem::TIER_COLORS[$gameItem->tier] ?? 'var(--dim)' : 'var(--dim)';
-                                $params = $item['params'] ?? [];
+                                $iconUrl   = $gameItem?->getIconUrl();
+                                $params    = $item['params'] ?? [];
                             @endphp
-                            <span class="build-item-dot" style="background:{{ $tierColor }}"></span>
+                            @if($iconUrl)
+                                <img src="{{ $iconUrl }}" class="build-item-icon" alt=""
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display=''">
+                                <span class="build-item-dot" style="background:{{ $tierColor }};display:none"></span>
+                            @else
+                                <span class="build-item-dot" style="background:{{ $tierColor }}"></span>
+                            @endif
                             <span class="build-item-name">{{ $item['name'] }}</span>
                             @if(($item['stack'] ?? 1) > 1)
                                 <span class="build-item-stack">×{{ $item['stack'] }}</span>
