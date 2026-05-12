@@ -49,20 +49,25 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Auto-purge when glitches are uploaded or deleted
-        $glitchUrls = function() {
+        $glitchUrls = function(\App\Models\Glitch $glitch) {
             $base = rtrim(config('services.cloudflare.base_url'), '/');
-            return [
+            $urls = [
                 $base . '/',
                 $base . '/gallery.html',
+                $base . '/galleryCore.html',
             ];
+            if ($glitch->creator) {
+                $urls[] = $base . '/u:' . $glitch->creator->username . '.html';
+            }
+            return $urls;
         };
 
-        \App\Models\Glitch::created(function () use ($glitchUrls) {
-            \Illuminate\Support\Facades\Artisan::call('cf:purge', ['--url' => $glitchUrls()]);
+        \App\Models\Glitch::created(function (\App\Models\Glitch $glitch) use ($glitchUrls) {
+            \Illuminate\Support\Facades\Artisan::call('cf:purge', ['--url' => $glitchUrls($glitch)]);
         });
 
-        \App\Models\Glitch::deleted(function () use ($glitchUrls) {
-            \Illuminate\Support\Facades\Artisan::call('cf:purge', ['--url' => $glitchUrls()]);
+        \App\Models\Glitch::deleted(function (\App\Models\Glitch $glitch) use ($glitchUrls) {
+            \Illuminate\Support\Facades\Artisan::call('cf:purge', ['--url' => $glitchUrls($glitch)]);
         });
     }
 }
