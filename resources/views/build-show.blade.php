@@ -65,9 +65,17 @@
             <div class="build-slot-header">
                 <div class="build-slot-sprite-wrap">
                     @if(!empty($slot['dex_number']))
+                        @php
+                            // Some pokemon have type-suffixed sprites (Arceus=493, Silvally=773)
+                            $typeSuffixDex = [493, 773];
+                            $spriteType = in_array((int)$slot['dex_number'], $typeSuffixDex)
+                                ? strtolower($slotTypes['type1_name'] ?? 'normal')
+                                : null;
+                        @endphp
                         <canvas class="build-slot-sprite build-slot-sprite--canvas"
                                 data-dex="{{ $slot['dex_number'] }}"
                                 data-palette="{{ json_encode($slotPalette) }}"
+                                @if($spriteType) data-type="{{ $spriteType }}" @endif
                                 width="80" height="80"></canvas>
                     @elseif($slotGlitchId)
                         <img
@@ -478,10 +486,13 @@ function toggleSection(label) {
     }
 
     document.querySelectorAll('.build-slot-sprite--canvas').forEach(async canvas => {
-        const dex     = canvas.dataset.dex;
-        const palette = JSON.parse(canvas.dataset.palette || '[]');
+        const dex      = canvas.dataset.dex;
+        const typeStr  = canvas.dataset.type || null;
+        const palette  = JSON.parse(canvas.dataset.palette || '[]');
         if (!dex) return;
-        const frame = await extractFirstFrame(dex);
+        // Some pokemon (Arceus=493, Silvally=773) have type-suffixed sprites
+        const spriteKey = typeStr ? `${dex}-${typeStr}` : dex;
+        const frame = await extractFirstFrame(spriteKey);
         if (!frame) { canvas.style.display = 'none'; return; }
         const ctx   = canvas.getContext('2d', { willReadFrequently: palette.length > 0 });
         const scale = Math.min(canvas.width / frame.width, canvas.height / frame.height);
