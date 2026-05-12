@@ -11,7 +11,8 @@
             <h1 class="wiki-page-title">Community Builds</h1>
             <p class="wiki-page-lead">Team builds shared by the PokéVoid community. Submit yours to help others climb.</p>
         </div>
-        <div id="builds-header-actions" style="display:none">
+        <div id="builds-header-actions" style="display:none;gap:0.5rem;display:none;align-items:center">
+            <a href="/builds/import.html" class="btn-secondary">⬆ Import Save</a>
             <a href="/builds/new.html" class="btn-primary">+ Submit Build</a>
         </div>
     </div>

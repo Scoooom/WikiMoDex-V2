@@ -215,6 +215,12 @@ Route::get('/move-search.json', [App\Http\Controllers\MoveSearchController::clas
 Route::get('/pokemon-search.json', [App\Http\Controllers\PokemonSearchController::class, 'search'])
     ->middleware('cache:no-store');
 
+// ── Build Import ─────────────────────────────────────────────────
+use App\Http\Controllers\BuildImportController;
+Route::get('/builds/import.html',   [BuildImportController::class, 'index'])->middleware('cache:no-store');
+Route::post('/builds/import',       [BuildImportController::class, 'preview']);
+Route::post('/builds/import/create',[BuildImportController::class, 'create']);
+
 // ── Community Builds ──────────────────────────────────────────────
 use App\Http\Controllers\BuildController;
 
