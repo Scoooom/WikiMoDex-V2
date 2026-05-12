@@ -200,6 +200,8 @@ class UserController extends Controller
 
         return redirect('/settings.html')->with('success', 'Settings saved!');
     }
+
+    public function setTcColor(Request $request, $username)
     {
         $user = User::where('username', $username)->firstOrFail();
         if (!$this->isOwner($user)) return redirect('/');
