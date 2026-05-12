@@ -167,8 +167,9 @@ class StatService
             // Use the alt build's own types when defined; fall back to the base pokemon only for unset slots
             $core = CorePokemon::where('dex_number', $altBuild->dex_number)->where('form_key', '')->first()
                  ?? CorePokemon::where('dex_number', $altBuild->dex_number)->first();
-            $dbType1 = $altBuild->type1 ?? $core?->type1;
-            $dbType2 = $altBuild->type2 ?? $core?->type2;
+            // alt_builds stores types as strings (e.g. "Fire"); core_pokemon stores ints
+            $dbType1 = $altBuild->type1 ? ($nameToInt[$altBuild->type1] ?? null) : $core?->type1;
+            $dbType2 = $altBuild->type2 ? ($nameToInt[$altBuild->type2] ?? null) : $core?->type2;
         } else {
             $core = CorePokemon::where('name', $species)->first();
             if ($core) { $dbType1 = $core->type1; $dbType2 = $core->type2; }
