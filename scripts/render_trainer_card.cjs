@@ -77,6 +77,14 @@ body { background:transparent; width:480px; }
     object-fit:cover;
 }
 
+.tc-fav-mon {
+    margin-top:8px; text-align:center;
+}
+.tc-fav-mon img {
+    width:64px; height:64px; image-rendering:pixelated;
+    object-fit:contain;
+}
+
 .tc-rivals-section {
     background:${s.header};
     padding:10px 14px;
@@ -128,8 +136,12 @@ body { background:transparent; width:480px; }
                 <span class="tc-field-value">${data.submittedCount}</span>
             </div>
         </div>
-        <div>
+        <div style="display:flex;flex-direction:column;align-items:center">
             <img class="tc-avatar" src="${data.avatarUrl}" alt="${data.username}">
+            ${data.favMonUrl ? `
+            <div class="tc-fav-mon">
+                <img src="${data.favMonUrl}" alt="${data.favMonName}" onerror="this.style.display='none'">
+            </div>` : ''}
         </div>
     </div>
     <div class="tc-rivals-section">

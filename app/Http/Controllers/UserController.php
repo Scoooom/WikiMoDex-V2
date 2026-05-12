@@ -273,10 +273,26 @@ class UserController extends Controller
                 $avatarUrl = rtrim(config('services.cloudflare.base_url'), '/') . $avatarUrl;
             }
 
+            // Resolve favourite mon sprite URL
+            $favMonUrl = null;
+            if ($user->tc_favorite_mon) {
+                $name = $user->tc_favorite_mon;
+                // Check mod glitch first
+                $glitch = \App\Models\Glitch::where('name', $name)->first();
+                if ($glitch) {
+                    $favMonUrl = $baseUrl . '/front:' . $glitch->id . '.png';
+                } else {
+                    // Core glitch or smitty — use cFront route
+                    $favMonUrl = $baseUrl . '/cFront:' . urlencode($name) . '.png';
+                }
+            }
+
             $cardData = json_encode([
                 'username'      => $user->username,
                 'userId'        => $user->id,
                 'avatarUrl'     => $avatarUrl,
+                'favMonUrl'     => $favMonUrl,
+                'favMonName'    => $user->tc_favorite_mon,
                 'color'         => $user->tc_color ?? 'maroon',
                 'glitchCount'   => count($glitchUnlocks) + $modCount,
                 'smittyCount'   => count($smittyUnlocks) + $uniSmittyCount,
