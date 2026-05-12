@@ -36,7 +36,16 @@ class UserController extends Controller
         }
 
         $file = $request->file('saveFile');
-        $decrypt = PrsvService::decrypt($file->getRealPath());
+
+        try {
+            $decrypt = PrsvService::decrypt($file->getRealPath());
+        } catch (\Throwable $e) {
+            return redirect('/u:' . $username . '.html')->with('error', 'Invalid save file — could not decrypt.');
+        }
+
+        if (empty($decrypt->systemData)) {
+            return redirect('/u:' . $username . '.html')->with('error', 'Invalid save file — this looks like a session save, not a system save. Please upload your system save file.');
+        }
 
         $user->raw_prsv = file_get_contents($file->getRealPath());
         $user->b64_prsv = base64_encode(json_encode($decrypt));

@@ -7,6 +7,10 @@
         echo '<div class="alert alert-danger">Trainer Card Error [0001] — Please DM scooom on Discord if you encountered this page in error.</div>';
         return;
     }
+    if ($save->getSystemData() === null) {
+        echo '<div class="alert alert-danger">Trainer Card Error [0002] — Save file appears invalid or corrupt. Please re-upload your system save file, or DM scooom on Discord.</div>';
+        return;
+    }
     $defeatedRivals  = $save->getDefeatedRivals();
     $glitchUnlocks   = $save->getGlitchUnlocks();
     $smittyUnlocks   = $save->getSmittyUnlocks();
