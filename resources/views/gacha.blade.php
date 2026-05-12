@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title', 'Gacha Simulator')
 
 @push('head')
 <script>

@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title', $user->getDisplayName() . "'s Profile")
 
 @section('content')
 <div class="container">

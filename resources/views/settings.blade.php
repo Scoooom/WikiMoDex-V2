@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title', 'Settings')
 
 @section('content')
 <div class="container mt-2" style="max-width:600px">

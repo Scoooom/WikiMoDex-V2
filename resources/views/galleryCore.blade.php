@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title', 'Core Glitch Gallery')
 
 @section('content')
 <div class="container">

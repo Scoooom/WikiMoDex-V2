@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title', 'Mod Glitch Gallery')
 
 @section('content')
 <div class="container">

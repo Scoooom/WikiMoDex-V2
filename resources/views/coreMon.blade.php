@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title', ucwords($mon->name) . ' — Core Glitch')
 
 @push('head')
 <meta property="og:type" content="website">

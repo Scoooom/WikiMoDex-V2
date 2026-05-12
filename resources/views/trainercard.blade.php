@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title', $user->getDisplayName() . "'s Trainer Card")
 
 @section('content')
 @php

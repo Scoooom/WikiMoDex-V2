@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title', 'SMITTY Pokémon')
 
 @section('content')
 <div class="container">
