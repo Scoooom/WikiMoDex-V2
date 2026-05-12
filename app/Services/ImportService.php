@@ -368,21 +368,22 @@ class ImportService
 
     private static function resolvePassive(array $mods, array $pokemon = []): ?string
     {
-        // Alt build pokemon store the passive as an ability int on the party object itself
+        // ANY_PASSIVE_ABILITY modifier = player has a passive override item equipped (takes priority)
+        foreach ($mods as $mod) {
+            if ($mod['typeId'] === 'ANY_PASSIVE_ABILITY') {
+                $name = $mod['typePregenArgs'][0]['name'] ?? null;
+                if ($name) return $name;
+            }
+        }
+
+        // altPassiveForRun = the passive assigned by the run for this pokemon (all species, not just alt builds)
         if (isset($pokemon['altPassiveForRun'])) {
             $key = self::resolveAbilityKey((int)$pokemon['altPassiveForRun']);
             $ab  = Ability::where('enum_name', $key)->first();
             if ($ab) return $ab->name;
         }
 
-        // Regular passive — last ANY_PASSIVE_ABILITY modifier wins
-        $passive = null;
-        foreach ($mods as $mod) {
-            if ($mod['typeId'] === 'ANY_PASSIVE_ABILITY') {
-                $passive = $mod['typePregenArgs'][0]['name'] ?? null;
-            }
-        }
-        return $passive;
+        return null;
     }
 
     private static function resolveAbilityKey(int $id): string
