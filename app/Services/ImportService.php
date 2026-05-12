@@ -77,6 +77,10 @@ class ImportService
             $data = json_decode(base64_decode($content), true);
         }
         if (!$data) {
+            // Try decrypt
+            $data = json_decode(\App\Services\PrsvService::decrypt($path,true), true); //json_decode(base64_decode($content), true);
+        }
+        if (!$data) {
             throw new \RuntimeException('Could not parse PRSV file.');
         }
 
@@ -126,6 +130,12 @@ class ImportService
     {
         $content = file_get_contents($path);
         $data    = json_decode($content, true) ?? json_decode(base64_decode($content), true);
+
+        if (!$data) {
+            // Try decrypt
+            $data = json_decode(\App\Services\PrsvService::decrypt($path,true), true); //json_decode(base64_decode($content), true);
+        }
+
 
         if (!$data) throw new \RuntimeException('Could not parse PRSV file.');
 

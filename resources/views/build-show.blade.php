@@ -94,7 +94,7 @@
                     @endif
                 </div>
                 <div class="build-slot-info">
-                    <div class="build-slot-species">{{ $slot['species'] }}</div>
+                    <div class="build-slot-species">{{ $slot['species'] }} Lv. {{ $slot['level'] }}</div>
                     @if($slotTypes['type1'] !== null)
                     <div class="build-slot-types-row">
                         <span class="type-badge type-{{ $slotTypes['type1'] }}">{{ $slotTypes['type1_name'] }}</span>
@@ -216,10 +216,16 @@
                 @endif
 
                 {{-- Items --}}
-                @if(!empty($slot['items']))
                 <div class="build-slot-section">
-                    <div class="build-slot-section-label">Held Items</div>
+                    <div class="build-slot-section-label build-slot-collapsible" onclick="toggleSection(this)">
+                        Help Items <span class="build-slot-collapse-icon">▾</span>
+                    </div>  
+                    <div class="build-move-grid build-slot-collapsible-body" style="display:none">
+
                     <div class="build-slot-items">
+                        @if(empty($slot['items']))
+                          <div class="build-item-chip">None</div>
+                        @else
                         @foreach($slot['items'] as $item)
                         @if(!empty($item['name']))
                         <div class="build-item-chip">
@@ -252,15 +258,19 @@
                         </div>
                         @endif
                         @endforeach
-                    </div>
+                        @endif
+                    </div></div>
                 </div>
-                @endif
 
                 {{-- Notes --}}
-                @if(!empty($slot['notes']))
-                <div class="build-slot-notes">{{ $slot['notes'] }}</div>
-                @endif
-
+                  <div class="build-slot-section">
+                    <div class="build-slot-section-label build-slot-collapsible" onclick="toggleSection(this)">
+                        Notes <span class="build-slot-collapse-icon">▾</span>
+                    </div>  
+                    <div class="build-move-grid build-slot-collapsible-body" style="display:none">
+                     <div class="build-slot-notes">{{ !empty($slot['notes']) ? slot['notes'] : 'None' }}</div>
+                   </div>
+                 </div>
                 {{-- Base Stats + Effective Stats --}}
                 @if($displayStats)
                 @php
