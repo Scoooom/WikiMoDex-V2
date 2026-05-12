@@ -101,45 +101,37 @@
                 @if(!empty(array_filter($slot['moves'] ?? [])))
                 <div class="build-slot-section">
                     <div class="build-slot-section-label">Moves</div>
-                    <div class="build-slot-moves">
+                    <div class="build-move-grid">
                         @foreach(array_filter($slot['moves'] ?? []) as $move)
                             @php
                                 $moveData = $moveCache->get($move);
-                                $catIcon  = match($moveData?->category ?? '') {
-                                    'physical' => '⚔',
-                                    'special'  => '✦',
-                                    'status'   => '◎',
-                                    default    => '',
-                                };
                                 $typeInt  = $moveData?->type ?? null;
-                                $typeClass = $typeInt !== null ? 'build-move-pill--typed type-' . $typeInt : '';
-                                $tooltip  = '';
-                                if ($moveData) {
-                                    $pwr = $moveData->power ?? '—';
-                                    $acc = $moveData->accuracy ?? '—';
-                                    $pp  = $moveData->pp ?? '—';
-                                    $isDyn = $moveData->is_dynamic_type ? ' (dynamic)' : '';
-                                    $tooltip = ($moveData->type_name ?? '?') . $isDyn . ' · ' . ucfirst($moveData->category ?? '?') . ' · Pwr:' . $pwr . ' Acc:' . $acc . ' PP:' . $pp;
-                                }
+                                $typeName = $moveData?->is_dynamic_type
+                                    ? 'Dynamic'
+                                    : ($moveData?->type_name ?? null);
+                                $typeInt  = $moveData?->is_dynamic_type ? null : $typeInt;
                             @endphp
-                            <div class="build-move-wrap" @if($tooltip) title="{{ $tooltip }}" @endif>
-                                <span class="build-move-pill {{ $typeClass }}">
-                                    @if($catIcon)<span class="build-move-cat-icon">{{ $catIcon }}</span>@endif
-                                    {{ $move }}
-                                </span>
-                                @if($moveData)
-                                <div class="build-move-stats">
-                                    <span class="build-move-stat-type {{ $typeInt !== null ? 'type-' . $typeInt : '' }}">
-                                        {{ $moveData->type_name ?? '?' }}{{ $moveData->is_dynamic_type ? '*' : '' }}
-                                    </span>
-                                    <span class="build-move-stat-sep">·</span>
-                                    <span class="build-move-stat">Pwr: {{ $moveData->power ?? '—' }}</span>
-                                    <span class="build-move-stat-sep">·</span>
-                                    <span class="build-move-stat">Acc: {{ $moveData->accuracy ? $moveData->accuracy . '%' : '—' }}</span>
-                                    <span class="build-move-stat-sep">·</span>
-                                    <span class="build-move-stat">PP: {{ $moveData->pp ?? '—' }}</span>
+                            <div class="build-move-card {{ $typeInt !== null ? 'type-bg-' . $typeInt : 'type-bg-none' }}">
+                                <div class="build-move-card-name {{ $typeInt !== null ? 'type-text-' . $typeInt : '' }}">{{ $move }}</div>
+                                @if($typeName)
+                                <div class="build-move-card-type">
+                                    <span class="type-badge {{ $typeInt !== null ? 'type-' . $typeInt : 'type-badge--dynamic' }}">{{ $typeName }}</span>
                                 </div>
                                 @endif
+                                <div class="build-move-card-stats">
+                                    <div class="build-move-card-stat">
+                                        <span class="build-move-card-stat-label">POWER</span>
+                                        <span class="build-move-card-stat-value">{{ $moveData?->power ?? '—' }}</span>
+                                    </div>
+                                    <div class="build-move-card-stat">
+                                        <span class="build-move-card-stat-label">ACCURACY</span>
+                                        <span class="build-move-card-stat-value">{{ $moveData?->accuracy ? $moveData->accuracy . '%' : '—' }}</span>
+                                    </div>
+                                    <div class="build-move-card-stat">
+                                        <span class="build-move-card-stat-label">PP</span>
+                                        <span class="build-move-card-stat-value">{{ $moveData?->pp ?? '—' }}</span>
+                                    </div>
+                                </div>
                             </div>
                         @endforeach
                     </div>

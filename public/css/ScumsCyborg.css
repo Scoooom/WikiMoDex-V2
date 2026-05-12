@@ -3607,3 +3607,102 @@ img { max-width: 100%; display: block; }
     height: 80px;
     image-rendering: pixelated;
 }
+
+/* ── Build move cards ── */
+.build-move-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+}
+@media (max-width: 420px) { .build-move-grid { grid-template-columns: 1fr; } }
+
+.build-move-card {
+    background: var(--card2);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 0.9rem 0.65rem;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    position: relative;
+    overflow: hidden;
+}
+/* Subtle type-tinted background */
+.build-move-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.08;
+    pointer-events: none;
+}
+/* Generate type background tints using the type colours */
+.type-bg-0::before  { background: #d0d078; }
+.type-bg-1::before  { background: #e06858; }
+.type-bg-2::before  { background: #85b0f5; }
+.type-bg-3::before  { background: #c07ec0; }
+.type-bg-4::before  { background: #deb868; }
+.type-bg-5::before  { background: #c8a848; }
+.type-bg-6::before  { background: #a8b820; }
+.type-bg-7::before  { background: #9a7ec8; }
+.type-bg-8::before  { background: #b8b8d0; }
+.type-bg-9::before  { background: #f08030; }
+.type-bg-10::before { background: #7ab4f5; }
+.type-bg-11::before { background: #78c850; }
+.type-bg-12::before { background: #f0c030; }
+.type-bg-13::before { background: #f85888; }
+.type-bg-14::before { background: #98d8d8; }
+.type-bg-15::before { background: #9470f0; }
+.type-bg-16::before { background: #907060; }
+.type-bg-17::before { background: #ee99ac; }
+.type-bg-20::before { background: #a8e6cf; }
+.type-bg-21::before { background: #ffaaa5; }
+
+.build-move-card-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+}
+/* Type-tinted name colour */
+.type-text-0  { color: #d0d078; } .type-text-1  { color: #e06858; }
+.type-text-2  { color: #85b0f5; } .type-text-3  { color: #c07ec0; }
+.type-text-4  { color: #deb868; } .type-text-5  { color: #c8a848; }
+.type-text-6  { color: #a8b820; } .type-text-7  { color: #9a7ec8; }
+.type-text-8  { color: #b8b8d0; } .type-text-9  { color: #f08030; }
+.type-text-10 { color: #7ab4f5; } .type-text-11 { color: #78c850; }
+.type-text-12 { color: #f0c030; } .type-text-13 { color: #f85888; }
+.type-text-14 { color: #98d8d8; } .type-text-15 { color: #9470f0; }
+.type-text-16 { color: #907060; } .type-text-17 { color: #ee99ac; }
+.type-text-20 { color: #a8e6cf; } .type-text-21 { color: #ffaaa5; }
+
+.build-move-card-type { margin-bottom: 0.1rem; }
+.type-badge--dynamic {
+    background: rgba(255,255,255,0.08);
+    color: var(--dim);
+    border: 1px dashed var(--border2);
+}
+
+.build-move-card-stats {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+}
+.build-move-card-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+.build-move-card-stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--dim);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.build-move-card-stat-value {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+}
