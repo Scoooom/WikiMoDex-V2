@@ -42,6 +42,7 @@ const input = document.getElementById('prsvInput');
 const selected = document.getElementById('selectedFile');
 
 drop.addEventListener('click', () => input.click());
+input.addEventListener('click', e => e.stopPropagation());
 drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragging'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('dragging'));
 drop.addEventListener('drop', e => {
