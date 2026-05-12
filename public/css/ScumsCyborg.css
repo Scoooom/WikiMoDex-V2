@@ -3156,6 +3156,15 @@ img { max-width: 100%; display: block; }
 .build-slot-info { flex: 1; min-width: 0; }
 .build-slot-species { font-weight: 700; font-size: 1.05rem; color: var(--accent3); }
 .build-slot-nickname { font-size: 0.8rem; color: var(--text2); font-style: italic; margin-top: 0.1rem; }
+.build-slot-gender { font-size: 0.9rem; margin-left: 0.3rem; }
+.build-slot-gender--male { color: #6ab0ff; }
+.build-slot-gender--female { color: #ff8ab0; }
+.build-slot-meta-badges { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.35rem; }
+.build-slot-badge { font-size: 0.7rem; padding: 0.15rem 0.45rem; border-radius: 999px; font-weight: 600; letter-spacing: 0.02em; }
+.build-slot-badge--shiny { background: rgba(255,220,50,0.15); color: #ffd83a; border: 1px solid rgba(255,220,50,0.3); }
+.build-slot-badge--pokerus { background: rgba(120,80,200,0.15); color: #b07fff; border: 1px solid rgba(120,80,200,0.3); }
+.build-slot-badge--pokeball { background: rgba(255,255,255,0.07); color: var(--text2); border: 1px solid rgba(255,255,255,0.12); }
+.build-slot-badge--biome { background: rgba(80,180,120,0.12); color: #7dd4a8; border: 1px solid rgba(80,180,120,0.25); }
 .build-slot-ability { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }
 .build-slot-ability span { color: var(--text); }
 .build-slot-nature { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }

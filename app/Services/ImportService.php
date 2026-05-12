@@ -192,8 +192,8 @@ class ImportService
                 if ($name) $moves[] = $name;
             }
 
-            // Ability — check ANY_ABILITY modifier first, fall back to abilityIndex
-            $ability = self::resolveAbility($speciesInt, (int)($p['abilityIndex'] ?? 0), $pMods);
+            // Ability — check ANY_ABILITY modifier first, then alt build abilities, then base species
+            $ability = self::resolveAbility($speciesInt, (int)($p['abilityIndex'] ?? 0), $pMods, $p);
 
             // Passive — altPassiveForRun on the pokemon object (alt builds) or ANY_PASSIVE_ABILITY modifier
             $passive = self::resolvePassive($pMods, $p);
@@ -224,6 +224,12 @@ class ImportService
                 'moves'           => $moves,
                 'items'           => $items,
                 'notes'           => '',
+                'shiny'           => (bool)($p['shiny'] ?? false),
+                'variant'         => (int)($p['variant'] ?? 0),
+                'gender'          => isset($p['gender']) && $p['gender'] !== -1 ? (int)$p['gender'] : null,
+                'pokeball'        => (int)($p['pokeball'] ?? 0),
+                'met_biome'       => isset($p['metBiome']) && $p['metBiome'] !== -1 ? (int)$p['metBiome'] : null,
+                'pokerus'         => (bool)($p['pokerus'] ?? false),
             ];
             if ($altBuildRank !== null) {
                 $entry['alt_build_rank'] = $altBuildRank;
@@ -319,7 +325,7 @@ class ImportService
         return $map[$id] ?? 'NONE';
     }
 
-    private static function resolveAbility(int $species, int $abilityIndex, array $mods): ?string
+    private static function resolveAbility(int $species, int $abilityIndex, array $mods, array $pokemon = []): ?string
     {
         // ANY_ABILITY modifier overrides abilityIndex
         foreach ($mods as $mod) {
@@ -332,7 +338,21 @@ class ImportService
             }
         }
 
-        // Fall back to abilityIndex on the species
+        // For alt build pokemon, use the alt build's own ability list
+        $buildId = $pokemon['altBuildId'] ?? null;
+        if ($buildId) {
+            $altBuild = \App\Models\AltBuild::where('build_id', strtolower($buildId))->first();
+            if ($altBuild) {
+                return match($abilityIndex) {
+                    0 => $altBuild->ability1,
+                    1 => $altBuild->ability2,
+                    2 => $altBuild->ability3,
+                    default => $altBuild->ability1,
+                };
+            }
+        }
+
+        // Fall back to abilityIndex on the base species
         $key  = self::resolveSpeciesKey($species);
         $core = CorePokemon::where('species_key', $key)->where('form_key', '')->first()
              ?? CorePokemon::where('dex_number', $species)->first();

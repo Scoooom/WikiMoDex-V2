@@ -75,6 +75,8 @@
                         <canvas class="build-slot-sprite build-slot-sprite--canvas"
                                 data-dex="{{ $slot['dex_number'] }}"
                                 data-palette="{{ json_encode($slotPalette) }}"
+                                data-shiny="{{ !empty($slot['shiny']) ? '1' : '0' }}"
+                                data-variant="{{ $slot['variant'] ?? 0 }}"
                                 @if($spriteType) data-type="{{ $spriteType }}" @endif
                                 width="80" height="80"></canvas>
                     @elseif($slotGlitchId)
@@ -94,10 +96,33 @@
                     @endif
                 </div>
                 <div class="build-slot-info">
-                    <div class="build-slot-species">{{ $slot['species'] }} Lv. {{ $slot['level'] }}</div>
+                    <div class="build-slot-species">
+                        {{ $slot['species'] }} Lv. {{ $slot['level'] }}
+                        @if(isset($slot['gender']) && $slot['gender'] === 0) <span class="build-slot-gender build-slot-gender--male">♂</span>
+                        @elseif(isset($slot['gender']) && $slot['gender'] === 1) <span class="build-slot-gender build-slot-gender--female">♀</span>
+                        @endif
+                    </div>
                     @if(!empty($slot['nickname']))
                     <div class="build-slot-nickname">&ldquo;{{ $slot['nickname'] }}&rdquo;</div>
                     @endif
+                    @php
+                        $pokeballNames = ['Poké Ball','Great Ball','Ultra Ball','Master Ball','Cherish Ball','Premier Ball','Friend Ball','Luxury Ball','Heal Ball','Quick Ball','Timer Ball','Dusk Ball','Nest Ball','Net Ball','Dive Ball','Fast Ball','Level Ball','Lure Ball','Moon Ball','Love Ball','Heavy Ball','Dream Ball'];
+                        $biomeNames = ['Town','Plains','Grass','Tall Grass','Metro','Forest','Sea','Swamp','Beach','Lake','Pond','Mountain','Badlands','Cave','Desert','Ice Cave','Meadow','Power Plant','Volcano','Graveyard','Dojo','Factory','Ruins','Wasteland','Abyss','Space','Jungle','Laboratory'];
+                    @endphp
+                    <div class="build-slot-meta-badges">
+                        @if(!empty($slot['shiny']))
+                            <span class="build-slot-badge build-slot-badge--shiny">✨ Shiny</span>
+                        @endif
+                        @if(!empty($slot['pokerus']))
+                            <span class="build-slot-badge build-slot-badge--pokerus">🦠 Pokérus</span>
+                        @endif
+                        @if(isset($slot['pokeball']) && isset($pokeballNames[$slot['pokeball']]))
+                            <span class="build-slot-badge build-slot-badge--pokeball">{{ $pokeballNames[$slot['pokeball']] }}</span>
+                        @endif
+                        @if(isset($slot['met_biome']) && isset($biomeNames[$slot['met_biome']]))
+                            <span class="build-slot-badge build-slot-badge--biome">Met: {{ $biomeNames[$slot['met_biome']] }}</span>
+                        @endif
+                    </div>
                     @if($slotTypes['type1'] !== null)
                     <div class="build-slot-types-row">
                         <span class="type-badge type-{{ $slotTypes['type1'] }}">{{ $slotTypes['type1_name'] }}</span>
@@ -452,7 +477,7 @@ function toggleSection(label) {
 
 // ── Sprite rendering ──────────────────────────────────────────────
 (function() {
-    async function extractFirstFrame(dex) {
+    async function extractFirstFrame(dex, shiny = false, variant = 0) {
         return new Promise(resolve => {
             const img = new Image();
             img.crossOrigin = 'anonymous';
@@ -461,7 +486,10 @@ function toggleSection(label) {
                 tmp.width = img.naturalWidth; tmp.height = img.naturalHeight;
                 const tctx = tmp.getContext('2d', { willReadFrequently: true });
                 tctx.drawImage(img, 0, 0);
-                fetch(`/pokevoid-atlas/${dex}.json`)
+                const atlasUrl = shiny
+                    ? `/pokevoid-atlas-shiny/${dex}/${variant}.json`
+                    : `/pokevoid-atlas/${dex}.json`;
+                fetch(atlasUrl)
                     .then(r => r.json())
                     .then(atlas => {
                         const frame = atlas.textures[0].frames[0];
@@ -475,8 +503,18 @@ function toggleSection(label) {
                     })
                     .catch(() => resolve(tmp));
             };
-            img.onerror = () => resolve(null);
-            img.src = `/pokevoid-sprites/${dex}.png`;
+            img.onerror = () => {
+                // Shiny variant not found — fall back to base shiny (variant 0)
+                if (shiny && variant > 0) {
+                    extractFirstFrame(dex, true, 0).then(resolve);
+                } else {
+                    resolve(null);
+                }
+            };
+            const suffix = shiny ? '_'.repeat(variant) : '';
+            img.src = shiny
+                ? `/pokevoid-sprites/shiny/${dex}${suffix}.png`
+                : `/pokevoid-sprites/${dex}.png`;
         });
     }
 
@@ -501,13 +539,15 @@ function toggleSection(label) {
     }
 
     document.querySelectorAll('.build-slot-sprite--canvas').forEach(async canvas => {
-        const dex      = canvas.dataset.dex;
-        const typeStr  = canvas.dataset.type || null;
-        const palette  = JSON.parse(canvas.dataset.palette || '[]');
+        const dex     = canvas.dataset.dex;
+        const typeStr = canvas.dataset.type || null;
+        const palette = JSON.parse(canvas.dataset.palette || '[]');
+        const shiny   = canvas.dataset.shiny === '1';
+        const variant = parseInt(canvas.dataset.variant || '0', 10);
         if (!dex) return;
         // Some pokemon (Arceus=493, Silvally=773) have type-suffixed sprites
         const spriteKey = typeStr ? `${dex}-${typeStr}` : dex;
-        const frame = await extractFirstFrame(spriteKey);
+        const frame = await extractFirstFrame(spriteKey, shiny, variant);
         if (!frame) { canvas.style.display = 'none'; return; }
         const ctx   = canvas.getContext('2d', { willReadFrequently: palette.length > 0 });
         const scale = Math.min(canvas.width / frame.width, canvas.height / frame.height);
