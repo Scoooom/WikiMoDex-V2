@@ -12,9 +12,6 @@
         return;
     }
 
-    $isOwner = false; // Always false server-side due to nosession — owner UI injected via JS
-    $sections = $user->getTcSections();
-
     $defeatedRivals = $save->getDefeatedRivals();
     $glitchUnlocks  = $save->getGlitchUnlocks();
     $smittyUnlocks  = $save->getSmittyUnlocks();
@@ -31,6 +28,8 @@
         $name = str_replace(' ', '', $name);
         return \App\Services\BuiltInService::loadSmitty($name);
     })->filter();
+
+    $sections = $user->getTcSections();
 @endphp
 
 <style>
@@ -53,6 +52,12 @@
 .rival-name { font-size: 10px; color: var(--muted); }
 .tc-owner-notice { font-size: 12px; color: var(--muted); margin-bottom: 16px; display:flex; align-items:center; gap:8px; }
 </style>
+
+{{-- Section visibility config passed to JS --}}
+<script>
+const TC_SECTIONS = @json($sections);
+const TC_USERNAME = '{{ $user->username }}';
+</script>
 
 <div class="container mt-2">
 
@@ -78,8 +83,7 @@
         <div>
 
             {{-- Rivals --}}
-            @if($sections['rivals'])
-            <div class="card tc-section">
+            <div class="card tc-section" data-section="rivals">
                 <div class="card-header">Rivals defeated</div>
                 <div class="card-body">
                     <div class="rival-grid">
@@ -101,11 +105,10 @@
                     </div>
                 </div>
             </div>
-            @endif
 
             {{-- Core Glitch Unlocks --}}
-            @if($sections['core'] && count($glitchUnlocks) > 0)
-            <div class="card tc-section">
+            @if(count($glitchUnlocks) > 0)
+            <div class="card tc-section" data-section="core">
                 <div class="card-header">Unlocked core glitches</div>
                 <div class="card-body">
                     <div class="tc-mon-grid">
@@ -123,8 +126,8 @@
             @endif
 
             {{-- Mod Glitch Unlocks --}}
-            @if($sections['mod'] && $modForms->count() > 0)
-            <div class="card tc-section">
+            @if($modForms->count() > 0)
+            <div class="card tc-section" data-section="mod">
                 <div class="card-header">Unlocked mod glitches</div>
                 <div class="card-body">
                     <div class="tc-mon-grid">
@@ -142,8 +145,8 @@
             @endif
 
             {{-- Smitty Form Unlocks --}}
-            @if($sections['smitty'] && count($smittyUnlocks) > 0)
-            <div class="card tc-section">
+            @if(count($smittyUnlocks) > 0)
+            <div class="card tc-section" data-section="smitty">
                 <div class="card-header">Unlocked SMITTY forms</div>
                 <div class="card-body">
                     <div class="tc-mon-grid">
@@ -172,8 +175,8 @@
             @endif
 
             {{-- UniSMITTY Unlocks --}}
-            @if($sections['unismitty'] && $uniSmitty->count() > 0)
-            <div class="card tc-section">
+            @if($uniSmitty->count() > 0)
+            <div class="card tc-section" data-section="unismitty">
                 <div class="card-header">Unlocked UniSMITTY forms</div>
                 <div class="card-body">
                     <div class="tc-mon-grid">
@@ -193,15 +196,29 @@
         </div>
     </div>
 </div>
+
 <script>
+const isPublicPreview = new URLSearchParams(window.location.search).get('public') === '1';
+
 fetch('/me.json', { credentials: 'same-origin' })
     .then(r => r.json())
     .then(me => {
-        if (!me.authed) return;
-        if (me.profile !== '/u:{{ $user->username }}.html') return;
-        const notice = document.getElementById('tc-owner-notice');
-        notice.innerHTML = `👁 You're viewing your full trainer card. <a href="/trainercard:{{ $user->username }}.html?public=1" style="color:var(--accent)">Preview public view</a> · <a href="/settings.html" style="color:var(--accent)">Edit settings</a> · <a href="/trainercard-img:{{ $user->username }}.png" target="_blank" style="color:var(--accent)">🖼 Share image</a>`;
-        notice.style.display = '';
+        const isOwner = me.authed && me.profile === '/u:' + TC_USERNAME + '.html';
+
+        // Apply section visibility for non-owners (or owner previewing public view)
+        if (!isOwner || isPublicPreview) {
+            document.querySelectorAll('.tc-section[data-section]').forEach(el => {
+                const key = el.dataset.section;
+                if (TC_SECTIONS[key] === false) el.style.display = 'none';
+            });
+        }
+
+        // Show owner notice
+        if (isOwner && !isPublicPreview) {
+            const notice = document.getElementById('tc-owner-notice');
+            notice.innerHTML = `👁 You're viewing your full trainer card. <a href="/trainercard:${TC_USERNAME}.html?public=1" style="color:var(--accent)">Preview public view</a> · <a href="/settings.html" style="color:var(--accent)">Edit settings</a> · <a href="/trainercard-img:${TC_USERNAME}.png" target="_blank" style="color:var(--accent)">🖼 Share image</a>`;
+            notice.style.display = '';
+        }
     });
 </script>
 @endsection
