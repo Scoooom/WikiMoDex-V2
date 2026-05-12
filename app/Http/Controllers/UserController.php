@@ -208,7 +208,7 @@ class UserController extends Controller
                 'rivals'        => $rivals,
             ]);
 
-            $script = base_path('scripts/render_trainer_card.js');
+            $script = base_path('scripts/render_trainer_card.cjs');
             $cmd = 'node ' . escapeshellarg($script)
                  . ' ' . escapeshellarg($username)
                  . ' ' . escapeshellarg($outPath)
