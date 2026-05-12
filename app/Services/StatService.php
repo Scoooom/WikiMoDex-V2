@@ -326,7 +326,11 @@ class StatService
      *
      * Returns array of [min, max] pairs: [[hpMin,hpMax],[atkMin,atkMax],...]
      */
-    public static function calcEffectiveStats(array $base, string $nature, int $level, array $items = [], ?string $ability = null, ?string $passive = null): array
+    /**
+     * $ivs: array of 6 values (0-31) or null per stat. null = unknown (show range).
+     * Returns array of [min, max] pairs. When IV is known, min === max.
+     */
+    public static function calcEffectiveStats(array $base, string $nature, int $level, array $items = [], ?string $ability = null, ?string $passive = null, array $ivs = []): array
     {
         $natureBoost = [
             1 => ['Lonely'=>1.1,'Brave'=>1.1,'Adamant'=>1.1,'Naughty'=>1.1,'Bold'=>0.9,'Timid'=>0.9,'Modest'=>0.9,'Calm'=>0.9],
@@ -349,14 +353,22 @@ class StatService
         $result = [];
 
         foreach ($base as $s => $baseStat) {
+            // Use known IV if provided, otherwise show range (0–31)
+            $knownIv = isset($ivs[$s]) && $ivs[$s] !== null ? (int) $ivs[$s] : null;
+
             if ($s === 0) {
                 // HP — Wonder Guard forces to 1
                 if ($wonderGuard) {
                     $result[] = [1, 1];
                 } else {
-                    $min = (int) floor(((2 * $baseStat + 0)  * $level) / 100) + $level + 10;
-                    $max = (int) floor(((2 * $baseStat + 31) * $level) / 100) + $level + 10;
-                    $result[] = [$min, $max];
+                    if ($knownIv !== null) {
+                        $val = (int) floor(((2 * $baseStat + $knownIv) * $level) / 100) + $level + 10;
+                        $result[] = [$val, $val];
+                    } else {
+                        $min = (int) floor(((2 * $baseStat + 0)  * $level) / 100) + $level + 10;
+                        $max = (int) floor(((2 * $baseStat + 31) * $level) / 100) + $level + 10;
+                        $result[] = [$min, $max];
+                    }
                 }
             } else {
                 $mult = $natureBoost[$s][$nature] ?? 1.0;
@@ -373,7 +385,12 @@ class StatService
                     return $value;
                 };
 
-                $result[] = [$calcStat(0), $calcStat(31)];
+                if ($knownIv !== null) {
+                    $val = $calcStat($knownIv);
+                    $result[] = [$val, $val];
+                } else {
+                    $result[] = [$calcStat(0), $calcStat(31)];
+                }
             }
         }
 

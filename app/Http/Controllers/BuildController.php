@@ -66,13 +66,19 @@ class BuildController extends Controller
             // Calculate effective stats if level is set
             $level = (int) ($slot['level'] ?? 0);
             if ($level > 0 && !empty($slotStats[$i]['stats'])) {
+                // Build IV array — null means unknown, 0-31 means known
+                $ivs = [];
+                foreach ($slot['ivs'] ?? [] as $idx => $iv) {
+                    $ivs[(int)$idx] = ($iv !== null && $iv !== '') ? (int)$iv : null;
+                }
                 $slotStats[$i]['effective'] = StatService::calcEffectiveStats(
                     $slotStats[$i]['stats'],
                     $slot['nature'] ?? 'Hardy',
                     $level,
                     $slot['items'] ?? [],
                     $slot['ability'] ?? null,
-                    $slot['passive_ability'] ?? null
+                    $slot['passive_ability'] ?? null,
+                    $ivs
                 );
             }
         }
@@ -126,6 +132,8 @@ class BuildController extends Controller
             'team.*.ability'                => 'nullable|string|max:80',
             'team.*.passive_ability'        => 'nullable|string|max:80',
             'team.*.nature'                 => 'nullable|string|max:20',
+            'team.*.ivs'                    => 'nullable|array|max:6',
+            'team.*.ivs.*'                  => 'nullable|integer|min:0|max:31',
             'team.*.moves'                  => 'nullable|array|max:4',
             'team.*.moves.*'                => 'nullable|string|max:60',
             'team.*.items'                  => 'nullable|array|max:20',
@@ -213,6 +221,8 @@ class BuildController extends Controller
             'team.*.nature'                 => 'nullable|string|max:20',
             'team.*.alt_build_rank'         => 'nullable|integer|min:1|max:9',
             'team.*.level'                  => 'nullable|integer|min:1|max:10000',
+            'team.*.ivs'                    => 'nullable|array|max:6',
+            'team.*.ivs.*'                  => 'nullable|integer|min:0|max:31',
             'team.*.moves'                  => 'nullable|array|max:4',
             'team.*.moves.*'                => 'nullable|string|max:60',
             'team.*.items'                  => 'nullable|array|max:20',

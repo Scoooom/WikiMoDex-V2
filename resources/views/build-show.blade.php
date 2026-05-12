@@ -306,7 +306,8 @@
                         <span class="build-slot-collapse-icon">▾</span>
                     </div>
                     <div class="build-stat-bars build-slot-collapsible-body" style="display:none">
-                        @foreach($effectiveDisplay as $stat)
+                        @foreach($effectiveDisplay as $idx => $stat)
+                        @php $iv = $slot['ivs'][$idx] ?? null; @endphp
                         <div class="build-stat-row">
                             <span class="build-stat-label {{ $stat['is_focus'] ? 'build-stat-focus' : '' }}">{{ $stat['label'] }}</span>
                             <div class="build-stat-bar-wrap">
@@ -316,6 +317,9 @@
                             <span class="build-stat-value">
                                 @if($stat['is_range']){{ $stat['min'] }}–{{ $stat['max'] }}@else{{ $stat['min'] }}@endif
                             </span>
+                            @if($iv !== null && $iv !== '')
+                                <span class="build-stat-iv">IV:{{ $iv }}</span>
+                            @endif
                         </div>
                         @endforeach
                     </div>

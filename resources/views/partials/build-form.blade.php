@@ -177,6 +177,19 @@ function addSlot(data) {
             </div>
         </div>
         <div class="build-form-subsection">
+            <div class="build-form-sublabel">IVs <span style="color:var(--dim);font-size:0.8em;font-weight:normal">(0–31, leave blank if unknown)</span></div>
+            <div class="build-iv-row">
+                ${['HP','ATK','DEF','SP.ATK','SP.DEF','SPD'].map((label, idx) => `
+                <div class="build-iv-field">
+                    <label class="build-iv-label">${label}</label>
+                    <input type="number" name="team[${i}][ivs][${idx}]"
+                           value="${(data?.ivs?.[idx] !== null && data?.ivs?.[idx] !== undefined) ? data.ivs[idx] : ''}"
+                           class="build-form-input build-iv-input"
+                           min="0" max="31" placeholder="?">
+                </div>`).join('')}
+            </div>
+        </div>
+        <div class="build-form-subsection">
             <div class="build-form-sublabel">Held Items</div>
             <div class="build-items-list" id="itemsList${i}"></div>
             <button type="button" class="build-add-item-btn" onclick="addItemRow(${i})">+ Add Item</button>

@@ -3780,3 +3780,39 @@ img { max-width: 100%; display: block; }
 /* ── Nature stat highlights ── */
 .build-stat-nature-boost { color: #f87171; } /* red  */
 .build-stat-nature-nerf  { color: #60a5fa; } /* blue */
+
+/* ── IV inputs ── */
+.build-iv-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.4rem;
+}
+@media (max-width: 500px) { .build-iv-row { grid-template-columns: repeat(3, 1fr); } }
+.build-iv-field { display: flex; flex-direction: column; gap: 0.2rem; }
+.build-iv-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--dim);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.build-iv-input {
+    text-align: center;
+    padding: 0.35rem 0.25rem !important;
+}
+/* Hide number input spinners */
+.build-iv-input::-webkit-outer-spin-button,
+.build-iv-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.build-iv-input[type=number] { -moz-appearance: textfield; }
+
+/* ── IV display on show page ── */
+.build-stat-iv {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--dim);
+    width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
