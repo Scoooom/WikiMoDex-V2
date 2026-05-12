@@ -203,14 +203,19 @@ function addSlot(data) {
         });
     }
 
-    // If pre-populated species, check if it's an alt build and show rank field
+    // If pre-populated species, check category + autofill abilities if empty
     if (data?.species) {
-        const rankField = el.querySelector('.build-altbuild-rank');
+        const rankField  = el.querySelector('.build-altbuild-rank');
+        const ab1Input   = el.querySelector('[name$="[ability]"]');
+        const ab2Input   = el.querySelector('[name$="[passive_ability]"]');
         fetch(`/pokemon-search.json?q=${encodeURIComponent(data.species)}`)
             .then(r => r.json())
             .then(results => {
                 const match = results.find(r => r.value === data.species);
-                if (rankField) rankField.style.display = (match?.category === 'Alt Build') ? '' : 'none';
+                if (!match) return;
+                if (rankField) rankField.style.display = (match.category === 'Alt Build') ? '' : 'none';
+                if (ab1Input && !ab1Input.value && match.ability1) ab1Input.value = match.ability1;
+                if (ab2Input && !ab2Input.value && match.abilityH)  ab2Input.value = match.abilityH;
             })
             .catch(() => {});
     }
