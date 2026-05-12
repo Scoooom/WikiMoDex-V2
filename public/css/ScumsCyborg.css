@@ -3110,6 +3110,17 @@ img { max-width: 100%; display: block; }
 }
 .build-share-btn:hover { border-color: var(--border2); color: var(--text); }
 
+.build-id-label { font-size: 0.75rem; color: var(--muted); align-self: center; }
+.build-id-code {
+    font-family: var(--mono); font-size: 0.7rem; color: var(--text2);
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 0.15rem 0.4rem;
+    cursor: pointer; transition: background 0.15s, color 0.15s;
+    user-select: all;
+}
+.build-id-code:hover { background: var(--border); color: var(--text); }
+.build-id-code.copied { border-color: var(--accent2); color: var(--accent2); }
+
 .build-delete-btn {
     background: none;
     border: 1px solid var(--danger);

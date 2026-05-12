@@ -215,6 +215,14 @@ class DiscordInteractionController extends Controller
             return $this->handleWikiSearch($query);
         }
 
+        if ($commandName === 'build') {
+            $input = '';
+            foreach ($data['data']['options'] ?? [] as $option) {
+                if ($option['name'] === 'id') { $input = trim($option['value']); break; }
+            }
+            return $this->handleCommunityBuild($input);
+        }
+
         return response()->json([
             'type' => self::CHANNEL_MESSAGE,
             'data' => ['content' => 'Unknown command.']
@@ -722,6 +730,68 @@ class DiscordInteractionController extends Controller
             ]);
         }
     }
+    private function handleCommunityBuild(string $input): \Illuminate\Http\JsonResponse
+    {
+        // Accept a full URL or just the slug
+        // URL formats: https://void.scooom.xyz/build/some-slug.html  or  some-slug
+        $slug = $input;
+        if (str_contains($input, '/build/')) {
+            // Extract slug from URL: /build/{slug}.html
+            if (preg_match('#/build/([^/]+?)(?:\.html)?$#', $input, $m)) {
+                $slug = $m[1];
+            }
+        }
+        $slug = preg_replace('/\.html$/', '', $slug);
+
+        $build = \App\Models\CommunityBuild::with('user')->where('slug', $slug)->first();
+
+        if (!$build) {
+            return response()->json([
+                'type' => self::CHANNEL_MESSAGE,
+                'data' => ['content' => "No build found for `{$slug}`. Make sure you're using the Build ID shown on the build page."],
+            ]);
+        }
+
+        $url    = "https://void.scooom.xyz/build/{$build->slug}.html";
+        $fields = [];
+
+        // Team slots
+        foreach ($build->team as $i => $slot) {
+            if (empty($slot['species'])) continue;
+
+            $lines = [];
+            if (!empty($slot['nickname'])) $lines[] = "_{$slot['nickname']}_";
+            if (!empty($slot['nature']))   $lines[] = $slot['nature'] . ' nature';
+            if (!empty($slot['ability']))  $lines[] = "Ability: " . $slot['ability'];
+            if (!empty($slot['passive_ability'])) $lines[] = "Passive: " . $slot['passive_ability'];
+            if (!empty($slot['moves']))    $lines[] = implode(', ', array_filter($slot['moves']));
+            if (!empty($slot['shiny']))    $lines[] = '✨ Shiny';
+
+            $label   = $slot['species'] . (isset($slot['level']) ? " Lv.{$slot['level']}" : '');
+            $fields[] = ['name' => $label, 'value' => implode("\n", $lines) ?: '—', 'inline' => true];
+        }
+
+        // Pad to even columns if odd number of slots
+        if (count($fields) % 2 === 1) {
+            $fields[] = ['name' => "\u{200B}", 'value' => "\u{200B}", 'inline' => true];
+        }
+
+        $embed = [
+            'title'       => $build->title,
+            'url'         => $url,
+            'color'       => 0x7c5cbf,
+            'description' => "by **{$build->user->username}** · {$build->votes} ▲ · {$build->team_size} Pokémon",
+            'fields'      => $fields,
+            'footer'      => ['text' => "WikiMoDex • Community Build · ID: {$build->slug}"],
+            'timestamp'   => $build->created_at->toIso8601String(),
+        ];
+
+        return response()->json([
+            'type' => self::CHANNEL_MESSAGE,
+            'data' => ['embeds' => [$embed]],
+        ]);
+    }
+
     private function statBar(int $value): string
     {
         $rounded = round($value / 5) * 5;

@@ -72,6 +72,18 @@ class RegisterSlashCommands extends Command
                     ]
                 ]
             ],
+            [
+                'name'        => 'build',
+                'description' => 'Share a community build by its ID or URL',
+                'options'     => [
+                    [
+                        'type'        => 3,
+                        'name'        => 'id',
+                        'description' => 'Build ID or full build URL from void.scooom.xyz/build/...',
+                        'required'    => true,
+                    ]
+                ]
+            ],
         ];
 
         $response = Http::withHeaders([

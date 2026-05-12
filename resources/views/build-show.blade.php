@@ -30,6 +30,11 @@
             {{-- Share --}}
             <button class="build-share-btn" onclick="copyBuildLink()" title="Copy link">🔗 Share</button>
 
+            {{-- Build ID for /build Discord command --}}
+            <span class="build-id-label" title="Use this ID with the /build Discord command">
+                ID: <code class="build-id-code" onclick="navigator.clipboard.writeText('{{ $build->slug }}').then(() => this.classList.add('copied'))" title="Click to copy">{{ $build->slug }}</code>
+            </span>
+
             {{-- Owner / admin delete --}}
             <span id="build-delete-slot"></span>
         </div>
