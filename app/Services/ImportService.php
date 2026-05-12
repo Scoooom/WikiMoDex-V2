@@ -102,12 +102,23 @@ class ImportService
                 continue;
             }
 
+            // Index modifiers by pokemonId for alt build detection in preview
+            $previewModsByPokemon = [];
+            foreach ($session['modifiers'] ?? [] as $mod) {
+                $args = $mod['args'] ?? [];
+                if (empty($args)) continue;
+                $pid = $args[0];
+                if (!is_int($pid) && !is_string($pid)) continue;
+                $previewModsByPokemon[$pid][] = $mod;
+            }
+
             // Build party preview (just names + level for the picker)
             $preview = [];
             foreach ($party as $p) {
-                $speciesName = self::resolveSpeciesName((int)$p['species']);
+                $pMods    = $previewModsByPokemon[$p['id']] ?? [];
+                $altBuild = self::resolveAltBuild($pMods);
                 $preview[] = [
-                    'species' => $speciesName,
+                    'species' => $altBuild ? $altBuild['name'] : self::resolveSpeciesName((int)$p['species']),
                     'level'   => $p['level'] ?? null,
                 ];
             }
@@ -163,10 +174,14 @@ class ImportService
             $natureInt  = (int)($p['natureOverride'] >= 0 ? $p['natureOverride'] : $p['nature']);
             $pMods      = $modsByPokemon[$pokemonId] ?? [];
 
-            $species = self::resolveSpeciesName($speciesInt);
-            $nature  = self::NATURES[$natureInt] ?? 'Hardy';
-            $level   = (int)($p['level'] ?? 1);
-            $ivs     = array_values((array)($p['ivs'] ?? []));
+            // Alt build overrides species name and provides rank
+            $altBuild     = self::resolveAltBuild($pMods);
+            $species      = $altBuild ? $altBuild['name'] : self::resolveSpeciesName($speciesInt);
+            $altBuildRank = $altBuild ? $altBuild['rank'] : null;
+
+            $nature = self::NATURES[$natureInt] ?? 'Hardy';
+            $level  = (int)($p['level'] ?? 1);
+            $ivs    = array_values((array)($p['ivs'] ?? []));
 
             // Moves
             $moves = [];
@@ -181,16 +196,21 @@ class ImportService
             // Passive — from ANY_PASSIVE_ABILITY modifier
             $passive = self::resolvePassive($pMods);
 
-            // Dex number
-            $coreMon   = CorePokemon::where('species_key', self::resolveSpeciesKey($speciesInt))
-                            ->where('form_key', '')->first()
-                         ?? CorePokemon::where('dex_number', $speciesInt)->first();
-            $dexNumber = $coreMon?->dex_number;
+            // Dex number — prefer alt_builds table if applicable, else core_pokemon
+            if ($altBuild) {
+                $altModel  = \App\Models\AltBuild::where('name', $species)->first();
+                $dexNumber = $altModel?->dex_number ?? $speciesInt;
+            } else {
+                $coreMon   = CorePokemon::where('species_key', self::resolveSpeciesKey($speciesInt))
+                                ->where('form_key', '')->first()
+                             ?? CorePokemon::where('dex_number', $speciesInt)->first();
+                $dexNumber = $coreMon?->dex_number;
+            }
 
             // Items
             $items = self::resolveItems($pMods);
 
-            $team[] = [
+            $entry = [
                 'species'         => $species,
                 'dex_number'      => $dexNumber,
                 'ability'         => $ability,
@@ -202,12 +222,40 @@ class ImportService
                 'items'           => $items,
                 'notes'           => '',
             ];
+            if ($altBuildRank !== null) {
+                $entry['alt_build_rank'] = $altBuildRank;
+            }
+            $team[] = $entry;
         }
 
         return $team;
     }
 
     // ── Resolution helpers ─────────────────────────────────────────
+
+    /**
+     * Check modifiers for a POKEMON_ALT_BUILD entry.
+     * Returns ['name' => 'Fireball Seahorse', 'rank' => 3] or null if not an alt build.
+     * The build_id is stored in typePregenArgs[0] (e.g. "HORSEA_FIREBALL_SEAHORSE").
+     */
+    private static function resolveAltBuild(array $mods): ?array
+    {
+        foreach ($mods as $mod) {
+            if (($mod['typeId'] ?? '') !== 'POKEMON_ALT_BUILD') continue;
+
+            $buildId = $mod['typePregenArgs'][0] ?? null;
+            if (!$buildId) continue;
+
+            $altBuild = \App\Models\AltBuild::where('build_id', strtolower($buildId))->first();
+            if (!$altBuild) continue;
+
+            return [
+                'name' => $altBuild->name,
+                'rank' => (int)($mod['stackCount'] ?? 1),
+            ];
+        }
+        return null;
+    }
 
     private static function resolveSpeciesKey(int $dex): string
     {
