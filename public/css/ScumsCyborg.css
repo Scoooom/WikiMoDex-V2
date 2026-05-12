@@ -3619,14 +3619,16 @@ img { max-width: 100%; display: block; }
 
 .build-move-card {
     background: var(--card2);
-    border-radius: var(--radius-md);
-    padding: 0.75rem 0.9rem 0.65rem;
-    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,0.12);
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 10px;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
+    min-width: 0;
 }
 /* Subtle type-tinted background */
 .build-move-card::before {
@@ -3684,24 +3686,31 @@ img { max-width: 100%; display: block; }
 }
 
 .build-move-card-stats {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0;
-    margin-top: 0.35rem;
-    flex-wrap: nowrap;
+    border-top: 1px solid rgba(255,255,255,0.10);
+    padding-top: 8px;
 }
 .build-move-card-stat {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
-    flex: 1;
+    gap: 4px;
     min-width: 0;
+    padding: 0 8px;
 }
+.build-move-card-stat + .build-move-card-stat {
+    border-left: 1px solid rgba(255,255,255,0.08);
+}
+.build-move-card-stat:first-child { padding-left: 0; }
 .build-move-card-stat-label {
     font-family: var(--font-mono);
-    font-size: 0.58rem;
-    color: var(--dim);
-    letter-spacing: 0.04em;
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    opacity: 0.45;
+    color: var(--text);
     white-space: nowrap;
 }
 .build-move-card-stat-value {
