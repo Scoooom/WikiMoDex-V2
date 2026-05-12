@@ -191,6 +191,10 @@ Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {
     return response()->file($outPath, ['Content-Type' => 'image/png', 'Cache-Control' => 'public, max-age=3600']);
 });
 
+// ── Ability search ───────────────────────────────────────────────
+Route::get('/ability-search.json', [App\Http\Controllers\AbilitySearchController::class, 'search'])
+    ->middleware('cache:no-store');
+
 // ── Move search ──────────────────────────────────────────────────
 Route::get('/move-search.json', [App\Http\Controllers\MoveSearchController::class, 'search'])
     ->middleware('cache:no-store');

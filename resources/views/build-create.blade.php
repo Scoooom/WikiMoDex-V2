@@ -134,12 +134,12 @@ function addSlot(data) {
             <div class="build-form-field">
                 <label>Ability</label>
                 <input type="text" name="team[${i}][ability]" value="${data?.ability||''}"
-                       class="build-form-input" placeholder="e.g. Drought" list="abilityOptions" autocomplete="off">
+                       class="build-form-input" placeholder="e.g. Drought" autocomplete="off" data-typeahead="ability">
             </div>
             <div class="build-form-field">
                 <label>Passive Ability</label>
                 <input type="text" name="team[${i}][passive_ability]" value="${data?.passive_ability||''}"
-                       class="build-form-input" placeholder="e.g. Flash Fire" list="abilityOptions" autocomplete="off">
+                       class="build-form-input" placeholder="e.g. Flash Fire" autocomplete="off" data-typeahead="ability">
             </div>
             <div class="build-form-field">
                 <label>Nature</label>
@@ -194,6 +194,7 @@ function addSlot(data) {
     // Init typeaheads on new slot
     initSpeciesTypeahead(el.querySelector('input[data-typeahead="species"]'));
     el.querySelectorAll('input[data-typeahead="move"]').forEach(initMoveTypeahead);
+    el.querySelectorAll('input[data-typeahead="ability"]').forEach(initAbilityTypeahead);
 
     // Restore items if data provided
     if (data?.items) {
@@ -373,6 +374,11 @@ function initSpeciesTypeahead(input) {
 function initMoveTypeahead(input) {
     if (!input) return;
     makeTypeahead(input, '/move-search.json', r => { input.value = r.value; });
+}
+
+function initAbilityTypeahead(input) {
+    if (!input) return;
+    makeTypeahead(input, '/ability-search.json', r => { input.value = r.value; });
 }
 
 // ── Init ──────────────────────────────────────────────────────────
