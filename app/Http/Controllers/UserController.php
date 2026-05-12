@@ -56,7 +56,7 @@ class UserController extends Controller
 
         \Illuminate\Support\Facades\Artisan::call('cf:purge', [
             '--url' => [
-                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html',
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-public:' . $username . '.html',
                 rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-img:' . $username . '.png',
             ],
         ]);
@@ -81,7 +81,7 @@ class UserController extends Controller
 
         \Illuminate\Support\Facades\Artisan::call('cf:purge', [
             '--url' => [
-                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html',
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-public:' . $username . '.html',
                 rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-img:' . $username . '.png',
             ],
         ]);
@@ -107,7 +107,15 @@ class UserController extends Controller
     public function trainerCard($username)
     {
         $user = User::where('username', $username)->firstOrFail();
-        return view('trainercard', compact('user'));
+        $isOwner = $this->isOwner($user);
+        return view('trainercard', compact('user', 'isOwner'));
+    }
+
+    public function trainerCardPublic($username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+        $isOwner = false;
+        return view('trainercard', compact('user', 'isOwner'));
     }
 
     public function handleProfilePost(Request $request, $username)
@@ -192,7 +200,7 @@ class UserController extends Controller
 
         \Illuminate\Support\Facades\Artisan::call('cf:purge', [
             '--url' => [
-                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $user->username . '.html',
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-public:' . $user->username . '.html',
                 rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-img:' . $user->username . '.png',
                 rtrim(config('services.cloudflare.base_url'), '/') . '/u:' . $user->username . '.html',
             ],
@@ -219,7 +227,7 @@ class UserController extends Controller
 
         \Illuminate\Support\Facades\Artisan::call('cf:purge', [
             '--url' => [
-                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $username . '.html',
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-public:' . $username . '.html',
                 rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-img:' . $username . '.png',
             ],
         ]);

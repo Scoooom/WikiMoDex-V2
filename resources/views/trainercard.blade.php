@@ -29,7 +29,10 @@
         return \App\Services\BuiltInService::loadSmitty($name);
     })->filter();
 
-    $s = $user->getTcSections();
+    // Owner sees all sections; public respects user's toggle settings
+    $s = $isOwner
+        ? array_fill_keys(['rivals','core','mod','smitty','unismitty','submitted'], true)
+        : $user->getTcSections();
 @endphp
 
 <style>
@@ -50,12 +53,19 @@
 .rival-status.defeated { background: #4caf7d; }
 .rival-status.not-defeated { background: var(--dim); }
 .rival-name { font-size: 10px; color: var(--muted); }
-.tc-owner-notice { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+.tc-owner-notice { font-size: 12px; color: var(--muted); margin-bottom: 16px; display:flex; align-items:center; gap:8px; }
 </style>
 
 <div class="container mt-2">
 
-    <div id="tc-owner-notice" style="display:none" class="tc-owner-notice"></div>
+    @if($isOwner)
+    <div class="tc-owner-notice">
+        👁 You're viewing your full trainer card.
+        <a href="/trainercard-public:{{ $user->username }}.html" style="color:var(--accent)">Preview public view</a> ·
+        <a href="/settings.html" style="color:var(--accent)">Edit settings</a> ·
+        <a href="/trainercard-img:{{ $user->username }}.png" target="_blank" style="color:var(--accent)">🖼 Share image</a>
+    </div>
+    @endif
 
     <div class="tc-grid">
 
@@ -192,15 +202,4 @@
         </div>
     </div>
 </div>
-
-<script>
-fetch('/me.json', { credentials: 'same-origin' })
-    .then(r => r.json())
-    .then(me => {
-        if (!me.authed || me.profile !== '/u:{{ $user->username }}.html') return;
-        const notice = document.getElementById('tc-owner-notice');
-        notice.innerHTML = `👁 You're viewing your public trainer card. <a href="/settings.html" style="color:var(--accent)">Edit settings</a> · <a href="/trainercard-img:{{ $user->username }}.png" target="_blank" style="color:var(--accent)">🖼 Share image</a>`;
-        notice.style.display = '';
-    });
-</script>
 @endsection

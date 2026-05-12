@@ -57,9 +57,11 @@
 
                     @if($user->b64_prsv && $user->raw_prsv)
                     <div style="margin-top:10px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
-                        <a href="/trainercard:{{ $user->username }}.html" class="btn btn-info btn-sm">Trainer Card</a>
                         @if($isOwner ?? false)
+                        <a href="/trainercard:{{ $user->username }}.html" class="btn btn-info btn-sm">Trainer Card</a>
                         <a href="/trainercard-img:{{ $user->username }}.png" target="_blank" class="btn btn-secondary btn-sm">🖼 Share Image</a>
+                        @else
+                        <a href="/trainercard-public:{{ $user->username }}.html" class="btn btn-info btn-sm">Trainer Card</a>
                         @endif
                     </div>
                     @endif
