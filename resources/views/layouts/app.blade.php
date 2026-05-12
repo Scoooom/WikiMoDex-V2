@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WikiMoDex@hasSection('title') — @yield('title')@endif</title>
+    <title>WikiMoDex{{ View::hasSection('title') ? ' — ' . View::yieldContent('title') : '' }}</title>
 
     @stack('head')
 
