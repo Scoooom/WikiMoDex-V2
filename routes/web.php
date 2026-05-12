@@ -86,6 +86,8 @@ Route::get('/me.json', function () {
 // Users — no-store (isOwner panel, like buttons are user-specific)
 Route::get('/u:{username}.html', [UserController::class, 'profile'])->middleware('cache:no-store');
 Route::post('/u:{username}.html', [UserController::class, 'handleProfilePost']);
+Route::get('/settings.html', [UserController::class, 'settings'])->middleware('cache:no-store');
+Route::post('/settings.html', [UserController::class, 'saveSettings'])->middleware('cache:no-store');
 Route::get('/trainercard:{username}.html', [UserController::class, 'trainerCard'])->middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, stale-while-revalidate=30']);
 Route::get('/trainercard-img:{username}.png', [UserController::class, 'trainerCardImage'])->middleware(['nosession', 'cache:public, max-age=0, s-maxage=86400, stale-while-revalidate=60']);
 

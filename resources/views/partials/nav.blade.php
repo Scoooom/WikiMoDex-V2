@@ -85,6 +85,7 @@ document.addEventListener('click', function(e) {
                 </button>
                 <div class="nav-dropdown-menu nav-dropdown-menu--right">
                     <a class="nav-dropdown-item" href="${me.profile}">Profile</a>
+                    <a class="nav-dropdown-item" href="/settings.html">Settings</a>
                     <a class="nav-dropdown-item" href="/create.html">Upload Glitch</a>
                     ${adminLink}
                     <div class="nav-dropdown-divider"></div>

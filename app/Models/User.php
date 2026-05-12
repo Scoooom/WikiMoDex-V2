@@ -34,7 +34,27 @@ class User extends Authenticatable
         return ($this->isAdmin() || $this->isWikiEditor()) && (bool) $this->mfa_enabled;
     }
 
-    public function glitches()
+    protected $casts = [
+        'tc_sections' => 'array',
+    ];
+
+    public function getTcSections(): array
+    {
+        $defaults = [
+            'rivals'    => true,
+            'core'      => true,
+            'mod'       => true,
+            'smitty'    => true,
+            'unismitty' => true,
+            'submitted' => true,
+        ];
+        return array_merge($defaults, $this->tc_sections ?? []);
+    }
+
+    public function getDisplayName(): string
+    {
+        return $this->display_name ?? $this->username;
+    }
     {
         return $this->hasMany(Glitch::class, 'created_by');
     }

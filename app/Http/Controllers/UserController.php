@@ -128,7 +128,78 @@ class UserController extends Controller
         }
     }
 
-    public function setTcColor(Request $request, $username)
+    public function settings()
+    {
+        if (!Auth::check()) return redirect('/login.html');
+        $user = Auth::user();
+        $save = $user->getSave();
+        $monOptions = [];
+        if (!is_array($save) && $save->getSystemData() !== null) {
+            $glitchUnlocks  = $save->getGlitchUnlocks();
+            $smittyUnlocks  = $save->getSmittyUnlocks();
+            $formUnlocks    = $save->getFormUnlocks();
+
+            foreach ($glitchUnlocks as $m) $monOptions[] = ['name' => $m->name, 'type' => 'core'];
+            foreach ($smittyUnlocks as $m) $monOptions[] = ['name' => $m->name, 'type' => 'smitty'];
+
+            collect($formUnlocks['modFormsUnlocked'])->each(function($unlock) use (&$monOptions) {
+                $name = str_replace(' ', '', preg_replace('/(.*)_(.*)/', '$2', $unlock));
+                $g = \App\Models\Glitch::where('name', $name)->first();
+                if ($g) $monOptions[] = ['name' => $g->name, 'type' => 'mod'];
+            });
+            collect($formUnlocks['uniSmittyUnlocks'])->filter()->each(function($unlock) use (&$monOptions) {
+                $name = str_replace(' ', '', preg_replace('/(.*?)_(.*)/', '$2', $unlock));
+                $m = \App\Services\BuiltInService::loadSmitty($name);
+                if ($m) $monOptions[] = ['name' => $m->name, 'type' => 'unismitty'];
+            });
+        }
+        return view('settings', compact('user', 'monOptions'));
+    }
+
+    public function saveSettings(Request $request)
+    {
+        if (!Auth::check()) return redirect('/login.html');
+        $user = Auth::user();
+
+        // Profile
+        $user->display_name = substr(strip_tags($request->input('display_name', '')), 0, 64) ?: null;
+        $user->pronouns     = substr(strip_tags($request->input('pronouns', '')), 0, 32) ?: null;
+        $user->bio          = substr(strip_tags($request->input('bio', '')), 0, 300) ?: null;
+
+        // Trainer card color
+        $allowed = ['blue', 'red', 'green', 'gold', 'purple', 'black', 'maroon'];
+        $color = $request->input('tc_color', 'maroon');
+        $user->tc_color = in_array($color, $allowed) ? $color : 'maroon';
+
+        // Trainer card favorite mon
+        $user->tc_favorite_mon = $request->input('tc_favorite_mon') ?: null;
+
+        // Trainer card sections
+        $user->tc_sections = [
+            'rivals'    => $request->boolean('tc_section_rivals'),
+            'core'      => $request->boolean('tc_section_core'),
+            'mod'       => $request->boolean('tc_section_mod'),
+            'smitty'    => $request->boolean('tc_section_smitty'),
+            'unismitty' => $request->boolean('tc_section_unismitty'),
+            'submitted' => $request->boolean('tc_section_submitted'),
+        ];
+
+        $user->save();
+
+        // Bust cached trainer card image
+        $imgPath = storage_path('app/trainer-cards/' . $user->username . '.png');
+        if (file_exists($imgPath)) unlink($imgPath);
+
+        \Illuminate\Support\Facades\Artisan::call('cf:purge', [
+            '--url' => [
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard:' . $user->username . '.html',
+                rtrim(config('services.cloudflare.base_url'), '/') . '/trainercard-img:' . $user->username . '.png',
+                rtrim(config('services.cloudflare.base_url'), '/') . '/u:' . $user->username . '.html',
+            ],
+        ]);
+
+        return redirect('/settings.html')->with('success', 'Settings saved!');
+    }
     {
         $user = User::where('username', $username)->firstOrFail();
         if (!$this->isOwner($user)) return redirect('/');
