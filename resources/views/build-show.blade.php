@@ -109,9 +109,7 @@
                     @if(!empty($slot['passive_ability']))
                         <div class="build-slot-ability">Passive: <span>{{ $slot['passive_ability'] }}</span></div>
                     @endif
-                    @if(!empty($slot['nature']))
-                        <div class="build-slot-nature">Nature: <span>{{ $slot['nature'] }}</span></div>
-                    @endif
+                    <div class="build-slot-nature">Nature: <span>{{ $slot['nature'] ?? 'Unknown' }}</span></div>
                 </div>
             </div>
 
