@@ -112,6 +112,32 @@ class StatService
 
         // If no slot-level override, check type switcher item params
         if ($ot1 === null && $ot2 === null) {
+            // Plate/Drive items override type for Arceus, Silvally (and their alt builds)
+            $plateDriveTypes = [
+                'FIST_PLATE'=>'Fighting','SKY_PLATE'=>'Flying','TOXIC_PLATE'=>'Poison',
+                'EARTH_PLATE'=>'Ground','STONE_PLATE'=>'Rock','INSECT_PLATE'=>'Bug',
+                'SPOOKY_PLATE'=>'Ghost','IRON_PLATE'=>'Steel','FLAME_PLATE'=>'Fire',
+                'SPLASH_PLATE'=>'Water','MEADOW_PLATE'=>'Grass','ZAP_PLATE'=>'Electric',
+                'MIND_PLATE'=>'Psychic','ICICLE_PLATE'=>'Ice','DRACO_PLATE'=>'Dragon',
+                'DREAD_PLATE'=>'Dark','PIXIE_PLATE'=>'Fairy','BLANK_PLATE'=>'Normal',
+                'SHOCK_DRIVE'=>'Electric','BURN_DRIVE'=>'Fire',
+                'CHILL_DRIVE'=>'Ice','DOUSE_DRIVE'=>'Water',
+            ];
+            $formChangers = ['arceus','silvally'];
+            $speciesLower = strtolower($species);
+            $isFormChanger = array_reduce($formChangers, fn($carry, $s) => $carry || str_contains($speciesLower, $s), false);
+            if ($isFormChanger) {
+                foreach ($slot['items'] ?? [] as $item) {
+                    $ik = $item['key'] ?? '';
+                    if (isset($plateDriveTypes[$ik])) {
+                        $typeName = $plateDriveTypes[$ik];
+                        $ot1 = $nameToInt[$typeName] ?? null;
+                        $ot2 = null; // Arceus/Silvally are mono-typed when holding a plate
+                        break;
+                    }
+                }
+            }
+
             foreach ($slot['items'] ?? [] as $item) {
                 $key    = $item['key'] ?? '';
                 $params = $item['params'] ?? [];
