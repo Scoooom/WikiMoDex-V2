@@ -74,11 +74,22 @@ class BuildController extends Controller
     public function create()
     {
         abort_unless(Auth::check(), 403, 'Login required');
+        $plateDriveTypes = [
+            'FIST_PLATE'=>'Fighting','SKY_PLATE'=>'Flying','TOXIC_PLATE'=>'Poison',
+            'EARTH_PLATE'=>'Ground','STONE_PLATE'=>'Rock','INSECT_PLATE'=>'Bug',
+            'SPOOKY_PLATE'=>'Ghost','IRON_PLATE'=>'Steel','FLAME_PLATE'=>'Fire',
+            'SPLASH_PLATE'=>'Water','MEADOW_PLATE'=>'Grass','ZAP_PLATE'=>'Electric',
+            'MIND_PLATE'=>'Psychic','ICICLE_PLATE'=>'Ice','DRACO_PLATE'=>'Dragon',
+            'DREAD_PLATE'=>'Dark','PIXIE_PLATE'=>'Fairy','BLANK_PLATE'=>'Normal',
+            'SHOCK_DRIVE'=>'Electric','BURN_DRIVE'=>'Fire',
+            'CHILL_DRIVE'=>'Ice','DOUSE_DRIVE'=>'Water',
+        ];
         $whitelist = [
             'STAT_SWITCHER', 'PRIMARY_TYPE_SWITCHER', 'SECONDARY_TYPE_SWITCHER',
             'TYPE_SWITCHER', 'STAT_SACRIFICE', 'TYPE_SACRIFICE', 'POKEMON_ALT_BUILD',
             'HP_UP', 'PROTEIN', 'IRON', 'CALCIUM', 'ZINC', 'CARBOS',
             'SOUL_DEW',
+            ...array_keys($plateDriveTypes),
         ];
         $items     = GameItem::whereIn('key', $whitelist)->orderBy('name')->get();
         $species   = \App\Models\BuiltinForm::orderBy('name')->pluck('name');
@@ -145,11 +156,22 @@ class BuildController extends Controller
         $user  = Auth::user();
         abort_unless($user && ($user->id === $build->user_id || $user->isAdmin()), 403);
 
+        $plateDriveTypes = [
+            'FIST_PLATE'=>'Fighting','SKY_PLATE'=>'Flying','TOXIC_PLATE'=>'Poison',
+            'EARTH_PLATE'=>'Ground','STONE_PLATE'=>'Rock','INSECT_PLATE'=>'Bug',
+            'SPOOKY_PLATE'=>'Ghost','IRON_PLATE'=>'Steel','FLAME_PLATE'=>'Fire',
+            'SPLASH_PLATE'=>'Water','MEADOW_PLATE'=>'Grass','ZAP_PLATE'=>'Electric',
+            'MIND_PLATE'=>'Psychic','ICICLE_PLATE'=>'Ice','DRACO_PLATE'=>'Dragon',
+            'DREAD_PLATE'=>'Dark','PIXIE_PLATE'=>'Fairy','BLANK_PLATE'=>'Normal',
+            'SHOCK_DRIVE'=>'Electric','BURN_DRIVE'=>'Fire',
+            'CHILL_DRIVE'=>'Ice','DOUSE_DRIVE'=>'Water',
+        ];
         $whitelist = [
             'STAT_SWITCHER', 'PRIMARY_TYPE_SWITCHER', 'SECONDARY_TYPE_SWITCHER',
             'TYPE_SWITCHER', 'STAT_SACRIFICE', 'TYPE_SACRIFICE', 'POKEMON_ALT_BUILD',
             'HP_UP', 'PROTEIN', 'IRON', 'CALCIUM', 'ZINC', 'CARBOS',
             'SOUL_DEW',
+            ...array_keys($plateDriveTypes),
         ];
         $items   = GameItem::whereIn('key', $whitelist)->orderBy('name')->get();
         $species = \App\Models\BuiltinForm::orderBy('name')->pluck('name');

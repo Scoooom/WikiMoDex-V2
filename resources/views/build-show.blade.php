@@ -112,19 +112,42 @@
                                 $typeName = $moveData?->type_name ?? null;
                                 if ($moveData?->is_dynamic_type) {
                                     $behaviour = $moveData->dynamic_type_behaviour;
+                                    // Plate/Drive key -> type name mapping
+                                    $plateDriveTypes = [
+                                        'FIST_PLATE'=>'Fighting','SKY_PLATE'=>'Flying','TOXIC_PLATE'=>'Poison',
+                                        'EARTH_PLATE'=>'Ground','STONE_PLATE'=>'Rock','INSECT_PLATE'=>'Bug',
+                                        'SPOOKY_PLATE'=>'Ghost','IRON_PLATE'=>'Steel','FLAME_PLATE'=>'Fire',
+                                        'SPLASH_PLATE'=>'Water','MEADOW_PLATE'=>'Grass','ZAP_PLATE'=>'Electric',
+                                        'MIND_PLATE'=>'Psychic','ICICLE_PLATE'=>'Ice','DRACO_PLATE'=>'Dragon',
+                                        'DREAD_PLATE'=>'Dark','PIXIE_PLATE'=>'Fairy','BLANK_PLATE'=>'Normal',
+                                        'SHOCK_DRIVE'=>'Electric','BURN_DRIVE'=>'Fire',
+                                        'CHILL_DRIVE'=>'Ice','DOUSE_DRIVE'=>'Water',
+                                    ];
+                                    $typeNameMap = array_flip(\App\Services\StatService::TYPE_NAMES);
                                     switch ($behaviour) {
                                         case 'primary':
                                             $typeInt  = $slotTypes['type1'];
                                             $typeName = $slotTypes['type1_name'] ?? 'Dynamic';
                                             break;
                                         case 'secondary':
-                                            // Use type2 if exists, else type1
                                             $typeInt  = $slotTypes['type2'] ?? $slotTypes['type1'];
                                             $typeName = $slotTypes['type2_name'] ?? $slotTypes['type1_name'] ?? 'Dynamic';
                                             break;
                                         case 'form':
-                                            $typeInt  = null;
-                                            $typeName = 'Form-based';
+                                            // Check slot items for a plate/drive — use that type, else fall back to move's base type (Normal)
+                                            $formType = null;
+                                            foreach ($slot['items'] ?? [] as $slotItem) {
+                                                $ik = $slotItem['key'] ?? '';
+                                                if (isset($plateDriveTypes[$ik])) {
+                                                    $formType = $plateDriveTypes[$ik];
+                                                    break;
+                                                }
+                                            }
+                                            if ($formType) {
+                                                $typeInt  = $typeNameMap[$formType] ?? null;
+                                                $typeName = $formType;
+                                            }
+                                            // else keep default stored type (Normal)
                                             break;
                                         case 'weather':
                                             $typeInt  = null;
