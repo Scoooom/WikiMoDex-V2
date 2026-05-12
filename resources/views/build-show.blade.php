@@ -43,6 +43,21 @@
     <div class="build-team">
         @foreach($build->team as $i => $slot)
         @if(!empty($slot['species']))
+        @php
+            $slotStat   = $slotStats[$i] ?? null;
+            $statValues = $slotStat['stats'] ?? null;
+            $statError  = $slotStat['error'] ?? null;
+            $statSource = $slotStat['source'] ?? null;
+            $slotTypes  = $slotStat['types'] ?? ['type1'=>null,'type2'=>null,'type1_name'=>null,'type2_name'=>null];
+            $statFocus  = '';
+            if ($statSource === 'alt_build') {
+                $ab = \App\Models\AltBuild::where('name', $slot['species'])->first();
+                $statFocus = $ab->stat_focus ?? '';
+            }
+            $displayStats = $statValues
+                ? \App\Services\StatService::formatForDisplay($statValues, $slot['items'] ?? [], $statFocus)
+                : null;
+        @endphp
         <div class="build-slot">
             <div class="build-slot-header">
                 <div class="build-slot-sprite-wrap">
@@ -81,21 +96,6 @@
                 </div>
             </div>
 
-            @php
-                $slotStat   = $slotStats[$i] ?? null;
-                $statValues = $slotStat['stats'] ?? null;
-                $statError  = $slotStat['error'] ?? null;
-                $statSource = $slotStat['source'] ?? null;
-                $slotTypes  = $slotStat['types'] ?? ['type1'=>null,'type2'=>null,'type1_name'=>null,'type2_name'=>null];
-                $statFocus  = '';
-                if ($statSource === 'alt_build') {
-                    $ab = \App\Models\AltBuild::where('name', $slot['species'])->first();
-                    $statFocus = $ab->stat_focus ?? '';
-                }
-                $displayStats = $statValues
-                    ? \App\Services\StatService::formatForDisplay($statValues, $slot['items'] ?? [], $statFocus)
-                    : null;
-            @endphp
             <div class="build-slot-body">
                 {{-- Moves --}}
                 @if(!empty(array_filter($slot['moves'] ?? [])))
