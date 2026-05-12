@@ -395,20 +395,25 @@ class ImportService
             }
 
             // Type switchers — typePregenArgs[0] = type int (type1), typePregenArgs[1] = type int (type2)
+            // SECONDARY/PRIMARY_TYPE_SWITCHER may store the type int in args[1] instead of typePregenArgs
             if (in_array($typeId, ['TYPE_SWITCHER', 'PRIMARY_TYPE_SWITCHER', 'SECONDARY_TYPE_SWITCHER', 'TYPE_SACRIFICE'])) {
+                \Log::debug('ImportService type switcher modifier', ['typeId' => $typeId, 'args' => $args, 'typePregenArgs' => $pregen]);
                 $typeNames = \App\Services\StatService::TYPE_NAMES;
-                $t1Name = isset($pregen[0]) ? ($typeNames[(int)$pregen[0]] ?? null) : null;
-                $t2Name = isset($pregen[1]) ? ($typeNames[(int)$pregen[1]] ?? null) : null;
+                // Prefer typePregenArgs, fall back to args[1] for single-type switchers
+                $rawT1 = $pregen[0] ?? $args[1] ?? null;
+                $rawT2 = $pregen[1] ?? $args[2] ?? null;
+                $t1Name = $rawT1 !== null ? ($typeNames[(int)$rawT1] ?? null) : null;
+                $t2Name = $rawT2 !== null ? ($typeNames[(int)$rawT2] ?? null) : null;
                 $params = [];
                 if ($typeId === 'SECONDARY_TYPE_SWITCHER') {
-                    // pregen[0] is the new secondary type
+                    // pregen[0] or args[1] is the new secondary type
                     $params = ['type2' => $t1Name];
                 } elseif ($typeId === 'PRIMARY_TYPE_SWITCHER') {
                     $params = ['type1' => $t1Name];
                 } elseif ($typeId === 'TYPE_SACRIFICE') {
                     $params = ['type1' => $t1Name];
                 } else {
-                    // TYPE_SWITCHER — pregen[0] = type1, pregen[1] = type2
+                    // TYPE_SWITCHER — two types
                     $params = ['type1' => $t1Name, 'type2' => $t2Name];
                 }
                 $name = ucwords(strtolower(str_replace('_', ' ', $typeId)));
