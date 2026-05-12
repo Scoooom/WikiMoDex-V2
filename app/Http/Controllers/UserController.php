@@ -107,7 +107,8 @@ class UserController extends Controller
     public function trainerCard($username)
     {
         $user = User::where('username', $username)->firstOrFail();
-        $isOwner = $this->isOwner($user);
+        if (!$this->isOwner($user)) abort(404);
+        $isOwner = true;
         return view('trainercard', compact('user', 'isOwner'));
     }
 
