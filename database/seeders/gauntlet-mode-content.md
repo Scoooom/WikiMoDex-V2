@@ -99,9 +99,9 @@ Two clusters of evil team battles are seeded into the run:
 
 The specific evil team (Rocket, Galactic, Plasma, etc.) is randomised each run.
 
-### The secret boss (wave 110)
+### The Smitty final battle
 
-If the 25% random chance triggers at the final wave 90 encounter and a Smitty Battle replaces the rival, the run actually continues to wave 110 where an additional final encounter awaits. Wave 110 is only accessible this way — it does not appear in the normal run.
+There is a **25% chance** (configurable by server overrides) that wave 90 spawns a Smitty Battle instead of your rival's stage-6 encounter. If this happens, you fight Smitty as the run's final boss rather than your rival. Winning still ends the run normally at wave 90, but triggers a different victory sequence — the Smitty victory cutscene, potential Universal Smitty Form unlocks, and the standard run-clear rewards. The run does not continue past wave 90 in either case.
 
 ---
 
