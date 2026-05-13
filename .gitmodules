@@ -1,0 +1,3 @@
+[submodule "pokevoid"]
+	path = pokevoid
+	url = https://github.com/smittynugget/pokevoid.git
