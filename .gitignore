@@ -77,7 +77,6 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
-pokevoid/
 scripts/__pycache__/
 /public/avatars/*.png
 /public/avatars/*.hash
