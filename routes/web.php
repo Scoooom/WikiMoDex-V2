@@ -261,6 +261,14 @@ Route::post('/build/{slug}/vote.html',  [BuildController::class, 'vote'])->middl
 Route::get('/build/{slug}/edit.html',   [BuildController::class, 'edit'])->middleware('cache:no-store');
 Route::post('/build/{slug}/edit.html',  [BuildController::class, 'update']);
 
+// ── Rivals ────────────────────────────────────────────────────────
+use App\Http\Controllers\RivalController;
+
+Route::middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, stale-while-revalidate=30'])->group(function () {
+    Route::get('/rivals.html',         [RivalController::class, 'index'])->name('rivals.index');
+    Route::get('/rival:{slug}.html',   [RivalController::class, 'show'])->name('rivals.show');
+});
+
 // ── Wiki ──────────────────────────────────────────────────────────
 use App\Http\Controllers\WikiController;
 

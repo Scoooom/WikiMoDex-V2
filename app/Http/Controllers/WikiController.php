@@ -88,6 +88,7 @@ class WikiController extends Controller
                 ['url' => '/gallerySmittyForm.html', 'icon' => '🌀', 'label' => 'SMITTY Forms',      'sub' => 'SMITTY alt forms'],
             ],
             'rivals' => [
+                ['url' => '/rivals.html', 'icon' => '⚔️', 'label' => 'Rival Roster', 'sub' => 'All 28 rivals & teams'],
                 ['url' => '/gallery.html', 'icon' => '👾', 'label' => 'Mod Glitch Forms', 'sub' => 'Browse uploaded forms'],
             ],
             'items-overview' => [

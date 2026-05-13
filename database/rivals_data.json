@@ -1,0 +1,568 @@
+[
+  {
+    "id": 200,
+    "slug": "brock",
+    "name": "Brock",
+    "role": "Gym Leader",
+    "game": "Red / Blue",
+    "type": "Rock",
+    "portrait": "brock.png",
+    "encounter_pokemon": [
+      "Geodude",
+      "Onix"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 201,
+    "slug": "misty",
+    "name": "Misty",
+    "role": "Gym Leader",
+    "game": "Red / Blue",
+    "type": "Water",
+    "portrait": "misty.png",
+    "encounter_pokemon": [
+      "Staryu",
+      "Psyduck"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 202,
+    "slug": "lt-surge",
+    "name": "Lt. Surge",
+    "role": "Gym Leader",
+    "game": "Red / Blue",
+    "type": "Electric",
+    "portrait": "lt_surge.png",
+    "encounter_pokemon": [
+      "Voltorb",
+      "Pikachu",
+      "Electabuzz"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 205,
+    "slug": "sabrina",
+    "name": "Sabrina",
+    "role": "Gym Leader",
+    "game": "Red / Blue",
+    "type": "Psychic",
+    "portrait": "sabrina.png",
+    "encounter_pokemon": [
+      "Abra",
+      "Mr. Mime",
+      "Espeon"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 206,
+    "slug": "blaine",
+    "name": "Blaine",
+    "role": "Gym Leader",
+    "game": "Red / Blue",
+    "type": "Fire",
+    "portrait": "blaine.png",
+    "encounter_pokemon": [
+      "Growlithe",
+      "Ponyta",
+      "Magmar"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 220,
+    "slug": "norman",
+    "name": "Norman",
+    "role": "Gym Leader",
+    "game": "Ruby / Sapphire",
+    "type": "Normal",
+    "portrait": "norman.png",
+    "encounter_pokemon": [
+      "Slakoth",
+      "Spinda",
+      "Chansey",
+      "Kangaskhan"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 238,
+    "slug": "roxie",
+    "name": "Roxie",
+    "role": "Gym Leader",
+    "game": "Black 2 / White 2",
+    "type": "Poison",
+    "portrait": "roxie.png",
+    "encounter_pokemon": [
+      "Venipede",
+      "Trubbish",
+      "Skorupi"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 258,
+    "slug": "allister",
+    "name": "Allister",
+    "role": "Gym Leader",
+    "game": "Sword",
+    "type": "Ghost",
+    "portrait": "allister.png",
+    "encounter_pokemon": [
+      "Galarian Yamask",
+      "Galarian Corsola",
+      "Gastly"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 270,
+    "slug": "larry",
+    "name": "Larry",
+    "role": "Gym Leader / Elite Four",
+    "game": "Scarlet / Violet",
+    "type": "Normal",
+    "portrait": "larry.png",
+    "encounter_pokemon": [
+      "Starly",
+      "Dunsparce",
+      "Komala"
+    ],
+    "rematch_pokemon": [
+      "Staraptor",
+      "Flamigo",
+      "Altaria",
+      "Tropius"
+    ]
+  },
+  {
+    "id": 303,
+    "slug": "lance",
+    "name": "Lance",
+    "role": "Elite Four / Champion",
+    "game": "Gold / Silver",
+    "type": "Dragon",
+    "portrait": "lance.png",
+    "encounter_pokemon": [
+      "Dragonite",
+      "Gyarados",
+      "Aerodactyl",
+      "Alolan Exeggutor"
+    ],
+    "rematch_pokemon": [
+      "Kingdra"
+    ]
+  },
+  {
+    "id": 350,
+    "slug": "blue",
+    "name": "Blue",
+    "role": "Champion",
+    "game": "Red / Blue",
+    "type": "Mixed",
+    "portrait": "blue.png",
+    "encounter_pokemon": [
+      "Gyarados",
+      "Exeggutor",
+      "Arcanine",
+      "Ho-Oh",
+      "Rhyperior",
+      "Magnezone"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 351,
+    "slug": "red",
+    "name": "Red",
+    "role": "Champion",
+    "game": "Gold / Silver",
+    "type": "Mixed",
+    "portrait": "red.png",
+    "encounter_pokemon": [
+      "Lugia",
+      "Snorlax",
+      "Espeon",
+      "Umbreon",
+      "Sylveon"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 353,
+    "slug": "steven",
+    "name": "Steven",
+    "role": "Champion",
+    "game": "Ruby / Sapphire",
+    "type": "Steel",
+    "portrait": "steven.png",
+    "encounter_pokemon": [
+      "Aggron",
+      "Armaldo",
+      "Cradily",
+      "Dialga"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 354,
+    "slug": "wallace",
+    "name": "Wallace",
+    "role": "Champion",
+    "game": "Emerald",
+    "type": "Water",
+    "portrait": "wallace.png",
+    "encounter_pokemon": [
+      "Milotic",
+      "Palkia",
+      "Ludicolo"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 355,
+    "slug": "cynthia",
+    "name": "Cynthia",
+    "role": "Champion",
+    "game": "Diamond / Pearl",
+    "type": "Mixed",
+    "portrait": "cynthia.png",
+    "encounter_pokemon": [
+      "Giratina",
+      "Lucario",
+      "Togekiss"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 356,
+    "slug": "alder",
+    "name": "Alder",
+    "role": "Champion",
+    "game": "Black / White",
+    "type": "Mixed",
+    "portrait": "alder.png",
+    "encounter_pokemon": [
+      "Volcarona",
+      "Zekrom",
+      "Accelgor",
+      "Escavalier",
+      "Keldeo"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 357,
+    "slug": "iris",
+    "name": "Iris",
+    "role": "Champion",
+    "game": "Black 2 / White 2",
+    "type": "Dragon",
+    "portrait": "iris.png",
+    "encounter_pokemon": [
+      "Haxorus",
+      "Reshiram",
+      "Archeops"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 359,
+    "slug": "hau",
+    "name": "Hau",
+    "role": "Champion",
+    "game": "Sun / Moon",
+    "type": "Mixed",
+    "portrait": "hau.png",
+    "encounter_pokemon": [
+      "Solgaleo",
+      "Lunala",
+      "Noivern",
+      "Decidueye",
+      "Incineroar",
+      "Primarina",
+      "Tapu Bulu",
+      "Tapu Fini",
+      "Tapu Koko",
+      "Tapu Lele"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 362,
+    "slug": "nemona",
+    "name": "Nemona",
+    "role": "Champion",
+    "game": "Scarlet / Violet",
+    "type": "Mixed",
+    "portrait": "nemona.png",
+    "encounter_pokemon": [
+      "Koraidon",
+      "Pawmot",
+      "Dudunsparce",
+      "Orthworm",
+      "Meowscarada",
+      "Skeledirge",
+      "Quaquaval"
+    ],
+    "rematch_pokemon": []
+  },
+  {
+    "id": 207,
+    "slug": "giovanni",
+    "name": "Giovanni",
+    "role": "Team Rocket Boss",
+    "game": "Red / Blue",
+    "type": "Ground / Dark",
+    "portrait": "giovanni.png",
+    "encounter_pokemon": [
+      "Persian",
+      "Alolan Persian",
+      "Nidoking",
+      "Nidoqueen",
+      "Rhyperior",
+      "Dugtrio",
+      "Alolan Dugtrio",
+      "Marowak",
+      "Alolan Marowak",
+      "Kangaskhan"
+    ],
+    "rematch_pokemon": [
+      "Tyranitar",
+      "Iron Thorns",
+      "Hippowdon",
+      "Excadrill",
+      "Gastrodon",
+      "Mewtwo"
+    ]
+  },
+  {
+    "id": 77,
+    "slug": "maxie",
+    "name": "Maxie",
+    "role": "Team Magma Boss",
+    "game": "Ruby / Sapphire",
+    "type": "Fire / Ground",
+    "portrait": "maxie.png",
+    "encounter_pokemon": [
+      "Mightyena",
+      "Crobat",
+      "Gliscor",
+      "Weezing",
+      "Galarian Weezing",
+      "Magmortar",
+      "Torkoal",
+      "Flygon",
+      "Camerupt"
+    ],
+    "rematch_pokemon": [
+      "Solrock",
+      "Typhlosion",
+      "Ninetales",
+      "Shiftry",
+      "Scovillain",
+      "Great Tusk",
+      "Groudon"
+    ]
+  },
+  {
+    "id": 79,
+    "slug": "archie",
+    "name": "Archie",
+    "role": "Team Aqua Boss",
+    "game": "Sapphire",
+    "type": "Water",
+    "portrait": "archie.png",
+    "encounter_pokemon": [
+      "Linoone",
+      "Crobat",
+      "Pelipper",
+      "Muk",
+      "Alolan Muk",
+      "Tentacruel",
+      "Relicanth",
+      "Wailord",
+      "Sharpedo"
+    ],
+    "rematch_pokemon": [
+      "Empoleon",
+      "Ludicolo",
+      "Politoed",
+      "Beartic",
+      "Armaldo",
+      "Overqwil",
+      "Kyogre"
+    ]
+  },
+  {
+    "id": 81,
+    "slug": "cyrus",
+    "name": "Cyrus",
+    "role": "Team Galactic Boss",
+    "game": "Diamond / Pearl",
+    "type": "Ghost / Dark",
+    "portrait": "cyrus.png",
+    "encounter_pokemon": [
+      "Gyarados",
+      "Honchkrow",
+      "Hisuian Braviary",
+      "Crobat",
+      "Gliscor",
+      "Azelf",
+      "Uxie",
+      "Mesprit",
+      "Houndoom",
+      "Weavile"
+    ],
+    "rematch_pokemon": [
+      "Electrode",
+      "Hisuian Electrode",
+      "Salamence",
+      "Roaring Moon",
+      "Darkrai"
+    ]
+  },
+  {
+    "id": 83,
+    "slug": "ghetsis",
+    "name": "Ghetsis",
+    "role": "Team Plasma Boss",
+    "game": "Black / White",
+    "type": "Mixed",
+    "portrait": "ghetsis.png",
+    "encounter_pokemon": [
+      "Cofagrigus",
+      "Runerigus",
+      "Bouffalant",
+      "Seismitoad",
+      "Carracosta",
+      "Eelektross",
+      "Galvantula",
+      "Volcarona",
+      "Hydreigon"
+    ],
+    "rematch_pokemon": [
+      "Genesect",
+      "Basculegion",
+      "Jellicent",
+      "Kingambit",
+      "Slither Wing",
+      "Iron Jugulis",
+      "Kyurem"
+    ]
+  },
+  {
+    "id": 85,
+    "slug": "lysandre",
+    "name": "Lysandre",
+    "role": "Team Flare Boss",
+    "game": "X / Y",
+    "type": "Fire",
+    "portrait": "lysandre.png",
+    "encounter_pokemon": [
+      "Mienshao",
+      "Honchkrow",
+      "Talonflame",
+      "Pyroar",
+      "Clawitzer",
+      "Dragalge",
+      "Heliolisk",
+      "Malamar",
+      "Gyarados"
+    ],
+    "rematch_pokemon": [
+      "Scream Tail",
+      "Flutter Mane",
+      "Iron Moth",
+      "Goodra",
+      "Hisuian Goodra",
+      "Yveltal"
+    ]
+  },
+  {
+    "id": 87,
+    "slug": "lusamine",
+    "name": "Lusamine",
+    "role": "Aether Foundation Boss",
+    "game": "Sun / Moon",
+    "type": "Fairy",
+    "portrait": "lusamine.png",
+    "encounter_pokemon": [
+      "Clefable",
+      "Lilligant",
+      "Hisuian Lilligant",
+      "Milotic",
+      "Primarina",
+      "Galarian Slowbro",
+      "Galarian Slowking",
+      "Bewear",
+      "Nihilego"
+    ],
+    "rematch_pokemon": [
+      "Pheromosa",
+      "Stakataka",
+      "Celesteela",
+      "Guzzlord",
+      "Necrozma"
+    ]
+  },
+  {
+    "id": 89,
+    "slug": "guzma",
+    "name": "Guzma",
+    "role": "Team Skull Boss",
+    "game": "Sun / Moon",
+    "type": "Bug",
+    "portrait": "guzma.png",
+    "encounter_pokemon": [
+      "Lokix",
+      "Yanmega",
+      "Heracross",
+      "Scizor",
+      "Kleavor",
+      "Galvantula",
+      "Vikavolt",
+      "Pinsir",
+      "Golisopod"
+    ],
+    "rematch_pokemon": [
+      "Hisuian Samurott",
+      "Crawdaunt",
+      "Buzzwole",
+      "Xurkitree"
+    ]
+  },
+  {
+    "id": 91,
+    "slug": "rose",
+    "name": "Rose",
+    "role": "Macro Cosmos Boss",
+    "game": "Sword / Shield",
+    "type": "Steel",
+    "portrait": "rose.png",
+    "encounter_pokemon": [
+      "Archaludon",
+      "Ferrothorn",
+      "Escavalier",
+      "Sirfetchd",
+      "Mr. Rime",
+      "Corviknight",
+      "Perrserker",
+      "Klinklang",
+      "Copperajah"
+    ],
+    "rematch_pokemon": [
+      "Aegislash",
+      "Gholdengo",
+      "Dracovish",
+      "Dracozolt",
+      "Melmetal",
+      "Galarian Articuno",
+      "Galarian Zapdos",
+      "Galarian Moltres"
+    ]
+  }
+]

@@ -99,12 +99,17 @@
                                 $defeated = $rival['defeated'] === 'true';
                                 $rivalImg = strtolower(str_replace(' ', '_', $rival['name']));
                             @endphp
+                            @php
+                                $rivalSlug = strtolower(str_replace([' ', '.'], ['-', ''], $rival['name']));
+                            @endphp
                             <div class="rival-item">
+                                <a href="/rival:{{ $rivalSlug }}.html" style="display:block;text-decoration:none">
                                 <div class="rival-wrap">
                                     <img class="rival-sprite{{ $defeated ? '' : ' gray' }}" src="/rivals/{{ $rivalImg }}.png" alt="{{ $rival['name'] }}">
                                     <span class="rival-status {{ $defeated ? 'defeated' : 'not-defeated' }}"></span>
                                 </div>
                                 <div class="rival-name">{{ $rival['name'] }}</div>
+                                </a>
                             </div>
                             @endif
                         @endforeach
