@@ -27,8 +27,6 @@ yarn-error.log
 /storage/app/glitchimgs/
 /storage/app/private/
 
-# PokeVoid source (separate repo)
-/pokevoid/
 
 # IDE & OS
 .idea/
