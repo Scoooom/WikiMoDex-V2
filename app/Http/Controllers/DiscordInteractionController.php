@@ -234,15 +234,33 @@ class DiscordInteractionController extends Controller
         $choices = [];
 
         if (strlen($query) >= 2) {
-            // Articles
-            $articles = \App\Models\WikiArticle::where('title', 'like', "%{$query}%")
-                ->orWhere('content', 'like', "%{$query}%")
-                ->orderByRaw("CASE WHEN title LIKE ? THEN 0 ELSE 1 END", ["%{$query}%"])
-                ->limit(8)
-                ->get(['slug', 'title', 'category']);
+            // Sections — word-split, scored, direct anchor links
+            $words = array_values(array_filter(explode(' ', $query), fn($w) => strlen($w) >= 2));
+            if (empty($words)) $words = [$query];
 
-            foreach ($articles as $a) {
-                $choices[] = ['name' => "📄 {$a->title} ({$a->category})", 'value' => "article:{$a->slug}"];
+            $sectionQuery = \App\Models\WikiSection::query();
+            foreach ($words as $word) {
+                $sectionQuery->where(function ($sub) use ($word) {
+                    $sub->where('heading', 'like', "%{$word}%")
+                        ->orWhere('body', 'like', "%{$word}%");
+                });
+            }
+            $sections = $sectionQuery->limit(40)->get();
+
+            $scored = $sections
+                ->map(fn($s) => ['section' => $s, 'score' => $s->score($words)])
+                ->sortByDesc('score')
+                ->take(8);
+
+            foreach ($scored as $item) {
+                $s = $item['section'];
+                $isTopLevel = strtolower(trim($s->heading)) === strtolower(trim($s->article_title));
+                $label = $isTopLevel
+                    ? "📄 {$s->article_title} ({$s->article_category})"
+                    : "📄 {$s->article_title} → {$s->heading} ({$s->article_category})";
+                // Discord choice names max 100 chars
+                if (strlen($label) > 100) $label = substr($label, 0, 97) . '…';
+                $choices[] = ['name' => $label, 'value' => "section:{$s->article_slug}:{$s->anchor}"];
             }
 
             // Items
@@ -274,7 +292,38 @@ class DiscordInteractionController extends Controller
     private function handleWikiSearch(string $query): \Illuminate\Http\JsonResponse
     {
         // Query format: "type:identifier" from autocomplete
-        [$type, $id] = array_pad(explode(':', $query, 2), 2, '');
+        // Section format: "section:article-slug:anchor"
+        $parts = explode(':', $query, 3);
+        $type  = $parts[0] ?? '';
+        $id    = $parts[1] ?? '';
+        $anchor = $parts[2] ?? '';
+
+        if ($type === 'section') {
+            $section = \App\Models\WikiSection::where('article_slug', $id)
+                ->where('anchor', $anchor)
+                ->first();
+            if (!$section) goto not_found;
+
+            $excerpt = strlen($section->body) > 300
+                ? substr($section->body, 0, 300) . '…'
+                : $section->body;
+
+            $url = "https://void.scooom.xyz/wiki:{$section->article_slug}.html#{$section->anchor}";
+
+            $isTopLevel = strtolower(trim($section->heading)) === strtolower(trim($section->article_title));
+            $title = $isTopLevel
+                ? $section->article_title
+                : "{$section->article_title} — {$section->heading}";
+
+            return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
+                'title'       => $title,
+                'description' => $excerpt,
+                'color'       => 0x7c5cbf,
+                'fields'      => [['name' => 'Category', 'value' => $section->article_category, 'inline' => true]],
+                'url'         => $url,
+                'footer'      => ['text' => 'WikiMoDex • Wiki'],
+            ]]]]);
+        }
 
         if ($type === 'article') {
             $article = \App\Models\WikiArticle::where('slug', $id)->first();
