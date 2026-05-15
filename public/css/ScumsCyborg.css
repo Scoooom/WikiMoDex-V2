@@ -566,6 +566,26 @@ img { max-width: 100%; display: block; }
 }
 
 /* --- FAQ -------------------------------------- */
+.faq-group {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+.faq-group:last-child { margin-bottom: 0; }
+
+.faq-group-label {
+    padding: 10px 20px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    border-bottom: 1px solid var(--border);
+    background: rgba(124,92,191,.06);
+}
+
 .faq-list {
     background: var(--card);
     border: 1px solid var(--border);
