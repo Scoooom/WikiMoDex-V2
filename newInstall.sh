@@ -1,3 +1,30 @@
+#!/bin/bash
+# WikiMoDex V2 - Fresh install script
+# Requires: submodules initialized (git submodule update --init --recursive)
+
+set -e
+
+echo "==> Migrating and seeding database..."
 php artisan migrate:fresh --seed
-for i in $(ls database/seeders/*.php); do file=$(echo $i | awk -F'/' '{print $3}'); class=$(echo $file | awk -F'.' '{print $1}'); php artisan db:seed --class=$class; done;
-for i in $(ls app/Console/Commands/*.php); do sigs=$(grep 'signature' $i | awk -F"'" '{print $2}' | awk -F'{' '{print $1}'); if [[ "$sigs" == "cf:purge" ]]; then continue; fi; echo $sigs; echo; echo;  php artisan $sigs; done;
+
+echo "==> Running AdminSeeder (no-op if user hasn't logged in yet)..."
+php artisan db:seed --class=AdminSeeder
+
+echo "==> Syncing PokeVoid data (forms, items, changelog, alt builds)..."
+php artisan pokevoid:sync
+
+echo "==> Parsing moves..."
+php artisan moves:parse
+
+echo "==> Parsing official Pokémon..."
+php artisan pokemon:parse-official
+
+echo "==> Extracting item icons..."
+php artisan items:extract-icons
+
+echo "==> Registering Discord slash commands..."
+php artisan discord:register-commands
+
+echo ""
+echo "Install complete!"
+echo "Note: Run 'php artisan db:seed --class=AdminSeeder' again after first Discord login to grant admin access."
