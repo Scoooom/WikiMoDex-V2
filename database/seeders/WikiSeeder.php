@@ -793,7 +793,7 @@ The **Legendary Up** machine features a **rotating daily Legendary Pokémon**. E
 
 Compared to the other two machines, Legendary Up has a **doubled base Legendary rate** (0.78% vs 0.39%). It also advances the Legendary pity counter by **2 per pull** instead of 1, effectively halving the pulls needed to trigger pity.
 
-When a Legendary egg hatches from this machine, there is a **50% chance it is specifically the day's featured Legendary** rather than a random one from the pool.
+When a Legendary egg hatches from this machine, there is a hard **50% chance to lock in the day's featured Legendary** before the pool is even rolled. If that check fails, the featured Legendary is still in the normal weighted pool — so the true probability of getting it is slightly above 50% (~52% given the ~23-species pool).
 
 **Best for:** Targeting a specific Legendary Pokémon, or farming Legendary-tier eggs in general.
 
