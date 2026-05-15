@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('tc_color', 20)->default('blue');
+            $table->string('tc_color', 20)->default('blue')->after('b64_prsv');
         });
     }
 

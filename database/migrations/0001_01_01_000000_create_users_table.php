@@ -13,12 +13,23 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
+            $table->string('username');
+            $table->string('display_name', 64)->nullable();
+            $table->string('pronouns', 32)->nullable();
+            $table->text('bio')->nullable();
+            $table->string('user_id');
+            $table->string('avatar_id');
+            $table->boolean('is_admin')->default(false);
+            $table->boolean('is_wiki_editor')->default(false);
+            $table->boolean('mfa_enabled')->default(false);
+            $table->bigInteger('join_date');
+            $table->bigInteger('last_login');
+            $table->boolean('smitty')->default(false);
+            $table->binary('raw_prsv')->nullable();
+            $table->binary('b64_prsv')->nullable();
+            $table->string('tc_color', 20)->default('blue');
+            $table->string('tc_favorite_mon')->nullable();
+            $table->json('tc_sections')->nullable();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
