@@ -7,9 +7,12 @@ Output: storage/app/item-icons/{filename}.png
 import json, sys
 from pathlib import Path
 from PIL import Image
+import os
 
-POKEVOID    = Path('/var/www/void.scooom.com/pokevoid')
-OUT_DIR     = Path('/var/www/void.scooom.com/storage/app/item-icons')
+dir_path = os.path.dirname(os.path.realpath(__file__)) + "/../"
+
+POKEVOID    = Path(dir_path + '/pokevoid')
+OUT_DIR     = Path(dir_path + '/storage/app/item-icons')
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 ATLASES = [

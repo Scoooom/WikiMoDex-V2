@@ -12,12 +12,11 @@ class SyncPokevoid extends Command
     public function handle()
     {
         $repoPath = base_path('pokevoid');
-
         // Pull latest
         $this->info('Pulling latest PokeVoid source...');
         $output = [];
         $exit = 0;
-        exec("cd {$repoPath} && git pull 2>&1", $output, $exit);
+        exec("cd {$repoPath} && git pull origin main 2>&1", $output, $exit);
         foreach ($output as $line) {
             $this->line($line);
         }
@@ -38,6 +37,11 @@ class SyncPokevoid extends Command
         $this->call('changelog:parse');
         $this->call('altbuilds:parse');
         $this->call('altbuilds:warm-sprites');
+        exec("rsync -azvp {$repoPath}/public/images/pokemon/glitch/ {$repoPath}/../storage/app/glitchimgs/", $output, $exit);
+        foreach ($output as $line) {
+            $this->line($line);
+        }
+
 
         $this->info('Sync complete!');
 
