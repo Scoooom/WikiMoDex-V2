@@ -41,8 +41,21 @@ class WikiSearchController extends Controller
         }
 
         // ── Wiki Articles ─────────────────────────────────────────────
-        $articles = WikiArticle::where('title', 'like', "%{$q}%")
-            ->orWhere('content', 'like', "%{$q}%")
+        // Split into words so multi-word queries like "egg pity" match
+        // articles containing all words even when not adjacent.
+        $words = array_filter(explode(' ', $q), fn($w) => strlen($w) >= 2);
+        if (empty($words)) {
+            $words = [$q];
+        }
+
+        $articleQuery = WikiArticle::query();
+        foreach ($words as $word) {
+            $articleQuery->where(function ($sub) use ($word) {
+                $sub->where('title', 'like', "%{$word}%")
+                    ->orWhere('content', 'like', "%{$word}%");
+            });
+        }
+        $articles = $articleQuery
             ->orderByRaw("CASE WHEN title LIKE ? THEN 0 ELSE 1 END", ["%{$q}%"])
             ->limit(5)
             ->get(['slug', 'title', 'category', 'content']);
