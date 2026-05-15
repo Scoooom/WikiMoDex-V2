@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_admin')->default(false)->after('avatar_id');
+            $table->boolean('is_admin')->default(false);
         });
 
         // Seed: grant admin to the existing scooom account by Discord ID
