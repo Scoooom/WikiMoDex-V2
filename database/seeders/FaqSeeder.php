@@ -184,8 +184,8 @@ class FaqSeeder extends Seeder
 <li><strong>Egg Move Up</strong> — doubles the Rare Egg Move chance. A Legendary egg has a 1-in-3 shot at the rare move. Best for farming egg move unlocks.</li>
 <li><strong>Shiny Up</strong> — doubles the shiny rate to 1 in 64. Best for hunting shinies from species you can\'t breed.</li>
 </ul>
-<p>See the <a href="https://void.scooom.xyz/wiki:eggs-gacha.html">Eggs & Gacha wiki article</a> for full odds.</p>',
-                'answer_plain'     => "Legendary Up — doubled Legendary rate (0.78%), rotating daily featured Legendary.\nEgg Move Up — doubles Rare Egg Move chance (1-in-3 on a Legendary egg).\nShiny Up — doubles shiny rate to 1 in 64.\n\nFull odds: https://void.scooom.xyz/wiki:eggs-gacha.html",
+<p>See the <a href="/wiki:eggs-gacha.html">Eggs & Gacha wiki article</a> for full odds.</p>',
+                'answer_plain'     => "Legendary Up — doubled Legendary rate (0.78%), rotating daily featured Legendary.\nEgg Move Up — doubles Rare Egg Move chance (1-in-3 on a Legendary egg).\nShiny Up — doubles shiny rate to 1 in 64.\n\nFull odds: /wiki:eggs-gacha.html",
                 'open_by_default'  => false,
             ],
 
