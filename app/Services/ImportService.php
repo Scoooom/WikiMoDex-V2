@@ -220,7 +220,7 @@ class ImportService
             $items = self::resolveItems($pMods);
 
             $entry = [
-                'species'         => $species,
+                'species'         => $altBuild ? $species : ($coreMon?->name ?? self::resolveSpeciesName($speciesInt)),
                 'dex_number'      => $dexNumber,
                 'form_key'        => $formKey,
                 'nickname'        => !empty($p['nickname']) ? base64_decode($p['nickname']) : null,
