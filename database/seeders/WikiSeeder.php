@@ -295,8 +295,6 @@ Each Chaos mode has three variants:
 
 ## Other Modes
 
-- **Endless** — No endpoint, enemies scale infinitely
-- **Endless (Spliced)** — Endless mode but all wild Pokémon are fusions
 - **Daily Run** — A fixed seed run refreshed every day. Starts at level 20.
 - **Challenge** — Custom challenge runs with selectable modifiers
 
@@ -1046,7 +1044,7 @@ Very rare items. Mostly passive combat items and powerful glitch tools.
 | **Party Ability** | Applies one ability to **all** current party members for the run. ★ Rare; requires Glitch Pieces. |
 | **Primary / Secondary Type Switcher** | |
 | **Map** | Lets you choose your destination at crossroads. ★ Chaos modes and before wave 90/100. |
-| **Voucher Plus Plus** | Premium egg voucher. ★ Not in Daily/Endless modes; reduced chance after rerolls. |
+| **Voucher Plus Plus** | Premium egg voucher. ★ Not in Daily mode; reduced chance after rerolls. |
 
 ---
 
@@ -1071,7 +1069,7 @@ The rarest in-run items. Game-changing permanent equipment.
 | **Shiny Charm** | Dramatically increases shiny encounter rate. |
 | **Healing Charm** | Increases HP restoration from moves and items by 10% (excludes Revives). |
 | **Multi Lens** | Attacks hit one additional time at reduced power per stack. |
-| **Voucher Premium** | Premium egg voucher. ★ Not in Daily/Endless modes. |
+| **Voucher Premium** | Premium egg voucher. ★ Not in Daily mode. |
 | **Mini Black Hole** | Every turn, the holder acquires one held item from the foe. ★ Requires The Void unlock. |
 | **AnyXM (Luxury)** | Teach a Luxury-tier move to any Pokémon. ★ Requires Glitch Pieces + The Void Overtaken unlock. |
 | **AnyXM (Master)** | Teach a Master-tier move to any Pokémon. ★ Requires Glitch Pieces. |
@@ -1144,9 +1142,7 @@ Modes unlock automatically when their condition is met at the end of a run. A no
 | **Chaos Void** | Unlock The Void **and** win at least 1 Nightmare run. |
 | **Chaos Rogue Void** | Win at least 1 Chaos Void run (any length). |
 | **Chaos Infinite** | Win at least 2 Chaos Rogue Void runs. |
-| **Chaos Infinite Rogue** | Reach wave 5000 or higher in Endless mode. |
-| **Endless** | Available from the start (shown on title screen after first Classic victory). |
-| **Endless (Spliced)** | Available from the start alongside Endless. |
+| **Chaos Infinite Rogue** | Win at least 2 Chaos Infinite runs. |
 | **Daily Run** | Available from the start. |
 
 > Unlocking a new game mode also unlocks new items, abilities, and shop options that appear in all future runs.

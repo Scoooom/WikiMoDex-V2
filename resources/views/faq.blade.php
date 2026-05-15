@@ -21,11 +21,10 @@
                 true,
             ],
             [
-                'What\'s the difference between Gauntlet, Chaos, and Endless?',
+                'What\'s the difference between Gauntlet and Chaos modes?',
                 '<ul>
                     <li><strong>Gauntlet</strong> — wave-based runs with a fixed endpoint. Classic PokéRogue-style structure.</li>
                     <li><strong>Chaos</strong> — path-based runs inspired by Slay the Spire. You choose your route through a branching map instead of fighting waves linearly.</li>
-                    <li><strong>Endless</strong> — no endpoint; enemies scale infinitely.</li>
                 </ul>
                 <p>Each category has variants: Nuzlight, Nuzlocke, Rogue (Draft), and Void (Nightmare) versions exist across most modes.</p>',
                 false,
