@@ -63,6 +63,7 @@
                                 data-shiny="{{ !empty($slot['shiny']) ? '1' : '0' }}"
                                 data-variant="{{ $slot['variant'] ?? 0 }}"
                                 data-form-key="{{ $slot['form_key'] ?? '' }}"
+                                data-palette="{{ json_encode($slot['palette'] ?? []) }}"
                                 width="42" height="42"
                                 alt="{{ $slot['species'] ?? '' }}"
                             ></canvas>
@@ -117,11 +118,32 @@ fetch('/me.json', { credentials: 'same-origin' })
 
 // Render first frame of each card sprite from the atlas
 (async () => {
+    function softLight(bg, fg) {
+        return bg <= 0.5 ? 2 * bg * fg : 1 - 2 * (1 - bg) * (1 - fg);
+    }
+    function hexToRgb(hex) {
+        return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
+    }
+    function applyGrayscaleOverlay(imageData, palette) {
+        const data = imageData.data;
+        const targets = palette.map(hexToRgb);
+        for (let i = 0; i < data.length; i += 4) {
+            if (data[i+3] === 0) continue;
+            const lum = (data[i]/255 + data[i+1]/255 + data[i+2]/255) / 3;
+            const [tr, tg, tb] = targets[Math.min(Math.floor(lum * targets.length), targets.length-1)].map(c => c/255);
+            data[i]   = Math.round(softLight(lum, tr) * 255);
+            data[i+1] = Math.round(softLight(lum, tg) * 255);
+            data[i+2] = Math.round(softLight(lum, tb) * 255);
+        }
+        return imageData;
+    }
+
     async function renderCardSprite(canvas) {
         const dex     = canvas.dataset.dex;
         const shiny   = canvas.dataset.shiny === '1';
         const variant = parseInt(canvas.dataset.variant || '0', 10);
         const formKey = canvas.dataset.formKey || '';
+        const palette = JSON.parse(canvas.dataset.palette || '[]');
         if (!dex) return;
 
         const formSuffix = formKey ? `-${formKey}` : '';
@@ -150,12 +172,17 @@ fetch('/me.json', { credentials: 'same-origin' })
 
         // Draw first frame centred into the 42×42 canvas
         const scale = Math.min(canvas.width / sw, canvas.height / sh);
-        const ctx   = canvas.getContext('2d');
+        const ctx   = canvas.getContext('2d', { willReadFrequently: palette.length > 0 });
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(tmp, x, y, w, h,
             (canvas.width  - sw * scale) / 2 + sx * scale,
             (canvas.height - sh * scale) / 2 + sy * scale,
             w * scale, h * scale);
+        if (palette.length > 0) {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            applyGrayscaleOverlay(imageData, palette);
+            ctx.putImageData(imageData, 0, 0);
+        }
     }
 
     // Use IntersectionObserver so off-screen cards don't block page load

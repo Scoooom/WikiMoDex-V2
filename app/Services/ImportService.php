@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\CorePokemon;
 use App\Models\CoreMove;
 use App\Models\Ability;
+use App\Models\AltBuild;
 
 class ImportService
 {
@@ -226,10 +227,22 @@ class ImportService
             // Items
             $items = self::resolveItems($pMods);
 
+            // Resolve alt build palette at import time so build cards can apply it
+            $palette = [];
+            if ($altBuild) {
+                $altModel  = \App\Models\AltBuild::where('name', $species)->first();
+                if ($altModel) {
+                    $rank    = (int)($altBuildRank ?? 1);
+                    $useDark = $rank >= 6 && !empty($altModel->dark_palette);
+                    $palette = $useDark ? $altModel->dark_palette : ($altModel->target_palette ?? []);
+                }
+            }
+
             $entry = [
                 'species'         => $altBuild ? $species : ($coreMon?->name ?? self::resolveSpeciesName($speciesInt)),
                 'dex_number'      => $dexNumber,
                 'form_key'        => $formKey,
+                'palette'         => $palette,
                 'nickname'        => !empty($p['nickname']) ? base64_decode($p['nickname']) : null,
                 'ability'         => $ability,
                 'passive_ability' => $passive,
