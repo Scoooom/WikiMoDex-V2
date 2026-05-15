@@ -131,7 +131,7 @@ fetch('/me.json', { credentials: 'same-origin' })
         if (!dex) return;
 
         const formSuffix = formKey ? `-${formKey}` : '';
-        const imgSrc    = shiny ? `/pokevoid-sprites/shiny/${dex}${formSuffix}.png` : `/pokevoid-sprites/${dex}.png`;
+        const imgSrc    = shiny ? `/pokevoid-sprites/shiny/${dex}${formSuffix}.png` : `/pokevoid-sprites/${dex}${formSuffix}.png`;
         const atlasUrl  = shiny ? `/pokevoid-atlas-shiny/${dex}${formKey ? '/' + formKey : ''}.json` : `/pokevoid-atlas/${dex}.json`;
 
         const [img, atlas] = await Promise.all([

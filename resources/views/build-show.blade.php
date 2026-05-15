@@ -522,7 +522,7 @@ function toggleSection(label) {
             const formSuffix = formKey ? `-${formKey}` : '';
             img.src = shiny
                 ? `/pokevoid-sprites/shiny/${dex}${formSuffix}.png`
-                : `/pokevoid-sprites/${dex}.png`;
+                : `/pokevoid-sprites/${dex}${formSuffix}.png`;
         });
     }
 
