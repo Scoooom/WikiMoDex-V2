@@ -52,6 +52,7 @@ Route::middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, sta
     Route::get('/back:{id}.png', [SpriteController::class, 'back']);
     Route::get('/cFront:{name}.png', [SpriteController::class, 'coreFront']);
     Route::get('/cBack:{name}.png', [SpriteController::class, 'coreBack']);
+    Route::get('/pokevoid-sprites/{file}', [SpriteController::class, 'pokevoidSprite'])->where('file', '.+\.png');
 });
 
 // Likes

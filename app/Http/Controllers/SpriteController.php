@@ -45,6 +45,25 @@ class SpriteController extends Controller
         return $this->serveCoreSprite($name, true);
     }
 
+    public function pokevoidSprite($file)
+    {
+        // Only allow safe filenames — dex numbers, optional suffixes, .png
+        if (!preg_match('/^[\w\-]+\.png$/', $file)) {
+            abort(404);
+        }
+
+        $path = base_path("pokevoid/public/images/pokemon/{$file}");
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->file($path, [
+            'Content-Type'                => 'image/png',
+            'Access-Control-Allow-Origin' => '*',
+        ]);
+    }
+
     private function serveCoreSprite($name, $back = false)
     {
         $name = strtolower(str_replace('Ω', 'ω', $name));
