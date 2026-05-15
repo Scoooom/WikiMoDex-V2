@@ -74,8 +74,6 @@
                                 alt="{{ $slot['species'] }}"
                                 onerror="this.style.opacity='0'"
                             >
-                        @else
-                            <div class="build-card-sprite build-card-sprite--empty"></div>
                         @endif
                     @endforeach
                     {{-- Fill remaining slots --}}
