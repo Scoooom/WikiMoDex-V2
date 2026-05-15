@@ -26,7 +26,7 @@ class User extends Authenticatable
     public function isWikiEditor(): bool
     {
         // Admins inherit editor privileges
-        return (bool) $this->is_admin || (bool) $this->is_wiki_editor;
+        return $this->isAdmin() || (bool) $this->is_wiki_editor;
     }
 
     public function canAccessPanel(): bool
