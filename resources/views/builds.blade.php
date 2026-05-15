@@ -76,10 +76,6 @@
                             >
                         @endif
                     @endforeach
-                    {{-- Fill remaining slots --}}
-                    @for($i = collect($build->team ?? [])->count(); $i < 6; $i++)
-                        <div class="build-card-sprite build-card-sprite--empty"></div>
-                    @endfor
                 </div>
 
                 <div class="build-card-body">
