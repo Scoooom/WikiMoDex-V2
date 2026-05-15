@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 class AdminSeeder extends Seeder
 {
+    /**
+     * Grant admin + wiki editor to the scooom account.
+     * This is a no-op on fresh installs until the user logs in via Discord.
+     * Run manually after first login with: php artisan db:seed --class=AdminSeeder
+     */
     public function run(): void
     {
         DB::table('users')
