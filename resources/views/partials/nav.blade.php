@@ -215,7 +215,36 @@ function initWikiSearch() {
             }
         }
         results.innerHTML=html;
-        results.querySelectorAll('.wiki-search-result-item').forEach(a=>a.addEventListener('click',close));
+        results.querySelectorAll('.wiki-search-result-item').forEach(a => {
+            a.addEventListener('click', e => {
+                // Close modal first (restores body overflow) before the browser scrolls
+                close();
+
+                // For same-page anchor links, the browser jumps instantly while
+                // overflow:hidden may still be applied, so we manually correct
+                // the scroll position after a short delay.
+                const href = a.getAttribute('href') || '';
+                const hashIdx = href.indexOf('#');
+                if (hashIdx === -1) return;
+
+                const anchor = href.slice(hashIdx + 1);
+                const isSamePage = href.startsWith('#') ||
+                    href.replace(/#.*$/, '') === (window.location.pathname + window.location.search);
+
+                if (isSamePage) {
+                    e.preventDefault();
+                    const target = document.getElementById(anchor);
+                    if (!target) return;
+                    const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h') || '54');
+                    const offset = navH + 24;
+                    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+                    window.scrollTo({ top, behavior: 'smooth' });
+                    history.pushState(null, '', href);
+                }
+                // Cross-page links: let the browser navigate normally;
+                // scroll-margin-top on the target page handles the offset.
+            });
+        });
     }
 }
 
