@@ -740,36 +740,160 @@ MD,
                 'title'    => 'Eggs & Gacha',
                 'category' => 'Items & Shop',
                 'order'    => 2,
-                'content'  => <<<MD
+                'content'  => <<<'MD'
 # Eggs & the Gacha System
 
-The Egg Gacha is a persistent system for collecting rare Pokémon — separate from wild encounters.
+The Egg Gacha is a persistent system for collecting rare Pokémon — completely separate from wild encounters. Some species can **only** be obtained through eggs, making the gacha essential for a complete Pokédex.
 
 ## Egg Vouchers
 
-Eggs are obtained by redeeming **Egg Vouchers** at the Egg Gacha machine (Menu → Egg Gacha). Vouchers are earned from various sources throughout the game.
+Eggs are obtained by spending **Egg Vouchers** at the Egg Gacha (Menu → Egg Gacha, or the **EGGS** command during battle). There are four voucher tiers, each enabling different pull options:
 
-## Hatching Eggs
+| Voucher | Pull Option | Guarantee |
+|---------|-------------|-----------|
+| **Egg Voucher** (Regular) | ×1 pull — or ×10 for 10 vouchers | ×10 guarantees at least 1 Rare egg |
+| **Egg Voucher Plus** | ×5 pulls | — |
+| **Egg Voucher Premium** | ×10 pulls | Guarantees at least 1 Rare egg |
+| **Egg Voucher Gold** | ×25 pulls | Guarantees at least 1 Epic egg |
 
-- Eggs hatch after a set number of battles — rarer eggs take longer
-- Hatched Pokémon are **added to your starter pool**, not your current party
-- Hatched Pokémon tend to have **superior IVs** compared to wild catches
-- Some Pokémon can **only** be obtained from eggs, making the gacha essential for full collection
+Vouchers appear as item rewards during runs (Voucher Plus from Ultra tier, Voucher Premium from Rogue tier, Voucher Gold from Master tier).
+
+## Egg Tiers & Hatch Waves
+
+Every egg belongs to one of four tiers, which determines how long it takes to hatch and what species can emerge. Rarer tiers produce more powerful Pokémon.
+
+| Tier (in-game name) | Hatch Waves | Pokémon Pool |
+|---------------------|-------------|--------------|
+| **Common** | 10 waves | Starter value 1–3 |
+| **Rare** | 25 waves | Starter value 4–5 |
+| **Epic** | 50 waves | Starter value 6–7 |
+| **Legendary** | 100 waves | Starter value 8–9 |
+| **Manaphy egg** | 50 waves | Phione (7/8) or Manaphy (1/8) |
+
+Hatched Pokémon are **added to your starter pool**, not your current party. Their IVs are determined by taking the **best of two independent IV rolls**, so egg Pokémon consistently have superior IVs versus wild catches.
+
+---
 
 ## The Three Machines
 
-There are **three gacha machines**, each with different bonuses. Choose the one that best fits your current goals (rare Pokémon, better IVs, specific species).
+All three machines share the same base tier odds and pull costs, but each boosts a specific outcome. Pick the machine that matches your current goal.
+
+### Legendary Up
+
+The **Legendary Up** machine features a **rotating daily Legendary Pokémon**. Every day a different Legendary cycles in as the day's featured Pokémon — check the [Gacha Calendar](/gacha.html) to see today's.
+
+**Tier odds (Legendary Up):**
+
+| Tier | Odds |
+|------|------|
+| Legendary | 0.78% (2 in 256) |
+| Epic | 2.73% (7 in 256) |
+| Rare | 17.19% (44 in 256) |
+| Common | 79.30% (203 in 256) |
+
+Compared to the other two machines, Legendary Up has a **doubled base Legendary rate** (0.78% vs 0.39%). It also advances the Legendary pity counter by **2 per pull** instead of 1, effectively halving the pulls needed to trigger pity.
+
+When a Legendary egg hatches from this machine, there is a **50% chance it is specifically the day's featured Legendary** rather than a random one from the pool.
+
+**Best for:** Targeting a specific Legendary Pokémon, or farming Legendary-tier eggs in general.
+
+---
+
+### Egg Move Up
+
+The **Egg Move Up** machine doubles the chance of hatching an egg with a **Rare Egg Move** unlocked.
+
+**Tier odds:** Identical to base (0.39% / 2.73% / 17.19% / 79.69%) — this machine does not affect tier rolls.
+
+#### Egg Move odds — how it works
+
+When an egg hatches, it rolls one of four egg move slots: indices 0–2 are common moves, index 3 is the rare move. The probability of landing on the rare move scales up with egg tier and is doubled by this machine:
+
+| Egg Tier | Default rate | Egg Move Up rate |
+|----------|-------------|-----------------|
+| Common | 1 in 48 (2.08%) | 1 in 24 (4.17%) |
+| Rare | 1 in 24 (4.17%) | 1 in 12 (8.33%) |
+| Epic | 1 in 12 (8.33%) | 1 in 6 (16.67%) |
+| Legendary | 1 in 6 (16.67%) | **1 in 3 (33.33%)** |
+
+Higher-tier eggs benefit most — a Legendary egg from this machine has a 1-in-3 shot at the rare move.
+
+#### How egg moves unlock
+
+When an egg hatches, if the rolled move is one the species hasn't had unlocked yet, it **permanently unlocks that egg move** for every future starter of that species. The rare move (index 3) is typically the strongest egg move a species can learn, so it's the most valuable unlock.
+
+**Best for:** Farming rare egg move unlocks, especially on high-tier species.
+
+---
+
+### Shiny Up
+
+The **Shiny Up** machine doubles the base shiny rate.
+
+**Tier odds:** Identical to base (0.39% / 2.73% / 17.19% / 79.69%) — this machine does not affect tier rolls.
+
+#### Shiny rates by source
+
+| Source | Shiny rate |
+|--------|------------|
+| Default gacha (Legendary Up / Egg Move Up) | 1 in 128 (0.78%) |
+| **Shiny Up machine** | **1 in 64 (1.56%)** |
+| Same-species egg | 1 in 24 (4.17%) |
+
+#### Shiny variant odds
+
+If an egg is shiny, it rolls a second time for a **variant tier**:
+
+| Variant | Chance (if shiny) |
+|---------|--------------------|
+| Common variant | 60% |
+| Rare variant | 30% |
+| Epic variant (full alternate palette) | 10% |
+
+Pokémon without variant data are always treated as Common variant regardless of this roll.
+
+**Best for:** Hunting shiny Pokémon from the gacha. For the absolute highest shiny rate, same-species eggs (4.17%) beat this machine, but Shiny Up is the best option for species you can't breed.
+
+---
+
+## Pity System
+
+The gacha tracks pull counts across all machines on your account. When a pity threshold is hit, the next **Common** egg that would be generated is automatically upgraded. All three counters run simultaneously — the highest eligible tier triggers first and resets that counter to 0.
+
+| Pity tier | Triggers after | Legendary Up effective threshold |
+|-----------|---------------|----------------------------------|
+| Rare | 9 pulls without Rare+ | 9 pulls |
+| Epic | 59 pulls without Epic+ | 59 pulls |
+| Legendary | 412 pulls without Legendary+ | **206 pulls** (counts +2/pull) |
+
+---
+
+## Hidden Ability Rates
+
+Hidden Abilities can hatch from gacha eggs, but the rate is low from the machines. Same-species eggs are far better for HA farming:
+
+| Source | HA rate |
+|--------|---------|
+| Any gacha machine | 1 in 192 (0.52%) |
+| Same-species egg | 1 in 8 (12.5%) |
+
+---
 
 ## Egg Swap
 
-After an egg hatches, you can optionally **swap** the new Pokémon for one of your current party members:
-- Your **first (lead) Pokémon cannot be swapped**
-- **Legendaries can only swap with legendaries**, Mega-evolvable, or Dynamax-capable Pokémon
-- Use this to mid-run upgrade your team with a powerful hatched Pokémon
+After any egg hatches you can optionally **swap** the new Pokémon into your current party:
+
+- Your **first (lead) Pokémon cannot be swapped out**
+- **Legendaries can only replace** another Legendary, a Mega-capable, or a Dynamax-capable Pokémon
+- Use this to upgrade your team mid-run with a powerful freshly-hatched Pokémon
+
+## Unlock Pity (Species Pool)
+
+The species pool for each tier only includes Pokémon you've **never caught and don't already have in an egg**. If you've rolled the same tier 9 consecutive times without getting an uncaught species, the pool forcibly narrows to only uncaught species — guaranteeing something new on the 10th roll. This counter resets whenever you do hatch a new species.
 
 ## Access During Battle
 
-In V2, you can access the Egg Gacha **mid-battle** via the **EGGS** command — no need to wait until the next title screen visit.
+In V2, the Egg Gacha is accessible **mid-battle** via the **EGGS** command — no need to wait until the next title screen visit. This lets you hatch eggs and potentially swap in a just-hatched Pokémon immediately.
 MD,
             ],
         ];
