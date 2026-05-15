@@ -99,7 +99,10 @@ Route::get('/trainercard-img:{username}.png', [UserController::class, 'trainerCa
 
 // Static pages — 1 hour
 Route::middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, stale-while-revalidate=30'])->group(function () {
-    Route::get('/faq.html', fn() => view('faq'));
+    Route::get('/faq.html', function () {
+        $grouped = \App\Models\FaqEntry::grouped();
+        return view('faq', compact('grouped'));
+    });
     Route::get('/gacha.html', fn() => view('gacha'));
 });
 

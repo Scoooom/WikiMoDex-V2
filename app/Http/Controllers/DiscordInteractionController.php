@@ -93,6 +93,10 @@ class DiscordInteractionController extends Controller
             return $this->autocompleteWikiSearch($query);
         }
 
+        if ($commandName === 'faq') {
+            return $this->autocompleteFaq($query);
+        }
+
         return $this->autocompleteForm($query);
     }
 
@@ -213,6 +217,14 @@ class DiscordInteractionController extends Controller
                 if ($option['name'] === 'query') { $query = $option['value']; break; }
             }
             return $this->handleWikiSearch($query);
+        }
+
+        if ($commandName === 'faq') {
+            $value = '';
+            foreach ($data['data']['options'] ?? [] as $option) {
+                if ($option['name'] === 'question') { $value = $option['value']; break; }
+            }
+            return $this->handleFaq($value);
         }
 
         if ($commandName === 'build') {
@@ -848,4 +860,54 @@ class DiscordInteractionController extends Controller
         $remain  = 20 - $div5;
         return str_repeat('█', $div5) . str_repeat('░', $remain);
     }
+    private function autocompleteFaq(string $query): \Illuminate\Http\JsonResponse
+    {
+        $q = trim($query);
+        $dbQuery = \App\Models\FaqEntry::orderBy('group_order')->orderBy('order');
+
+        if (strlen($q) >= 2) {
+            $dbQuery->where(function ($sub) use ($q) {
+                $sub->where('question', 'like', "%{$q}%")
+                    ->orWhere('answer_plain', 'like', "%{$q}%")
+                    ->orWhere('group', 'like', "%{$q}%");
+            });
+        }
+
+        $entries = $dbQuery->limit(25)->get(['question', 'group', 'slug']);
+
+        $choices = $entries->map(fn($e) => [
+            'name'  => mb_substr("[{$e->group}] {$e->question}", 0, 100),
+            'value' => $e->slug,
+        ])->values()->all();
+
+        return response()->json([
+            'type' => self::AUTOCOMPLETE_RESULT,
+            'data' => ['choices' => $choices],
+        ]);
+    }
+
+    private function handleFaq(string $slug): \Illuminate\Http\JsonResponse
+    {
+        $entry = \App\Models\FaqEntry::where('slug', $slug)->first();
+
+        if (!$entry) {
+            return response()->json([
+                'type' => self::CHANNEL_MESSAGE,
+                'data' => ['content' => "FAQ entry not found. Browse all FAQs at <https://void.scooom.xyz/faq.html>"],
+            ]);
+        }
+
+        $url = "https://void.scooom.xyz/faq.html#{$entry->slug}";
+
+        return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
+            'title'       => $entry->question,
+            'description' => $entry->answer_plain,
+            'color'       => 0x7c5cbf,
+            'fields'      => [['name' => 'Category', 'value' => $entry->group, 'inline' => true]],
+            'url'         => $url,
+            'footer'      => ['text' => 'WikiMoDex • FAQ'],
+        ]]]]);
+    }
+
+
 }

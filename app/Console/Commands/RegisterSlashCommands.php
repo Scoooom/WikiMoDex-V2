@@ -73,6 +73,19 @@ class RegisterSlashCommands extends Command
                 ]
             ],
             [
+                'name'        => 'faq',
+                'description' => 'Get an answer to a frequently asked question',
+                'options'     => [
+                    [
+                        'type'         => 3,
+                        'name'         => 'question',
+                        'description'  => 'The question you want answered',
+                        'required'     => true,
+                        'autocomplete' => true,
+                    ]
+                ]
+            ],
+            [
                 'name'        => 'build',
                 'description' => 'Share a community build by its ID or URL',
                 'options'     => [
