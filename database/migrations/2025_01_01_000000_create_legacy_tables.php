@@ -36,16 +36,6 @@ return new class extends Migration
             $table->string('creatorID')->nullable();
             $table->string('userID')->nullable();
         });
-
-        Schema::create('community_build_votes', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('build_id');
-            $table->unsignedBigInteger('user_id');
-            $table->timestamps();
-            $table->unique(['build_id', 'user_id']);
-            $table->index('build_id');
-            $table->index('user_id');
-        });
     }
 
     public function down(): void
@@ -54,6 +44,5 @@ return new class extends Migration
         Schema::dropIfExists('glitchLikes');
         Schema::dropIfExists('glitchDislikes');
         Schema::dropIfExists('userLikes');
-        Schema::dropIfExists('community_build_votes');
     }
 };
