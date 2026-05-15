@@ -9,14 +9,26 @@ import json
 import subprocess
 import sys
 
-POKEVOID       = '/var/www/void.scooom.com/pokevoid/src'
+import os
+from dotenv import load_dotenv
+
+
+dir_path = os.path.dirname(os.path.realpath(__file__)) + "/../"
+from dotenv import load_dotenv
+
+load_dotenv(dir_path+ "/.env")
+
+# DB config
+DB_NAME = os.getenv("DB_DATABASE")
+DB_USER = os.getenv("DB_USERNAME")
+DB_PASS = os.getenv("DB_PASSWORD")
+
+
+# Paths
+POKEVOID = dir_path + '/pokevoid/src'
 ALT_BUILD_TS   = f'{POKEVOID}/data/pokemon-alt-buid.ts'
 SPECIES_TS     = f'{POKEVOID}/enums/species.ts'
 POKEMON_TS     = f'{POKEVOID}/data/pokemon-species.ts'
-
-DB_NAME = 'pokevoid'
-DB_USER = 'void'
-DB_PASS = '827uh6aV8VI7F50D30BF'
 
 def run_sql(sql):
     result = subprocess.run(

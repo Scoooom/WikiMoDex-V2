@@ -17,7 +17,7 @@ class SyncPokevoid extends Command
         $this->info('Pulling latest PokeVoid source...');
         $output = [];
         $exit = 0;
-        exec("cd {$repoPath} && git pull 2>&1", $output, $exit);
+        exec("cd {$repoPath} && git pull origin main 2>&1", $output, $exit);
         foreach ($output as $line) {
             $this->line($line);
         }

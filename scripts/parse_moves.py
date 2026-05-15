@@ -8,15 +8,26 @@ import re
 import json
 import subprocess
 import sys
+import os
+from dotenv import load_dotenv
 
-POKEVOID   = '/var/www/void.scooom.com/pokevoid/src'
+
+dir_path = os.path.dirname(os.path.realpath(__file__)) + "/../"
+from dotenv import load_dotenv
+
+load_dotenv(dir_path+ "/.env")
+
+# DB config
+DB_NAME = os.getenv("DB_DATABASE")
+DB_USER = os.getenv("DB_USERNAME")
+DB_PASS = os.getenv("DB_PASSWORD")
+
+
+# Paths
+POKEVOID = dir_path + '/pokevoid/src'
 MOVES_ENUM = f'{POKEVOID}/enums/moves.ts'
 MOVE_TS    = f'{POKEVOID}/data/move.ts'
 MOVE_JSON  = f'{POKEVOID}/locales/en/move.json'
-
-DB_NAME = 'pokevoid'
-DB_USER = 'void'
-DB_PASS = '827uh6aV8VI7F50D30BF'
 
 SMITTY_KEYS = {'SMITTY_NUGGETS', 'NUGGET_OF_SMITTY'}
 
