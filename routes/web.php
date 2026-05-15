@@ -52,8 +52,12 @@ Route::middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, sta
     Route::get('/back:{id}.png', [SpriteController::class, 'back']);
     Route::get('/cFront:{name}.png', [SpriteController::class, 'coreFront']);
     Route::get('/cBack:{name}.png', [SpriteController::class, 'coreBack']);
-    Route::get('/pokevoid-sprites/{file}', [SpriteController::class, 'pokevoidSprite'])->where('file', '.+\.png');
 });
+
+// Pokevoid sprites — outside group so request()->path() captures subdirs (e.g. shiny/795.png)
+Route::get('/pokevoid-sprites/{file}', [SpriteController::class, 'pokevoidSprite'])
+    ->middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, stale-while-revalidate=30'])
+    ->where('file', '.+');
 
 // Likes
 Route::middleware('throttle:30,1')->group(function () {

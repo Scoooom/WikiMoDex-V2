@@ -45,10 +45,13 @@ class SpriteController extends Controller
         return $this->serveCoreSprite($name, true);
     }
 
-    public function pokevoidSprite($file)
+    public function pokevoidSprite()
     {
-        // Only allow safe filenames — dex numbers, optional suffixes, .png
-        if (!preg_match('/^[\w\-]+\.png$/', $file)) {
+        // Extract the file path from the request, stripping the /pokevoid-sprites/ prefix
+        $file = substr(request()->path(), strlen('pokevoid-sprites/'));
+
+        // Only allow safe paths — alphanumeric, hyphens, underscores, slashes, .png
+        if (!preg_match('/^[\w\-]+(\/[\w\-]+)*\.png$/', $file)) {
             abort(404);
         }
 
