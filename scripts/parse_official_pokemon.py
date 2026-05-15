@@ -178,7 +178,7 @@ def form_display_name(species_display, form_name, form_key):
         return species_display
     return f"{species_display} ({form_name})"
 
-def upsert(dex_number, species_key, name, form_name, form_key, type1, type2,
+def upsert(dex_number, species_key, name, form_name, form_key, form_index, type1, type2,
            ab1, ab2, abh, bst, hp, atk, def_, spatk, spdef, spd):
     t2 = str(type2) if type2 is not None else 'NULL'
     ab1_s = f"'{escape(ab1)}'" if ab1 else 'NULL'
@@ -187,16 +187,17 @@ def upsert(dex_number, species_key, name, form_name, form_key, type1, type2,
 
     sql = f"""
 INSERT INTO core_pokemon
-    (dex_number, species_key, name, form_name, form_key,
+    (dex_number, species_key, name, form_name, form_key, form_index,
      type1, type2, ability1, ability2, ability_hidden,
      bst, hp, atk, def, spatk, spdef, spd, created_at, updated_at)
 VALUES
     ({dex_number}, '{escape(species_key)}', '{escape(name)}',
-     '{escape(form_name)}', '{escape(form_key)}',
+     '{escape(form_name)}', '{escape(form_key)}', {form_index},
      {type1}, {t2}, {ab1_s}, {ab2_s}, {abh_s},
      {bst}, {hp}, {atk}, {def_}, {spatk}, {spdef}, {spd}, NOW(), NOW())
 ON DUPLICATE KEY UPDATE
     species_key=VALUES(species_key), name=VALUES(name), form_name=VALUES(form_name),
+    form_index=VALUES(form_index),
     type1=VALUES(type1), type2=VALUES(type2),
     ability1=VALUES(ability1), ability2=VALUES(ability2), ability_hidden=VALUES(ability_hidden),
     bst=VALUES(bst), hp=VALUES(hp), atk=VALUES(atk), def=VALUES(def),
@@ -302,7 +303,7 @@ def main():
                     fspd   = int(fargs[15].strip())
 
                     full_name = form_display_name(display_name, form_name_raw, form_key_raw)
-                    upsert(dex_number, species_key, full_name, form_name_raw, form_key_raw,
+                    upsert(dex_number, species_key, full_name, form_name_raw, form_key_raw, forms_found,
                            ftype1, ftype2, fab1, fab2, fabh,
                            fbst, fhp, fatk, fdef, fspatk, fspdef, fspd)
                     forms_found += 1
@@ -311,7 +312,7 @@ def main():
 
             if forms_found == 0:
                 # No explicit forms — insert base
-                upsert(dex_number, species_key, display_name, '', '',
+                upsert(dex_number, species_key, display_name, '', '', 0,
                        type1, type2, ab1, ab2, abh,
                        bst, hp, atk, def_, spatk, spdef, spd)
 

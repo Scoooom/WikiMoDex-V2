@@ -62,6 +62,7 @@
                                 data-dex="{{ $slot['dex_number'] }}"
                                 data-shiny="{{ !empty($slot['shiny']) ? '1' : '0' }}"
                                 data-variant="{{ $slot['variant'] ?? 0 }}"
+                                data-form-key="{{ $slot['form_key'] ?? '' }}"
                                 width="42" height="42"
                                 alt="{{ $slot['species'] ?? '' }}"
                             ></canvas>
@@ -126,11 +127,12 @@ fetch('/me.json', { credentials: 'same-origin' })
         const dex     = canvas.dataset.dex;
         const shiny   = canvas.dataset.shiny === '1';
         const variant = parseInt(canvas.dataset.variant || '0', 10);
+        const formKey = canvas.dataset.formKey || '';
         if (!dex) return;
 
-        const suffix    = shiny ? '_'.repeat(variant) : '';
-        const imgSrc    = shiny ? `/pokevoid-sprites/shiny/${dex}${suffix}.png` : `/pokevoid-sprites/${dex}.png`;
-        const atlasUrl  = shiny ? `/pokevoid-atlas-shiny/${dex}/${variant}.json` : `/pokevoid-atlas/${dex}.json`;
+        const formSuffix = formKey ? `-${formKey}` : '';
+        const imgSrc    = shiny ? `/pokevoid-sprites/shiny/${dex}${formSuffix}.png` : `/pokevoid-sprites/${dex}.png`;
+        const atlasUrl  = shiny ? `/pokevoid-atlas-shiny/${dex}/${formKey}.json` : `/pokevoid-atlas/${dex}.json`;
 
         const [img, atlas] = await Promise.all([
             new Promise(res => {

@@ -82,6 +82,7 @@
                                 data-palette="{{ json_encode($slotPalette) }}"
                                 data-shiny="{{ !empty($slot['shiny']) ? '1' : '0' }}"
                                 data-variant="{{ $slot['variant'] ?? 0 }}"
+                                data-form-key="{{ $slot['form_key'] ?? '' }}"
                                 @if($spriteType) data-type="{{ $spriteType }}" @endif
                                 width="80" height="80"></canvas>
                     @elseif($slotGlitchId)
@@ -484,7 +485,7 @@ function toggleSection(label) {
 
 // ── Sprite rendering ──────────────────────────────────────────────
 (function() {
-    async function extractFirstFrame(dex, shiny = false, variant = 0) {
+    async function extractFirstFrame(dex, shiny = false, formKey = '') {
         return new Promise(resolve => {
             const img = new Image();
             img.crossOrigin = 'anonymous';
@@ -494,7 +495,7 @@ function toggleSection(label) {
                 const tctx = tmp.getContext('2d', { willReadFrequently: true });
                 tctx.drawImage(img, 0, 0);
                 const atlasUrl = shiny
-                    ? `/pokevoid-atlas-shiny/${dex}/${variant}.json`
+                    ? `/pokevoid-atlas-shiny/${dex}/${formKey}.json`
                     : `/pokevoid-atlas/${dex}.json`;
                 fetch(atlasUrl)
                     .then(r => r.json())
@@ -511,16 +512,16 @@ function toggleSection(label) {
                     .catch(() => resolve(tmp));
             };
             img.onerror = () => {
-                // Shiny variant not found — fall back to base shiny (variant 0)
-                if (shiny && variant > 0) {
-                    extractFirstFrame(dex, true, 0).then(resolve);
+                // Form not found — fall back to base shiny
+                if (shiny && formKey) {
+                    extractFirstFrame(dex, true, '').then(resolve);
                 } else {
                     resolve(null);
                 }
             };
-            const suffix = shiny ? '_'.repeat(variant) : '';
+            const formSuffix = formKey ? `-${formKey}` : '';
             img.src = shiny
-                ? `/pokevoid-sprites/shiny/${dex}${suffix}.png`
+                ? `/pokevoid-sprites/shiny/${dex}${formSuffix}.png`
                 : `/pokevoid-sprites/${dex}.png`;
         });
     }
@@ -550,11 +551,11 @@ function toggleSection(label) {
         const typeStr = canvas.dataset.type || null;
         const palette = JSON.parse(canvas.dataset.palette || '[]');
         const shiny   = canvas.dataset.shiny === '1';
-        const variant = parseInt(canvas.dataset.variant || '0', 10);
+        const formKey = canvas.dataset.formKey || '';
         if (!dex) return;
         // Some pokemon (Arceus=493, Silvally=773) have type-suffixed sprites
         const spriteKey = typeStr ? `${dex}-${typeStr}` : dex;
-        const frame = await extractFirstFrame(spriteKey, shiny, variant);
+        const frame = await extractFirstFrame(spriteKey, shiny, formKey);
         if (!frame) { canvas.style.display = 'none'; return; }
         const ctx   = canvas.getContext('2d', { willReadFrequently: palette.length > 0 });
         const scale = Math.min(canvas.width / frame.width, canvas.height / frame.height);

@@ -181,10 +181,11 @@ Route::get('/pokevoid-atlas/{dex}.json', function ($dex) {
                           ->header('Cache-Control', 'public, max-age=86400');
 })->where('dex', '[\d]+(-[a-z]+)?');
 
-// Shiny variant atlas: variant 0 = shiny/{dex}.png, 1 = shiny/{dex}_.png, 2 = shiny/{dex}__.png
-Route::get('/pokevoid-atlas-shiny/{dex}/{variant}.json', function ($dex, $variant) {
-    if (!preg_match('/^\d+$/', $dex) || !in_array((int)$variant, [0, 1, 2])) abort(404);
-    $suffix = str_repeat('_', (int)$variant);
+// Shiny form atlas: formKey = '' for base shiny, 'primal'/'mega'/etc for forms
+Route::get('/pokevoid-atlas-shiny/{dex}/{formKey}.json', function ($dex, $formKey) {
+    if (!preg_match('/^\d+$/', $dex)) abort(404);
+    if (!preg_match('/^[\w-]*$/', $formKey)) abort(404);
+    $suffix = $formKey ? "-{$formKey}" : '';
     $path = base_path("pokevoid/public/images/pokemon/shiny/{$dex}{$suffix}.png");
     if (!file_exists($path)) abort(404);
     $out = shell_exec("python3 " . escapeshellarg(base_path('scripts/extract_atlas.py')) . " " . escapeshellarg($path) . " 2>/dev/null");
@@ -192,7 +193,7 @@ Route::get('/pokevoid-atlas-shiny/{dex}/{variant}.json', function ($dex, $varian
     return response($out)->header('Content-Type', 'application/json')
                           ->header('Access-Control-Allow-Origin', '*')
                           ->header('Cache-Control', 'public, max-age=86400');
-})->where(['dex' => '\d+', 'variant' => '[012]']);
+})->where(['dex' => '\d+', 'formKey' => '[\w-]*']);
 
 Route::get('/alt-build-sprite:{buildId}.png', function ($buildId) {
     $build = \App\Models\AltBuild::where('build_id', $buildId)->first();

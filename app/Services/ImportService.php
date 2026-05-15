@@ -202,11 +202,18 @@ class ImportService
             if ($altBuild) {
                 $altModel  = \App\Models\AltBuild::where('name', $species)->first();
                 $dexNumber = $altModel?->dex_number ?? $speciesInt;
+                $formKey   = '';
             } else {
+                $formIndex = (int)($p['formIndex'] ?? 0);
                 $coreMon   = CorePokemon::where('species_key', self::resolveSpeciesKey($speciesInt))
+                                ->where('form_index', $formIndex)->first()
+                             ?? CorePokemon::where('dex_number', $speciesInt)
+                                ->where('form_index', $formIndex)->first()
+                             ?? CorePokemon::where('species_key', self::resolveSpeciesKey($speciesInt))
                                 ->where('form_key', '')->first()
                              ?? CorePokemon::where('dex_number', $speciesInt)->first();
                 $dexNumber = $coreMon?->dex_number;
+                $formKey   = $coreMon?->form_key ?? '';
             }
 
             // Items
@@ -215,6 +222,7 @@ class ImportService
             $entry = [
                 'species'         => $species,
                 'dex_number'      => $dexNumber,
+                'form_key'        => $formKey,
                 'nickname'        => !empty($p['nickname']) ? base64_decode($p['nickname']) : null,
                 'ability'         => $ability,
                 'passive_ability' => $passive,
