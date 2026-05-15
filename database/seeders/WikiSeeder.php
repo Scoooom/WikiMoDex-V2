@@ -1547,5 +1547,11 @@ MD,
         ]);
 
         $this->command->info('WikiSeeder: champion articles added (index, Apollo, Diana, Brock, Misty).');
+
+        // Re-index all sections now that bulk inserts are done.
+        // (Bulk inserts via WikiArticle::truncate + create bypass model events,
+        //  so we rebuild the section index explicitly here.)
+        \App\Models\WikiArticle::reindexAll();
+        $this->command->info('WikiSeeder: wiki_sections index rebuilt.');
     }
 }

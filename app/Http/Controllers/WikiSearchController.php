@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\WikiArticle;
+use App\Models\WikiSection;
 use App\Models\GameItem;
 use App\Models\BuiltinForm;
 use App\Models\Glitch;
@@ -40,36 +41,83 @@ class WikiSearchController extends Controller
             }
         }
 
-        // ── Wiki Articles ─────────────────────────────────────────────
-        // Split into words so multi-word queries like "egg pity" match
-        // articles containing all words even when not adjacent.
-        $words = array_filter(explode(' ', $q), fn($w) => strlen($w) >= 2);
+        // ── Wiki Sections ─────────────────────────────────────────────
+        // Split into words; require all words to appear in the section.
+        // Score and rank so the best heading match surfaces first.
+        $words = array_values(array_filter(explode(' ', $q), fn($w) => strlen($w) >= 2));
         if (empty($words)) {
             $words = [$q];
         }
 
-        $articleQuery = WikiArticle::query();
+        $sectionQuery = WikiSection::query();
         foreach ($words as $word) {
-            $articleQuery->where(function ($sub) use ($word) {
-                $sub->where('title', 'like', "%{$word}%")
-                    ->orWhere('content', 'like', "%{$word}%");
+            $sectionQuery->where(function ($sub) use ($word) {
+                $sub->where('heading', 'like', "%{$word}%")
+                    ->orWhere('body', 'like', "%{$word}%");
             });
         }
-        $articles = $articleQuery
-            ->orderByRaw("CASE WHEN title LIKE ? THEN 0 ELSE 1 END", ["%{$q}%"])
-            ->limit(5)
-            ->get(['slug', 'title', 'category', 'content']);
+        $sections = $sectionQuery->limit(30)->get();
 
-        foreach ($articles as $article) {
-            $excerpt = $this->excerpt($article->content, $q);
+        // Score each candidate and pick the top 5
+        $scored = $sections
+            ->map(fn($s) => ['section' => $s, 'score' => $s->score($words)])
+            ->sortByDesc('score')
+            ->take(5);
+
+        // Deduplicate: only one result per article (the highest-scoring section)
+        $seenArticles = [];
+        foreach ($scored as $item) {
+            $s = $item['section'];
+
+            // Build a display title: "Article Title → Section Heading"
+            $isTopLevel = strtolower(trim($s->heading)) === strtolower(trim($s->article_title));
+            $displayTitle = $isTopLevel
+                ? $s->article_title
+                : $s->article_title . ' → ' . $s->heading;
+
+            // Excerpt from the section body
+            $excerpt = $this->excerptFromBody($s->body, $words);
+
+            $url = route('wiki.show', $s->article_slug) . '#' . $s->anchor;
+
+            $key = $s->article_slug . '#' . $s->anchor;
+            if (isset($seenArticles[$key])) continue;
+            $seenArticles[$key] = true;
+
             $results[] = [
                 'type'     => 'article',
                 'label'    => 'Wiki',
-                'title'    => $article->title,
-                'subtitle' => $article->category,
+                'title'    => $displayTitle,
+                'subtitle' => $s->article_category,
                 'excerpt'  => $excerpt,
-                'url'      => route('wiki.show', $article->slug),
+                'url'      => $url,
             ];
+        }
+
+        // Fallback: if sections yielded nothing, search article titles directly
+        if (empty($seenArticles)) {
+            $articleQuery = WikiArticle::query();
+            foreach ($words as $word) {
+                $articleQuery->where(function ($sub) use ($word) {
+                    $sub->where('title', 'like', "%{$word}%")
+                        ->orWhere('content', 'like', "%{$word}%");
+                });
+            }
+            $articles = $articleQuery
+                ->orderByRaw("CASE WHEN title LIKE ? THEN 0 ELSE 1 END", ["%{$q}%"])
+                ->limit(5)
+                ->get(['slug', 'title', 'category', 'content']);
+
+            foreach ($articles as $article) {
+                $results[] = [
+                    'type'     => 'article',
+                    'label'    => 'Wiki',
+                    'title'    => $article->title,
+                    'subtitle' => $article->category,
+                    'excerpt'  => $this->excerpt($article->content, $q),
+                    'url'      => route('wiki.show', $article->slug),
+                ];
+            }
         }
 
         // ── Items ─────────────────────────────────────────────────────
@@ -152,6 +200,33 @@ class WikiSearchController extends Controller
         }
 
         return response()->json(['query' => $q, 'results' => $results]);
+    }
+
+    /**
+     * Build an excerpt from a pre-stripped section body, highlighting the
+     * first query word found. Falls back to the start of the body.
+     */
+    private function excerptFromBody(string $body, array $words, int $length = 120): ?string
+    {
+        $pos = false;
+        foreach ($words as $word) {
+            $p = stripos($body, $word);
+            if ($p !== false) {
+                $pos = $p;
+                break;
+            }
+        }
+
+        if ($pos === false) {
+            return $this->truncate($body, $length);
+        }
+
+        $start   = max(0, $pos - 30);
+        $snippet = substr($body, $start, $length);
+        if ($start > 0) $snippet = '…' . ltrim($snippet);
+        if ($start + $length < strlen($body)) $snippet .= '…';
+
+        return $snippet;
     }
 
     private function excerpt(string $text, string $q, int $length = 100): ?string

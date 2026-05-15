@@ -11,6 +11,27 @@ class WikiArticle extends Model
 
     protected $fillable = ['slug', 'title', 'content', 'category', 'order'];
 
+    protected static function booted(): void
+    {
+        // Re-index sections whenever an article is created or updated
+        static::saved(function (WikiArticle $article) {
+            WikiSection::indexArticle($article);
+        });
+
+        static::deleted(function (WikiArticle $article) {
+            WikiSection::where('article_slug', $article->slug)->delete();
+        });
+    }
+
+    /** Re-index every article — call after bulk seeding (which bypasses model events). */
+    public static function reindexAll(): void
+    {
+        WikiSection::truncate();
+        foreach (static::all() as $article) {
+            WikiSection::indexArticle($article);
+        }
+    }
+
     public static function categories(): array
     {
         return self::distinct()
