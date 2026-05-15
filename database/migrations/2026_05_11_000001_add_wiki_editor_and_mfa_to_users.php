@@ -8,10 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_wiki_editor')->default(false)->after('is_admin');
-            $table->boolean('mfa_enabled')->default(false)->after('is_wiki_editor');
-        });
+        if (!Schema::hasColumn('users', 'is_wiki_editor')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->boolean('is_wiki_editor')->default(false)->after('is_admin');
+                $table->boolean('mfa_enabled')->default(false)->after('is_wiki_editor');
+            });
+        }
     }
 
     public function down(): void
