@@ -495,7 +495,7 @@ function toggleSection(label) {
                 const tctx = tmp.getContext('2d', { willReadFrequently: true });
                 tctx.drawImage(img, 0, 0);
                 const atlasUrl = shiny
-                    ? `/pokevoid-atlas-shiny/${dex}/${formKey}.json`
+                    ? `/pokevoid-atlas-shiny/${dex}${formKey ? '/' + formKey : ''}.json`
                     : `/pokevoid-atlas/${dex}.json`;
                 fetch(atlasUrl)
                     .then(r => r.json())
