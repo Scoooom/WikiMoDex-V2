@@ -118,8 +118,15 @@ class ImportService
                 $pMods    = $previewModsByPokemon[$p['id']] ?? [];
                 $altBuild = self::resolveAltBuild($pMods, $p);
                 $nickname = !empty($p['nickname']) ? base64_decode($p['nickname']) : null;
+                $formIndex = (int)($p['formIndex'] ?? 0);
+                $previewMon = $altBuild ? null : (
+                    CorePokemon::where('species_key', self::resolveSpeciesKey((int)$p['species']))
+                        ->where('form_index', $formIndex)->first()
+                    ?? CorePokemon::where('dex_number', (int)$p['species'])
+                        ->where('form_index', $formIndex)->first()
+                );
                 $preview[] = [
-                    'species'  => $altBuild ? $altBuild['name'] : self::resolveSpeciesName((int)$p['species']),
+                    'species'  => $altBuild ? $altBuild['name'] : ($previewMon?->name ?? self::resolveSpeciesName((int)$p['species'])),
                     'level'    => $p['level'] ?? null,
                     'nickname' => $nickname ?: null,
                 ];
