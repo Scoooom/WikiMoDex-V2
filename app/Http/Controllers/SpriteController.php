@@ -57,6 +57,14 @@ class SpriteController extends Controller
 
         $path = base_path("pokevoid/public/images/pokemon/{$file}");
 
+        // If the form-suffixed file doesn't exist, try the base dex number (e.g. 386-normal.png -> 386.png)
+        if (!file_exists($path)) {
+            $fallback = preg_replace('/-[^\/]+\.png$/', '.png', $file);
+            if ($fallback !== $file) {
+                $path = base_path("pokevoid/public/images/pokemon/{$fallback}");
+            }
+        }
+
         if (!file_exists($path)) {
             abort(404);
         }
