@@ -15,7 +15,6 @@ from dotenv import load_dotenv
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__)) + "/../"
-from dotenv import load_dotenv
 
 load_dotenv(dir_path+ "/.env")
 
