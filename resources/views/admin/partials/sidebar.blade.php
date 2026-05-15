@@ -26,6 +26,10 @@
            class="admin-sidebar-link {{ ($active ?? '') === 'wiki' ? 'active' : '' }}">
             <span class="admin-sidebar-icon">📄</span> Articles
         </a>
+        <a href="{{ route('faq.admin.index') }}"
+           class="admin-sidebar-link {{ ($active ?? '') === 'faq' ? 'active' : '' }}">
+            <span class="admin-sidebar-icon">❓</span> FAQ
+        </a>
         <div class="admin-sidebar-divider"></div>
         <span class="admin-sidebar-section-label">Site</span>
         <a href="/" class="admin-sidebar-link">

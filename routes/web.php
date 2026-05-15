@@ -296,6 +296,7 @@ Route::middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, sta
 
 // ── Wiki ──────────────────────────────────────────────────────────
 use App\Http\Controllers\WikiController;
+use App\Http\Controllers\FaqController;
 
 // Wiki search — no-store (dynamic per query)
 Route::get('/wiki-search.json', [\App\Http\Controllers\WikiSearchController::class, 'search'])
@@ -333,5 +334,13 @@ Route::middleware(['editor', 'cache:no-store'])->prefix('admin')->group(function
     Route::get('/wiki:{slug}.html',    [WikiController::class, 'adminEdit'])->name('wiki.admin.edit');
     Route::post('/wiki:{slug}.html',   [WikiController::class, 'adminSave'])->name('wiki.admin.save');
     Route::delete('/wiki:{slug}.html', [WikiController::class, 'adminDelete'])->name('wiki.admin.delete');
+
+    // FAQ
+    Route::get('/faq.html',            [FaqController::class, 'index'])->name('faq.admin.index');
+    Route::get('/faq/new.html',        [FaqController::class, 'create'])->name('faq.admin.new');
+    Route::post('/faq/new.html',       [FaqController::class, 'store'])->name('faq.admin.create');
+    Route::get('/faq:{slug}.html',     [FaqController::class, 'edit'])->name('faq.admin.edit');
+    Route::post('/faq:{slug}.html',    [FaqController::class, 'update'])->name('faq.admin.save');
+    Route::delete('/faq:{slug}.html',  [FaqController::class, 'destroy'])->name('faq.admin.delete');
 });
 

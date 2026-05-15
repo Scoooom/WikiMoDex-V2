@@ -48,6 +48,18 @@ class AppServiceProvider extends ServiceProvider
             ]);
         });
 
+        // Auto-purge Cloudflare cache when FAQ entries change
+        $faqPurge = function () {
+            \Illuminate\Support\Facades\Artisan::call('cf:purge', [
+                '--url' => [
+                    rtrim(config('services.cloudflare.base_url'), '/') . '/faq.html',
+                ],
+            ]);
+        };
+
+        \App\Models\FaqEntry::saved($faqPurge);
+        \App\Models\FaqEntry::deleted($faqPurge);
+
         // Auto-purge when glitches are uploaded or deleted
         $glitchUrls = function(\App\Models\Glitch $glitch) {
             $base = rtrim(config('services.cloudflare.base_url'), '/');
