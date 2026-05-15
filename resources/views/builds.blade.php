@@ -141,7 +141,7 @@ fetch('/me.json', { credentials: 'same-origin' })
             fetch(atlasUrl).then(r => r.json()).catch(() => null),
         ]);
 
-        if (!img || !atlas) { canvas.style.opacity = '0'; return; }
+        if (!img || !atlas) { canvas.style.display = 'none'; return; }
 
         const tmp = document.createElement('canvas');
         tmp.width = img.naturalWidth; tmp.height = img.naturalHeight;
