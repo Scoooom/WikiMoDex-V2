@@ -173,6 +173,11 @@ Route::get('/alt-build-stats/{buildId}.json', function ($buildId) {
 Route::get('/pokevoid-atlas/{dex}.json', function ($dex) {
     if (!preg_match('/^[\d]+(-[a-z]+)?$/', $dex)) abort(404);
     $path = base_path("pokevoid/public/images/pokemon/{$dex}.png");
+    // Fall back to unsuffixed file if form-suffixed doesn't exist (e.g. 386-normal.png -> 386.png)
+    if (!file_exists($path)) {
+        $fallback = preg_replace('/-[a-z]+$/', '', $dex);
+        $path = base_path("pokevoid/public/images/pokemon/{$fallback}.png");
+    }
     if (!file_exists($path)) abort(404);
     $out = shell_exec("python3 " . escapeshellarg(base_path('scripts/extract_atlas.py')) . " " . escapeshellarg($path) . " 2>/dev/null");
     if (!$out) abort(404);
