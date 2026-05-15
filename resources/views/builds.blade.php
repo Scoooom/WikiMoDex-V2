@@ -56,15 +56,7 @@
                 {{-- Team preview sprites --}}
                 <div class="build-card-sprites">
                     @foreach(collect($build->team ?? [])->take(6) as $slot)
-                        @if(!empty($slot['alt_build_rank']) || (!empty($slot['species']) && empty($slot['dex_number'])))
-                            {{-- Alt build or glitch: use cFront route by name --}}
-                            <img
-                                src="/cFront:{{ $slot['species'] }}.png"
-                                class="build-card-sprite build-card-sprite--canvas"
-                                alt="{{ $slot['species'] }}"
-                                onerror="this.style.display='none'"
-                            >
-                        @elseif(!empty($slot['dex_number']))
+                        @if(!empty($slot['dex_number']))
                             <canvas
                                 class="build-card-sprite build-card-sprite--canvas {{ !empty($slot['shiny']) ? 'build-card-sprite--shiny' : '' }}"
                                 data-dex="{{ $slot['dex_number'] }}"
@@ -74,6 +66,14 @@
                                 width="42" height="42"
                                 alt="{{ $slot['species'] ?? '' }}"
                             ></canvas>
+                        @elseif(!empty($slot['species']))
+                            {{-- Core glitch / SMITTY: use cFront route by name --}}
+                            <img
+                                src="/cFront:{{ $slot['species'] }}.png"
+                                class="build-card-sprite build-card-sprite--canvas"
+                                alt="{{ $slot['species'] }}"
+                                onerror="this.style.opacity='0'"
+                            >
                         @endif
                     @endforeach
                 </div>
