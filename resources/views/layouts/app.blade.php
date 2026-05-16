@@ -26,6 +26,12 @@
         gtag('js', new Date());
         gtag('config', 'G-QS5H466REX');
     </script>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://stats.scooom.xyz/js/pa-dbuwMAtytRej1UrBohPqo.js"></script>
+    <script>
+        window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+        plausible.init()
+    </script>
     @endif
 </head>
 <body>
