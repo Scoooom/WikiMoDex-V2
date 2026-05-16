@@ -296,7 +296,7 @@ class FaqSeeder extends Seeder
                 'order'            => 4,
                 'question'         => 'How do I get a Trainer Card?',
                 'answer_html'      => '<p>Log in with Discord on <a href="https://void.scooom.xyz">void.scooom.xyz</a>, then go to your profile from the nav bar. In the sidebar, find the <strong>Save File</strong> section — select your save file and click <strong>Upload Save File</strong>.</p><p>Once uploaded, buttons will appear to view your <strong>Trainer Card</strong> or copy a <strong>Share Image</strong> to your clipboard.</p>',
-                'answer_plain'     => "Log in with Discord on void.scooom.xyz and go to your profile from the nav bar. In the sidebar, find the Save File section — select your save file and click Upload Save File. Once uploaded, you can view your Trainer Card or copy a Share Image to your clipboard.",
+                'answer_plain'     => "Log in with Discord on <https://void.scooom.xyz> and go to your profile from the nav bar. In the sidebar, find the Save File section — select your save file and click Upload Save File. Once uploaded, you can view your Trainer Card or copy a Share Image to your clipboard.",
                 'open_by_default'  => false,
             ],
 
