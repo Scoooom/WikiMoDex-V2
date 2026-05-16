@@ -293,6 +293,15 @@ class FaqSeeder extends Seeder
 
             [
                 'group'            => 'Saving & Technical',
+                'order'            => 4,
+                'question'         => 'How do I get a Trainer Card?',
+                'answer_html'      => '<p>Log in with your Discord account on <a href="https://void.scooom.xyz">void.scooom.xyz</a> and visit your profile page. Your Trainer Card is generated automatically and can be customised in your account settings.</p>',
+                'answer_plain'     => "Log in with your Discord account on void.scooom.xyz and visit your profile page. Your Trainer Card is generated automatically and can be customised in your account settings.",
+                'open_by_default'  => false,
+            ],
+
+            [
+                'group'            => 'Saving & Technical',
                 'order'            => 5,
                 'question'         => 'My game froze / black screen — nothing is working!',
                 'answer_html'      => '<p>Sounds like you found a bug — nice work! Please post in <a href="https://discord.com/channels/1339035316585107546/1351943292467544135">#bugs-or-issues</a> on Discord with:</p>
