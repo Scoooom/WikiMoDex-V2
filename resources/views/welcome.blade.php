@@ -4,13 +4,9 @@
 @section('content')
 <div class="container">
 
-    <div class="hero">
+    <div class="hero" style="padding:24px 0 20px">
         <div class="hero-eyebrow">PokeVoid Wiki</div>
-        <h1>Harness the power<br>of the void</h1>
-        <p class="hero-lead">
-            PokeVoid is a fork of PokeRogue where you fight to save the world from corruption —
-            collecting glitch shards to corrupt your own Pokémon in legendary ways.
-        </p>
+        <h1 style="font-size:26px;margin-bottom:10px">Harness the power of the void</h1>
         <div class="hero-actions">
             <a href="/wiki.html" class="btn btn-primary">Browse the Wiki</a>
             <a href="/gallery.html" class="btn btn-secondary">Glitch Forms</a>
@@ -18,7 +14,7 @@
         </div>
     </div>
 
-    <div class="stats-strip">
+    <div class="stats-strip" style="margin-bottom:24px">
         <div class="stat-cell">
             <div class="stat-num">{{ $stats['glitches'] }}</div>
             <div class="stat-label">Glitch forms</div>
