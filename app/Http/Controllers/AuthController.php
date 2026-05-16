@@ -85,16 +85,21 @@ class AuthController extends Controller
 
     public function logout()
     {
+        $returnURL = request()->input('returnURL', '/');
         Auth::logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
-        return redirect('/');
+        return redirect($returnURL);
     }
 
     public function handleLogin()
     {
         if (request()->has('logoutkey')) {
             return $this->logout();
+        }
+        // Store returnURL so we can redirect back after OAuth callback
+        if ($returnURL = request()->input('returnURL')) {
+            session(['url.intended' => $returnURL]);
         }
         return $this->redirect();
     }
