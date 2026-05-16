@@ -93,7 +93,7 @@ document.addEventListener('click', function(e) {
                     <form method="post" action="/login.html" style="display:contents">
                         <input type="hidden" name="_token" value="${getCsrfToken()}">
                         <input type="hidden" name="logoutkey" value="1">
-                        <input type="hidden" name="returnURL" value="/">
+                        <input type="hidden" name="returnURL" value="${currentPath}">
                         <button type="submit" class="nav-dropdown-item nav-dropdown-item--danger">Logout</button>
                     </form>
                 </div>
