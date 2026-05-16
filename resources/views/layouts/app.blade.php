@@ -18,14 +18,6 @@
     <link rel="manifest" href="/site.webmanifest">
 
     @if(app()->environment('production'))
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QS5H466REX"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-QS5H466REX');
-    </script>
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://stats.scooom.xyz/js/pa-dbuwMAtytRej1UrBohPqo.js"></script>
     <script>
