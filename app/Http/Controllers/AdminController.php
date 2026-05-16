@@ -51,7 +51,7 @@ class AdminController extends Controller
             $query->where('is_wiki_editor', true);
         }
 
-        $users = $query->orderByDesc('id')->paginate(30)->withQueryString();
+        $users = $query->orderBy('id')->paginate(30)->withQueryString();
 
         return view('admin.users', compact('users'));
     }
