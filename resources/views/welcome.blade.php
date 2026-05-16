@@ -42,12 +42,12 @@
         <a href="/wiki:chaos-mode.html" class="home-wiki-card">
             <div class="home-wiki-card-icon">🌀</div>
             <div class="home-wiki-card-title">Chaos Mode</div>
-            <div class="home-wiki-card-sub">Pick your path, risk everything</div>
+            <div class="home-wiki-card-sub">Choose your path through the Void</div>
         </a>
         <a href="/wiki:gauntlet-mode.html" class="home-wiki-card">
             <div class="home-wiki-card-icon">⚔️</div>
             <div class="home-wiki-card-title">Gauntlet Mode</div>
-            <div class="home-wiki-card-sub">Chase rivals through the darkness</div>
+            <div class="home-wiki-card-sub">Wave after wave of intense encounters</div>
         </a>
         <a href="/rivals.html" class="home-wiki-card">
             <div class="home-wiki-card-icon">👤</div>
