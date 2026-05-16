@@ -43,9 +43,8 @@
 <script>
 async function copyTrainerCard(btn, url) {
     try {
-        const res = await fetch(url);
-        const blob = await res.blob();
-        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+        const fullUrl = window.location.origin + url;
+        await navigator.clipboard.writeText(fullUrl);
         const orig = btn.textContent;
         btn.textContent = '✓ Copied!';
         setTimeout(() => btn.textContent = orig, 2000);
