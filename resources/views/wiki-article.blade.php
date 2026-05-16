@@ -59,14 +59,16 @@
 </div>
 
 <script>
-// Inject admin edit button if user is admin (keeps page CF-cacheable)
+// Inject admin edit button or contribute CTA (keeps page CF-cacheable)
 fetch('/me.json', { credentials: 'same-origin' })
     .then(r => r.json())
     .then(me => {
-        if (!me.isAdmin) return;
         const slot = document.getElementById('wiki-edit-btn-slot');
-        if (slot) {
+        if (!slot) return;
+        if (me.isEditor || me.isAdmin) {
             slot.innerHTML = '<a href="{{ route('wiki.admin.edit', $article->slug) }}" class="wiki-edit-btn">Edit Article</a>';
+        } else {
+            slot.innerHTML = '<a href="https://discord.gg/xsQummMK3H" target="_blank" rel="noopener" class="wiki-edit-btn" style="opacity:.7">Want to contribute? Join Discord →</a>';
         }
     })
     .catch(() => {});
@@ -190,7 +192,5 @@ fetch('/me.json', { credentials: 'same-origin' })
     });
 })();
 </script>
-
-@include('partials.contribute-cta')
 
 @endsection
