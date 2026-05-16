@@ -39,15 +39,15 @@
         <a href="/wiki.html" class="section-link">Browse all →</a>
     </div>
     <div class="home-wiki-grid mb-4">
-        <a href="/wiki:game-modes-overview.html" class="home-wiki-card">
+        <a href="/wiki:chaos-mode.html" class="home-wiki-card">
             <div class="home-wiki-card-icon">🌀</div>
-            <div class="home-wiki-card-title">Game Modes</div>
-            <div class="home-wiki-card-sub">Chaos, Gauntlet and more</div>
+            <div class="home-wiki-card-title">Chaos Mode</div>
+            <div class="home-wiki-card-sub">Pick your path, risk everything</div>
         </a>
-        <a href="/wiki:introduction.html" class="home-wiki-card">
+        <a href="/wiki:gauntlet-mode.html" class="home-wiki-card">
             <div class="home-wiki-card-icon">⚔️</div>
-            <div class="home-wiki-card-title">Getting Started</div>
-            <div class="home-wiki-card-sub">New to PokeVoid? Start here</div>
+            <div class="home-wiki-card-title">Gauntlet Mode</div>
+            <div class="home-wiki-card-sub">Chase rivals through the darkness</div>
         </a>
         <a href="/rivals.html" class="home-wiki-card">
             <div class="home-wiki-card-icon">👤</div>
