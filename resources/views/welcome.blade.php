@@ -12,8 +12,9 @@
             collecting glitch shards to corrupt your own Pokémon in legendary ways.
         </p>
         <div class="hero-actions">
-            <a href="/gallery.html" class="btn btn-primary">Browse glitch forms</a>
-            <a href="/faq.html" class="btn btn-secondary">Read the FAQ</a>
+            <a href="/wiki.html" class="btn btn-primary">Browse the Wiki</a>
+            <a href="/gallery.html" class="btn btn-secondary">Glitch Forms</a>
+            <a href="/faq.html" class="btn btn-secondary">FAQ</a>
         </div>
     </div>
 
@@ -36,6 +37,51 @@
         </div>
     </div>
 
+    {{-- Wiki quick links --}}
+    <div class="section-header">
+        <span class="section-title">Wiki</span>
+        <a href="/wiki.html" class="section-link">Browse all →</a>
+    </div>
+    <div class="home-wiki-grid mb-4">
+        <a href="/wiki:chaos-mode.html" class="home-wiki-card">
+            <div class="home-wiki-card-icon">🌀</div>
+            <div class="home-wiki-card-title">Chaos Mode</div>
+            <div class="home-wiki-card-sub">Pick your path, risk everything</div>
+        </a>
+        <a href="/wiki:gauntlet-mode.html" class="home-wiki-card">
+            <div class="home-wiki-card-icon">⚔️</div>
+            <div class="home-wiki-card-title">Gauntlet Mode</div>
+            <div class="home-wiki-card-sub">Chase rivals through the darkness</div>
+        </a>
+        <a href="/rivals.html" class="home-wiki-card">
+            <div class="home-wiki-card-icon">👤</div>
+            <div class="home-wiki-card-title">Rivals</div>
+            <div class="home-wiki-card-sub">All 28 rivals and their teams</div>
+        </a>
+        <a href="/wiki:items.html" class="home-wiki-card">
+            <div class="home-wiki-card-icon">🎒</div>
+            <div class="home-wiki-card-title">Items & Shop</div>
+            <div class="home-wiki-card-sub">Every item in the game</div>
+        </a>
+        <a href="/wiki:alt-builds.html" class="home-wiki-card">
+            <div class="home-wiki-card-icon">⚡</div>
+            <div class="home-wiki-card-title">Alt Builds</div>
+            <div class="home-wiki-card-sub">Community-curated movesets</div>
+        </a>
+        <a href="/wiki:changelog.html" class="home-wiki-card">
+            <div class="home-wiki-card-icon">📋</div>
+            <div class="home-wiki-card-title">Changelog</div>
+            <div class="home-wiki-card-sub">Latest updates to the game</div>
+        </a>
+    </div>
+
+    {{-- Contribute CTA --}}
+    <div class="section-header mb-4" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 16px;margin-bottom:32px">
+        <span style="font-size:13px;color:var(--muted)">Want to help build the wiki? Join the community and ask for editor access.</span>
+        <a href="https://discord.gg/xsQummMK3H" target="_blank" rel="noopener" class="section-link" style="white-space:nowrap">Join Discord →</a>
+    </div>
+
+    {{-- Top-rated glitch forms --}}
     @if(count($featured) > 0)
     <div class="section-header">
         <span class="section-title">Top-rated glitch forms</span>
@@ -87,4 +133,28 @@
     </div>
 
 </div>
+
+<style>
+.home-wiki-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+.home-wiki-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 16px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: border-color var(--transition), transform var(--transition);
+}
+.home-wiki-card:hover { border-color: var(--accent); transform: translateY(-2px); color: inherit; }
+.home-wiki-card-icon { font-size: 22px; margin-bottom: 4px; }
+.home-wiki-card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.home-wiki-card-sub { font-size: 12px; color: var(--muted); line-height: 1.4; }
+</style>
 @endsection
