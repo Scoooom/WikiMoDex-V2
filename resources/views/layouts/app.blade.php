@@ -40,5 +40,19 @@
             <span class="footer-text">Questions? Find <code>scooom</code> on Discord.</span>
         </div>
     </footer>
+<script>
+async function copyTrainerCard(btn, url) {
+    try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+        const orig = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => btn.textContent = orig, 2000);
+    } catch (e) {
+        window.open(url, '_blank');
+    }
+}
+</script>
 </body>
 </html>

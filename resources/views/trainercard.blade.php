@@ -64,7 +64,7 @@
         👁 You're viewing your full trainer card.
         <a href="/trainercard-public:{{ $user->username }}.html" style="color:var(--accent)">Preview public view</a> ·
         <a href="/settings.html" style="color:var(--accent)">Edit settings</a> ·
-        <a href="/trainercard-img:{{ $user->username }}.png" target="_blank" style="color:var(--accent)">🖼 Share image</a>
+        <button onclick="copyTrainerCard(this, '/trainercard-img:{{ $user->username }}.png')" style="background:none;border:none;color:var(--accent);cursor:pointer;padding:0">🖼 Share image</button>
     </div>
     @endif
 

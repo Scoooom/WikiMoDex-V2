@@ -60,7 +60,7 @@
                     <div style="margin-top:10px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
                         @if($isOwner ?? false)
                         <a href="/trainercard:{{ $user->username }}.html" class="btn btn-info btn-sm">Trainer Card</a>
-                        <a href="/trainercard-img:{{ $user->username }}.png" target="_blank" class="btn btn-secondary btn-sm">🖼 Share Image</a>
+                        <button onclick="copyTrainerCard(this, '/trainercard-img:{{ $user->username }}.png')" class="btn btn-secondary btn-sm">🖼 Share Image</button>
                         @else
                         <a href="/trainercard-public:{{ $user->username }}.html" class="btn btn-info btn-sm">Trainer Card</a>
                         @endif
@@ -76,7 +76,10 @@
                     <form action="/u:{{ $user->username }}.html" method="post" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="action" value="uploadNew">
-                        <input type="file" name="saveFile" class="form-input mb-2" style="padding:6px">
+                        <label style="display:block;margin-bottom:8px">
+                            <span style="display:block;font-size:12px;color:var(--muted);margin-bottom:4px">Select save file</span>
+                            <input type="file" name="saveFile" accept=".pv" style="display:block;width:100%;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 8px;cursor:pointer">
+                        </label>
                         <button type="submit" class="btn btn-primary btn-sm" style="width:100%">
                             {{ ($user->b64_prsv && $user->raw_prsv) ? 'Update save file' : 'Upload save file' }}
                         </button>
