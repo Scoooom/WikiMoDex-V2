@@ -76,10 +76,14 @@
                     <form action="/u:{{ $user->username }}.html" method="post" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="action" value="uploadNew">
-                        <label style="display:block;margin-bottom:8px">
+                        <div style="margin-bottom:8px">
                             <span style="display:block;font-size:12px;color:var(--muted);margin-bottom:4px">Select save file</span>
-                            <input type="file" name="saveFile" accept=".pv" style="display:block;width:100%;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 8px;cursor:pointer">
-                        </label>
+                            <label style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 8px;cursor:pointer">
+                                <span style="font-size:12px;background:var(--accent);color:#fff;padding:3px 10px;border-radius:4px;white-space:nowrap">Browse</span>
+                                <span id="save-file-name" style="font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">No file chosen</span>
+                                <input type="file" name="saveFile" style="display:none" onchange="document.getElementById('save-file-name').textContent = this.files[0]?.name || 'No file chosen'">
+                            </label>
+                        </div>
                         <button type="submit" class="btn btn-primary btn-sm" style="width:100%">
                             {{ ($user->b64_prsv && $user->raw_prsv) ? 'Update save file' : 'Upload save file' }}
                         </button>
