@@ -191,4 +191,6 @@ fetch('/me.json', { credentials: 'same-origin' })
 })();
 </script>
 
+@include('partials.contribute-cta')
+
 @endsection
