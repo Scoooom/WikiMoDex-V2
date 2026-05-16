@@ -344,3 +344,30 @@ Route::middleware(['editor', 'cache:no-store'])->prefix('admin')->group(function
     Route::delete('/faq:{slug}.html',  [FaqController::class, 'destroy'])->name('faq.admin.delete');
 });
 
+
+// ── Sitemap ───────────────────────────────────────────────────────
+Route::get('/sitemap.xml', function () {
+    $articles = \App\Models\WikiArticle::all(['slug']);
+    $rivals   = \App\Models\Rival::all(['slug']);
+
+    $urls = collect([
+        ['loc' => url('/'),                     'changefreq' => 'daily',   'priority' => '1.0'],
+        ['loc' => url('/rivals.html'),           'changefreq' => 'weekly',  'priority' => '0.8'],
+        ['loc' => url('/wiki.html'),             'changefreq' => 'weekly',  'priority' => '0.8'],
+        ['loc' => url('/wiki:alt-builds.html'),  'changefreq' => 'weekly',  'priority' => '0.7'],
+        ['loc' => url('/wiki:items.html'),       'changefreq' => 'weekly',  'priority' => '0.7'],
+        ['loc' => url('/wiki:changelog.html'),   'changefreq' => 'weekly',  'priority' => '0.6'],
+        ['loc' => url('/faq.html'),              'changefreq' => 'monthly', 'priority' => '0.5'],
+    ]);
+
+    foreach ($articles as $article) {
+        $urls->push(['loc' => url("/wiki:{$article->slug}.html"), 'changefreq' => 'weekly', 'priority' => '0.8']);
+    }
+    foreach ($rivals as $rival) {
+        $urls->push(['loc' => url("/rival:{$rival->slug}.html"), 'changefreq' => 'monthly', 'priority' => '0.7']);
+    }
+
+    return response()->view('sitemap', compact('urls'))
+        ->header('Content-Type', 'application/xml')
+        ->header('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=60');
+})->middleware('nosession');
