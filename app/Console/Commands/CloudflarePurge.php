@@ -26,6 +26,11 @@ class CloudflarePurge extends Command
         $this->zoneId   = config('services.cloudflare.zone_id');
         $this->baseUrl  = rtrim(config('services.cloudflare.base_url'), '/');
 
+        if (app()->environment('local')) {
+            $this->error('cf:purge is disabled in local environment.');
+            return self::FAILURE;
+        }
+
         if (!$this->apiToken || !$this->zoneId) {
             $this->error('CLOUDFLARE_API_TOKEN and CLOUDFLARE_ZONE_ID must be set in .env');
             return self::FAILURE;
