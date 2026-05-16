@@ -71,11 +71,23 @@
         </a>
     </div>
 
-    {{-- Contribute CTA --}}
-    <div class="section-header mb-4" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 16px;margin-bottom:32px">
+    {{-- Contribute CTA — shown to guests and non-editors via /me.json --}}
+    <div id="contribute-cta" class="section-header mb-4" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 16px;margin-bottom:32px">
         <span style="font-size:13px;color:var(--muted)">Want to help build the wiki? Join the community and ask for editor access.</span>
         <a href="https://discord.gg/xsQummMK3H" target="_blank" rel="noopener" class="section-link" style="white-space:nowrap">Join Discord →</a>
     </div>
+    <script>
+    fetch('/me.json', { credentials: 'same-origin' })
+        .then(r => r.json())
+        .then(me => {
+            if (!me.authed || (!me.isAdmin && !me.isEditor)) {
+                document.getElementById('contribute-cta').style.display = '';
+            }
+        })
+        .catch(() => {
+            document.getElementById('contribute-cta').style.display = '';
+        });
+    </script>
 
     {{-- Top-rated glitch forms --}}
     @if(count($featured) > 0)
