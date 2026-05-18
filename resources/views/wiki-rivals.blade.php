@@ -7,6 +7,27 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="{{ asset('og/smittom.png') }}">
+<?php
+$rivalsJsonLd = json_encode([
+    '@context' => 'https://schema.org',
+    '@graph'   => [
+        [
+            '@type'       => 'CollectionPage',
+            'name'        => 'Rivals — PokéVoid Wiki',
+            'description' => 'Meet the rivals of PokéVoid — their lore, battle conditions, and full team layouts.',
+            'url'         => 'https://pokevoid.wiki/rivals.html',
+        ],
+        [
+            '@type'           => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home',   'item' => 'https://pokevoid.wiki'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Rivals', 'item' => 'https://pokevoid.wiki/rivals.html'],
+            ],
+        ],
+    ],
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+?>
+<script type="application/ld+json">{!! $rivalsJsonLd !!}</script>
 @endpush
 
 @section('content')

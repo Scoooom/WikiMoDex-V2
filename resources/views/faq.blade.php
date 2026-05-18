@@ -7,21 +7,26 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="{{ asset('og/smittom.png') }}">
-@endpush
-
-@push('meta')
 <?php
 $faqJsonLd = json_encode([
     '@context' => 'https://schema.org',
-    '@type'    => 'FAQPage',
-    'mainEntity' => collect($grouped)->flatten(1)->map(fn($faq) => [
-        '@type' => 'Question',
-        'name'  => $faq['question'],
-        'acceptedAnswer' => [
-            '@type' => 'Answer',
-            'text'  => $faq['answer_plain'],
+    '@graph'   => [
+        [
+            '@type'      => 'FAQPage',
+            'mainEntity' => collect($grouped)->flatten(1)->map(fn($faq) => [
+                '@type' => 'Question',
+                'name'  => $faq['question'],
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => $faq['answer_plain']],
+            ])->values()->all(),
         ],
-    ])->values()->all(),
+        [
+            '@type'           => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://pokevoid.wiki'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'FAQ',  'item' => 'https://pokevoid.wiki/faq.html'],
+            ],
+        ],
+    ],
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 ?>
 <script type="application/ld+json">{!! $faqJsonLd !!}</script>

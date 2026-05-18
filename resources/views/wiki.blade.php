@@ -8,6 +8,27 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="{{ asset('og/smittom.png') }}">
+<?php
+$wikiJsonLd = json_encode([
+    '@context' => 'https://schema.org',
+    '@graph'   => [
+        [
+            '@type'       => 'CollectionPage',
+            'name'        => 'WikiMoDex — PokéVoid Wiki',
+            'description' => 'Browse the PokéVoid Wiki — game mechanics, champions, rivals, items, builds, and more.',
+            'url'         => 'https://pokevoid.wiki/wiki.html',
+        ],
+        [
+            '@type'           => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://pokevoid.wiki'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Wiki', 'item' => 'https://pokevoid.wiki/wiki.html'],
+            ],
+        ],
+    ],
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+?>
+<script type="application/ld+json">{!! $wikiJsonLd !!}</script>
 @endpush
 
 @section('content')

@@ -10,14 +10,26 @@
 <meta name="twitter:image" content="{{ $article->ogImageUrl() }}">
 <?php
 $articleJsonLd = json_encode([
-    '@context'     => 'https://schema.org',
-    '@type'        => 'Article',
-    'headline'     => $article->title . ' — PokéVoid Wiki',
-    'description'  => $article->plainTextExcerpt(),
-    'url'          => url()->current(),
-    'image'        => $article->ogImageUrl(),
-    'dateModified' => $article->updated_at->toIso8601String(),
-    'publisher'    => ['@type' => 'Organization', 'name' => 'WikiMoDex'],
+    '@context' => 'https://schema.org',
+    '@graph'   => [
+        [
+            '@type'        => 'Article',
+            'headline'     => $article->title . ' — PokéVoid Wiki',
+            'description'  => $article->plainTextExcerpt(),
+            'url'          => url()->current(),
+            'image'        => $article->ogImageUrl(),
+            'dateModified' => $article->updated_at->toIso8601String(),
+            'publisher'    => ['@type' => 'Organization', 'name' => 'WikiMoDex'],
+        ],
+        [
+            '@type'           => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home',  'item' => 'https://pokevoid.wiki'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Wiki',  'item' => 'https://pokevoid.wiki/wiki.html'],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $article->title, 'item' => url()->current()],
+            ],
+        ],
+    ],
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 ?>
 <script type="application/ld+json">{!! $articleJsonLd !!}</script>

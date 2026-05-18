@@ -9,12 +9,24 @@
 <meta name="twitter:image" content="{{ asset('og/rivals/' . $rival->slug . '.png') }}">
 <?php
 $rivalJsonLd = json_encode([
-    '@context'    => 'https://schema.org',
-    '@type'       => 'ProfilePage',
-    'name'        => $rival->name . ' — PokéVoid Rivals',
-    'description' => $rival->name . ' is a ' . $rival->role . ' rival in PokéVoid. View their full team, encounter conditions, and battle details on WikiMoDex.',
-    'url'         => url()->current(),
-    'image'       => asset('og/rivals/' . $rival->slug . '.png'),
+    '@context' => 'https://schema.org',
+    '@graph'   => [
+        [
+            '@type'       => 'ProfilePage',
+            'name'        => $rival->name . ' — PokéVoid Rivals',
+            'description' => $rival->name . ' is a ' . $rival->role . ' rival in PokéVoid. View their full team, encounter conditions, and battle details on WikiMoDex.',
+            'url'         => url()->current(),
+            'image'       => asset('og/rivals/' . $rival->slug . '.png'),
+        ],
+        [
+            '@type'           => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home',   'item' => 'https://pokevoid.wiki'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Rivals', 'item' => 'https://pokevoid.wiki/rivals.html'],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $rival->name, 'item' => url()->current()],
+            ],
+        ],
+    ],
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 ?>
 <script type="application/ld+json">{!! $rivalJsonLd !!}</script>
