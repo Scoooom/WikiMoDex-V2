@@ -9,6 +9,29 @@
 <meta name="twitter:image" content="{{ asset('og/smittom.png') }}">
 @endpush
 
+@push('meta')
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        @foreach($grouped as $groupName => $faqs)
+        @foreach($faqs as $i => $faq)
+        {
+            "@type": "Question",
+            "name": {{ Js::from($faq['question']) }},
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": {{ Js::from($faq['answer_plain']) }}
+            }
+        }{{ !$loop->last || !$loop->parent->last ? ',' : '' }}
+        @endforeach
+        @endforeach
+    ]
+}
+</script>
+@endpush
+
 @section('content')
 <div class="container">
     <div class="section-header mt-2 mb-3">
