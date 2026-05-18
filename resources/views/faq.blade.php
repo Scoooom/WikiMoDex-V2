@@ -20,11 +20,13 @@
         <div class="faq-group-label">{{ $groupName }}</div>
         @foreach($faqs as $faq)
         <div class="faq-item {{ $faq['open_by_default'] ? 'open' : '' }}" id="faq-{{ $faq['slug'] }}">
-            <button class="faq-question" onclick="toggleFaqBySlug('{{ $faq['slug'] }}')">
-                {{ $faq['question'] }}
-                <span class="faq-chevron">▾</span>
-            </button>
-            <a class="faq-anchor" href="#faq-{{ $faq['slug'] }}" aria-label="Link to this question">#</a>
+            <div class="faq-question-row">
+                <button class="faq-question" onclick="toggleFaqBySlug('{{ $faq['slug'] }}')">
+                    {{ $faq['question'] }}
+                    <span class="faq-chevron">▾</span>
+                </button>
+                <a class="faq-anchor" href="#faq-{{ $faq['slug'] }}" aria-label="Link to this question">#</a>
+            </div>
             <div class="faq-answer">
                 <div class="faq-answer-inner">
                     {!! $faq['answer_html'] !!}
