@@ -52,6 +52,8 @@
         <div class="footer-inner">
             <span class="footer-brand">WikiMoDex</span>
             <span class="footer-sep">·</span>
+            <a class="footer-link" href="https://pokevoid.com" target="_blank" rel="noopener">Play PokéVoid ↗</a>
+            <span class="footer-sep">·</span>
             <span class="footer-text">Questions? Find <code>scooom</code> on Discord.</span>
         </div>
     </footer>

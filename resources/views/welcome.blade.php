@@ -11,6 +11,7 @@
             <a href="/wiki.html" class="btn btn-primary">Browse the Wiki</a>
             <a href="/gallery.html" class="btn btn-secondary">Glitch Forms</a>
             <a href="/faq.html" class="btn btn-secondary">FAQ</a>
+            <a href="https://pokevoid.com" class="btn btn-secondary" target="_blank" rel="noopener">Play PokéVoid ↗</a>
         </div>
     </div>
 

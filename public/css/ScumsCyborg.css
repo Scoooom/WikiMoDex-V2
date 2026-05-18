@@ -839,6 +839,9 @@ img { max-width: 100%; display: block; }
 }
 .footer-brand { font-weight: 700; color: var(--dim); }
 .footer-sep   { color: var(--border2); }
+.footer-text  { color: var(--dim); font-size: 13px; }
+.footer-link  { color: var(--dim); font-size: 13px; text-decoration: none; }
+.footer-link:hover { color: var(--accent2); }
 
 /* --- Responsive ------------------------------- */
 @media (max-width: 768px) {
