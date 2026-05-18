@@ -64,7 +64,7 @@ class CloudflarePurge extends Command
             $this->line('  php artisan cf:purge --all');
             $this->line('  php artisan cf:purge --wiki');
             $this->line('  php artisan cf:purge --sprites');
-            $this->line('  php artisan cf:purge --url=https://void.scooom.xyz/wiki.html --url=https://void.scooom.xyz/');
+            $this->line('  php artisan cf:purge --url=https://pokevoid.wiki/wiki.html --url=https://pokevoid.wiki/');
             return self::FAILURE;
         }
 

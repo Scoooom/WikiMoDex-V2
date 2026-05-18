@@ -175,13 +175,13 @@ class DiscordInteractionController extends Controller
                         'description' => 'The PokéVoid community wiki and Pokémon form database.',
                         'color'       => 0x7c5cbf,
                         'fields'      => [
-                            ['name' => '📖 Wiki',          'value' => "[Game mechanics, champions, items & more](<https://void.scooom.xyz/wiki.html>)",                   'inline' => false],
-                            ['name' => '🎒 Items',         'value' => "[Full item reference by tier](<https://void.scooom.xyz/wiki:items.html>)",                         'inline' => true],
-                            ['name' => '✨ Alt Builds',    'value' => "[Champion alt build gallery](<https://void.scooom.xyz/wiki:alt-builds.html>)",                     'inline' => true],
-                            ['name' => '👾 Mod Glitches',  'value' => "[Community-made glitch forms](<https://void.scooom.xyz/gallery.html>)",                           'inline' => true],
-                            ['name' => '⚡ Core Glitches', 'value' => "[Official glitch forms](<https://void.scooom.xyz/galleryCore.html>)",                             'inline' => true],
-                            ['name' => '📅 Gacha',         'value' => "[Today\'s legendary & Pokérus calendar](<https://void.scooom.xyz/gacha.html>)",                   'inline' => true],
-                            ['name' => '❓ FAQ',           'value' => "[Frequently asked questions](<https://void.scooom.xyz/faq.html>)",                                 'inline' => true],
+                            ['name' => '📖 Wiki',          'value' => "[Game mechanics, champions, items & more](<https://pokevoid.wiki/wiki.html>)",                   'inline' => false],
+                            ['name' => '🎒 Items',         'value' => "[Full item reference by tier](<https://pokevoid.wiki/wiki:items.html>)",                         'inline' => true],
+                            ['name' => '✨ Alt Builds',    'value' => "[Champion alt build gallery](<https://pokevoid.wiki/wiki:alt-builds.html>)",                     'inline' => true],
+                            ['name' => '👾 Mod Glitches',  'value' => "[Community-made glitch forms](<https://pokevoid.wiki/gallery.html>)",                           'inline' => true],
+                            ['name' => '⚡ Core Glitches', 'value' => "[Official glitch forms](<https://pokevoid.wiki/galleryCore.html>)",                             'inline' => true],
+                            ['name' => '📅 Gacha',         'value' => "[Today\'s legendary & Pokérus calendar](<https://pokevoid.wiki/gacha.html>)",                   'inline' => true],
+                            ['name' => '❓ FAQ',           'value' => "[Frequently asked questions](<https://pokevoid.wiki/faq.html>)",                                 'inline' => true],
                         ],
                         'footer' => ['text' => 'WikiMoDex • Use /form, /ability, or /alt-build for specific lookups'],
                     ]]
@@ -320,7 +320,7 @@ class DiscordInteractionController extends Controller
                 ? substr($section->body, 0, 300) . '…'
                 : $section->body;
 
-            $url = "https://void.scooom.xyz/wiki:{$section->article_slug}.html#{$section->anchor}";
+            $url = "https://pokevoid.wiki/wiki:{$section->article_slug}.html#{$section->anchor}";
 
             $isTopLevel = strtolower(trim($section->heading)) === strtolower(trim($section->article_title));
             $title = $isTopLevel
@@ -344,7 +344,7 @@ class DiscordInteractionController extends Controller
             $plain   = preg_replace('/[#*`\[\]_>|~]/u', '', $article->content);
             $plain   = preg_replace('/\s+/', ' ', trim($plain));
             $excerpt = substr($plain, 0, 300) . (strlen($plain) > 300 ? '…' : '');
-            $url     = "https://void.scooom.xyz/wiki:{$article->slug}.html";
+            $url     = "https://pokevoid.wiki/wiki:{$article->slug}.html";
 
             return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
                 'title'       => $article->title,
@@ -369,7 +369,7 @@ class DiscordInteractionController extends Controller
                 'description' => $item->description ?: 'No description available.',
                 'color'       => 0x7c5cbf,
                 'fields'      => $fields,
-                'url'         => "https://void.scooom.xyz/wiki:items.html",
+                'url'         => "https://pokevoid.wiki/wiki:items.html",
                 'footer'      => ['text' => 'WikiMoDex • Items Reference'],
             ]]]]);
         }
@@ -380,7 +380,7 @@ class DiscordInteractionController extends Controller
 
         not_found:
         return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => [
-            'content' => "No result found. Try searching on the [wiki](<https://void.scooom.xyz/wiki.html>)."
+            'content' => "No result found. Try searching on the [wiki](<https://pokevoid.wiki/wiki.html>)."
         ]]);
     }
 
@@ -458,7 +458,7 @@ class DiscordInteractionController extends Controller
 
         $championLabels = \App\Models\AltBuild::championLabel();
         $champion = $championLabels[$build->champion] ?? ucfirst($build->champion ?? 'Unknown');
-        $spriteUrl = "https://void.scooom.xyz/alt-build-sprite:{$build->build_id}.png?v=2";
+        $spriteUrl = "https://pokevoid.wiki/alt-build-sprite:{$build->build_id}.png?v=2";
 
         $embed = [
             'title'       => "{$build->species} — {$build->name}",
@@ -467,7 +467,7 @@ class DiscordInteractionController extends Controller
             'thumbnail'   => ['url' => $spriteUrl],
             'fields'      => $fields,
             'footer'      => ['text' => 'WikiMoDex • Alt Builds'],
-            'url'         => 'https://void.scooom.xyz/wiki:alt-builds.html#champion-' . ($build->champion ?? ''),
+            'url'         => 'https://pokevoid.wiki/wiki:alt-builds.html#champion-' . ($build->champion ?? ''),
         ];
 
         return response()->json([
@@ -641,21 +641,21 @@ class DiscordInteractionController extends Controller
 
             // URLs
             if ($custom) {
-                $pageUrl   = 'https://void.scooom.xyz/g:' . urlencode(trim($form->name)) . ':' . $form->id . '.html';
-                $frontUrl  = "https://void.scooom.xyz/front:{$form->id}.png";
-                $backUrl   = "https://void.scooom.xyz/back:{$form->id}.png";
+                $pageUrl   = 'https://pokevoid.wiki/g:' . urlencode(trim($form->name)) . ':' . $form->id . '.html';
+                $frontUrl  = "https://pokevoid.wiki/front:{$form->id}.png";
+                $backUrl   = "https://pokevoid.wiki/back:{$form->id}.png";
             } elseif ($coreForm) {
-                $pageUrl  = "https://void.scooom.xyz/core:{$form->name}.html";
-                $frontUrl = "https://void.scooom.xyz/cFront:{$form->name}.png";
-                $backUrl  = "https://void.scooom.xyz/cBack:{$form->name}.png";
+                $pageUrl  = "https://pokevoid.wiki/core:{$form->name}.html";
+                $frontUrl = "https://pokevoid.wiki/cFront:{$form->name}.png";
+                $backUrl  = "https://pokevoid.wiki/cBack:{$form->name}.png";
             } elseif ($smittyMon) {
-                $pageUrl  = "https://void.scooom.xyz/smitty:{$form->name}.html";
-                $frontUrl = "https://void.scooom.xyz/cFront:{$form->name}.png";
-                $backUrl  = "https://void.scooom.xyz/cBack:{$form->name}.png";
+                $pageUrl  = "https://pokevoid.wiki/smitty:{$form->name}.html";
+                $frontUrl = "https://pokevoid.wiki/cFront:{$form->name}.png";
+                $backUrl  = "https://pokevoid.wiki/cBack:{$form->name}.png";
             } else {
-                $pageUrl  = "https://void.scooom.xyz/smittyForm:{$form->name}.html";
-                $frontUrl = "https://void.scooom.xyz/cFront:{$form->name}.png";
-                $backUrl  = "https://void.scooom.xyz/cBack:{$form->name}.png";
+                $pageUrl  = "https://pokevoid.wiki/smittyForm:{$form->name}.html";
+                $frontUrl = "https://pokevoid.wiki/cFront:{$form->name}.png";
+                $backUrl  = "https://pokevoid.wiki/cBack:{$form->name}.png";
             }
 
             // Title
@@ -730,7 +730,7 @@ class DiscordInteractionController extends Controller
             }
             if ($custom) {
                 $creator = \App\Models\User::find($form->created_by);
-                $fields[] = ['name' => 'Created by', 'value' => "[{$creator->username}](https://void.scooom.xyz/u:{$creator->username}.html)", 'inline' => true];
+                $fields[] = ['name' => 'Created by', 'value' => "[{$creator->username}](https://pokevoid.wiki/u:{$creator->username}.html)", 'inline' => true];
             }
 
             $fields[] = ['name' => 'Types', 'value' => $typesStr, 'inline' => false];
@@ -794,7 +794,7 @@ class DiscordInteractionController extends Controller
     private function handleCommunityBuild(string $input): \Illuminate\Http\JsonResponse
     {
         // Accept a full URL or just the slug
-        // URL formats: https://void.scooom.xyz/build/some-slug.html  or  some-slug
+        // URL formats: https://pokevoid.wiki/build/some-slug.html  or  some-slug
         $slug = $input;
         if (str_contains($input, '/build/')) {
             // Extract slug from URL: /build/{slug}.html
@@ -813,7 +813,7 @@ class DiscordInteractionController extends Controller
             ]);
         }
 
-        $url    = "https://void.scooom.xyz/build/{$build->slug}.html";
+        $url    = "https://pokevoid.wiki/build/{$build->slug}.html";
         $fields = [];
 
         // Team slots
@@ -893,11 +893,11 @@ class DiscordInteractionController extends Controller
         if (!$entry) {
             return response()->json([
                 'type' => self::CHANNEL_MESSAGE,
-                'data' => ['content' => "FAQ entry not found. Browse all FAQs at <https://void.scooom.xyz/faq.html>"],
+                'data' => ['content' => "FAQ entry not found. Browse all FAQs at <https://pokevoid.wiki/faq.html>"],
             ]);
         }
 
-        $url = "https://void.scooom.xyz/faq.html#{$entry->slug}";
+        $url = "https://pokevoid.wiki/faq.html#{$entry->slug}";
 
         return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
             'title'       => $entry->question,

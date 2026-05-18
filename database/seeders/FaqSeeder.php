@@ -295,8 +295,8 @@ class FaqSeeder extends Seeder
                 'group'            => 'Saving & Technical',
                 'order'            => 4,
                 'question'         => 'How do I get a Trainer Card?',
-                'answer_html'      => '<p>Log in with Discord on <a href="https://void.scooom.xyz">void.scooom.xyz</a>, then go to your profile from the nav bar. In the sidebar, find the <strong>Save File</strong> section — select your save file and click <strong>Upload Save File</strong>.</p><p>Once uploaded, buttons will appear to view your <strong>Trainer Card</strong> or use <strong>Share Image</strong> to copy the image URL to your clipboard.</p>',
-                'answer_plain'     => "Log in with Discord on <https://void.scooom.xyz> and go to your profile from the nav bar. In the sidebar, find the Save File section — select your save file and click Upload Save File. Once uploaded, you can view your Trainer Card or use Share Image to copy the image URL to your clipboard.",
+                'answer_html'      => '<p>Log in with Discord on <a href="https://pokevoid.wiki">pokevoid.wiki</a>, then go to your profile from the nav bar. In the sidebar, find the <strong>Save File</strong> section — select your save file and click <strong>Upload Save File</strong>.</p><p>Once uploaded, buttons will appear to view your <strong>Trainer Card</strong> or use <strong>Share Image</strong> to copy the image URL to your clipboard.</p>',
+                'answer_plain'     => "Log in with Discord on <https://pokevoid.wiki> and go to your profile from the nav bar. In the sidebar, find the Save File section — select your save file and click Upload Save File. Once uploaded, you can view your Trainer Card or use Share Image to copy the image URL to your clipboard.",
                 'open_by_default'  => false,
             ],
 

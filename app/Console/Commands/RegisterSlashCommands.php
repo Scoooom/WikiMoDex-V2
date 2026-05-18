@@ -92,7 +92,7 @@ class RegisterSlashCommands extends Command
                     [
                         'type'        => 3,
                         'name'        => 'id',
-                        'description' => 'Build ID or full build URL from void.scooom.xyz/build/...',
+                        'description' => 'Build ID or full build URL from pokevoid.wiki/build/...',
                         'required'    => true,
                     ]
                 ]
