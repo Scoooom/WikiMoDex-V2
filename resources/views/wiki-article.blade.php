@@ -1,7 +1,14 @@
 @extends('layouts.app')
 
 @section('title', $article->title . ' — PokéVoid Wiki')
-@section('meta_description', Str::limit(strip_tags($article->content), 155))
+@section('meta_description', $article->plainTextExcerpt())
+@push('meta')
+<meta property="og:image" content="{{ $article->ogImageUrl() }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ $article->ogImageUrl() }}">
+@endpush
 
 @section('content')
 
