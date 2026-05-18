@@ -592,7 +592,7 @@ img { max-width: 100%; display: block; }
     border-radius: var(--radius-lg);
     overflow: hidden;
 }
-.faq-item { border-bottom: 1px solid var(--border); position: relative; }
+.faq-item { border-bottom: 1px solid var(--border); position: relative; scroll-margin-top: calc(var(--nav-h) + 16px); }
 .faq-item:last-child { border-bottom: none; }
 
 .faq-anchor {
