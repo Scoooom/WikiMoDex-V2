@@ -9,19 +9,19 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="{{ $article->ogImageUrl() }}">
 <script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": {{ Js::from($article->title . ' — PokéVoid Wiki') }},
-    "description": {{ Js::from($article->plainTextExcerpt()) }},
-    "url": "{{ url()->current() }}",
-    "image": "{{ $article->ogImageUrl() }}",
-    "dateModified": "{{ $article->updated_at->toIso8601String() }}",
-    "publisher": {
-        "@type": "Organization",
-        "name": "WikiMoDex"
-    }
-}
+{!! json_encode([
+    '@context'     => 'https://schema.org',
+    '@type'        => 'Article',
+    'headline'     => $article->title . ' — PokéVoid Wiki',
+    'description'  => $article->plainTextExcerpt(),
+    'url'          => url()->current(),
+    'image'        => $article->ogImageUrl(),
+    'dateModified' => $article->updated_at->toIso8601String(),
+    'publisher'    => [
+        '@type' => 'Organization',
+        'name'  => 'WikiMoDex',
+    ],
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
 </script>
 @endpush
 
