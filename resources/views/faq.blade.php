@@ -11,24 +11,18 @@
 
 @push('meta')
 <script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-        @foreach($grouped as $groupName => $faqs)
-        @foreach($faqs as $i => $faq)
-        {
-            "@type": "Question",
-            "name": {{ Js::from($faq['question']) }},
-            "acceptedAnswer": {
-                "@type": "Answer",
-                "text": {{ Js::from($faq['answer_plain']) }}
-            }
-        }{{ !$loop->last || !$loop->parent->last ? ',' : '' }}
-        @endforeach
-        @endforeach
-    ]
-}
+{!! json_encode([
+    '@context' => 'https://schema.org',
+    '@type'    => 'FAQPage',
+    'mainEntity' => collect($grouped)->flatten(1)->map(fn($faq) => [
+        '@type' => 'Question',
+        'name'  => $faq['question'],
+        'acceptedAnswer' => [
+            '@type' => 'Answer',
+            'text'  => $faq['answer_plain'],
+        ],
+    ])->values()->all(),
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
 </script>
 @endpush
 
