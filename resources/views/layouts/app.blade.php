@@ -44,6 +44,8 @@
 <body>
     @include('partials.nav')
 
+    <div class="void-splash" style="position:fixed;inset:0;z-index:0;background-image:url('/pokevoid-title-bg/0.png');background-size:cover;background-position:center;opacity:0.07;pointer-events:none;"></div>
+
     <main class="site-main">
         @yield('content')
     </main>
