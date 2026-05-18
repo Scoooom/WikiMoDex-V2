@@ -7,7 +7,6 @@
 
     {{-- SEO: pages can override via @push('meta') --}}
     <meta name="robots" content="index, follow">
-    @stack('meta')
     @hasSection('meta_description')
         <meta name="description" content="@yield('meta_description')">
         <meta property="og:description" content="@yield('meta_description')">
@@ -19,6 +18,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
     <link rel="canonical" href="{{ url()->current() }}">
+    @stack('meta')
 
     @stack('head')
 
