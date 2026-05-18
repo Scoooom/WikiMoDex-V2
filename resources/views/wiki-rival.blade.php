@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title', $rival->name . ' — PokéVoid Rivals')
+@section('meta_description', $rival->name . ' is a ' . $rival->role . ' rival in PokéVoid. View their full team, encounter conditions, and battle details on WikiMoDex.')
 
 @section('content')
 

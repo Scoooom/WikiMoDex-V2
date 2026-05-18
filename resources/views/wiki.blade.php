@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Wiki — PokéVoid')
+@section('meta_description', 'Browse the PokéVoid Wiki — game mechanics, champions, rivals, items, builds, and more. Your complete guide to the PokéVoid fan game.')
 
 @section('content')
 <div class="wiki-index-page">

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', $article->title . ' — PokéVoid Wiki')
+@section('meta_description', Str::limit(strip_tags($article->content), 155))
 
 @section('content')
 

@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Rivals — PokéVoid Wiki')
+@section('meta_description', 'Meet the rivals of PokéVoid — their lore, battle conditions, and full team layouts. A complete rival guide for the PokéVoid fan game.')
 
 @section('content')
 

@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title', 'FAQ — PokéVoid Wiki')
+@section('meta_description', 'WikiMoDex — the PokéVoid fan game wiki. Guides, builds, items, rivals, and more.')
 
 @section('content')
 <div class="container">
