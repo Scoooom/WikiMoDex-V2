@@ -6,7 +6,7 @@
 <meta property="og:url" content="{{ url()->current() }}">
 <meta property="og:title" content="{{ $glitch->name }} | {{ $creator->username }}">
 <meta property="og:description" content="{{ $glitch->name }}; {{ $abilityOne['name'] }} / {{ $abilityTwo['name'] }} / {{ $abilityHA['name'] }}">
-<meta property="og:image" content="https://void.scooom.xyz/front:{{ $glitch->id }}.png">
+<meta property="og:image" content="https://pokevoid.wiki/front:{{ $glitch->id }}.png">
 @endpush
 
 @section('content')

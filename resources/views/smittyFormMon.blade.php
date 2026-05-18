@@ -6,7 +6,7 @@
 <meta property="og:url" content="{{ url()->current() }}">
 <meta property="og:title" content="{{ ucwords($mon->name) }}">
 <meta property="og:description" content="{{ ucwords($mon->name) }}; {{ $mon->ab1->name }} / {{ $mon->ab2->name }} / {{ $mon->ha->name }}; SMITTY of {{ $mons }}; Requires: {{ $items }}">
-<meta property="og:image" content="https://void.scooom.xyz/cFront:{{ $mon->name }}.png">
+<meta property="og:image" content="https://pokevoid.wiki/cFront:{{ $mon->name }}.png">
 @endpush
 
 @section('content')
