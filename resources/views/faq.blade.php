@@ -47,7 +47,8 @@ function toggleFaqBySlug(slug) {
 
 // Open + scroll to item if URL hash matches
 if (window.location.hash) {
-    const slug = window.location.hash.slice(1);
+    const raw = window.location.hash.slice(1);
+    const slug = raw.startsWith('faq-') ? raw.slice(4) : raw;
     const el = document.getElementById('faq-' + slug);
     if (el) {
         el.classList.add('open');
