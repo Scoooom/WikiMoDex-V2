@@ -10,8 +10,8 @@
 @endpush
 
 @push('meta')
-<script type="application/ld+json">
-{!! json_encode([
+<?php
+$faqJsonLd = json_encode([
     '@context' => 'https://schema.org',
     '@type'    => 'FAQPage',
     'mainEntity' => collect($grouped)->flatten(1)->map(fn($faq) => [
@@ -22,8 +22,9 @@
             'text'  => $faq['answer_plain'],
         ],
     ])->values()->all(),
-], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-</script>
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+?>
+<script type="application/ld+json">{!! $faqJsonLd !!}</script>
 @endpush
 
 @section('content')

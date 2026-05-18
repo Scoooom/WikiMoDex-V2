@@ -8,8 +8,8 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="{{ $article->ogImageUrl() }}">
-<script type="application/ld+json">
-{!! json_encode([
+<?php
+$articleJsonLd = json_encode([
     '@context'     => 'https://schema.org',
     '@type'        => 'Article',
     'headline'     => $article->title . ' — PokéVoid Wiki',
@@ -17,12 +17,10 @@
     'url'          => url()->current(),
     'image'        => $article->ogImageUrl(),
     'dateModified' => $article->updated_at->toIso8601String(),
-    'publisher'    => [
-        '@type' => 'Organization',
-        'name'  => 'WikiMoDex',
-    ],
-], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-</script>
+    'publisher'    => ['@type' => 'Organization', 'name' => 'WikiMoDex'],
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+?>
+<script type="application/ld+json">{!! $articleJsonLd !!}</script>
 @endpush
 
 @section('content')

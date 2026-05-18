@@ -7,16 +7,17 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="{{ asset('og/rivals/' . $rival->slug . '.png') }}">
-<script type="application/ld+json">
-{!! json_encode([
+<?php
+$rivalJsonLd = json_encode([
     '@context'    => 'https://schema.org',
     '@type'       => 'ProfilePage',
     'name'        => $rival->name . ' — PokéVoid Rivals',
     'description' => $rival->name . ' is a ' . $rival->role . ' rival in PokéVoid. View their full team, encounter conditions, and battle details on WikiMoDex.',
     'url'         => url()->current(),
     'image'       => asset('og/rivals/' . $rival->slug . '.png'),
-], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-</script>
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+?>
+<script type="application/ld+json">{!! $rivalJsonLd !!}</script>
 @endpush
 
 @section('content')
