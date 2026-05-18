@@ -1,5 +1,24 @@
 @extends('layouts.app')
 @section('title', 'Home')
+@push('meta')
+<?php
+$searchJsonLd = json_encode([
+    '@context'        => 'https://schema.org',
+    '@type'           => 'WebSite',
+    'name'            => 'WikiMoDex',
+    'url'             => 'https://pokevoid.wiki',
+    'potentialAction' => [
+        '@type'       => 'SearchAction',
+        'target'      => [
+            '@type'       => 'EntryPoint',
+            'urlTemplate' => 'https://pokevoid.wiki/wiki.html?q={search_term_string}',
+        ],
+        'query-input' => 'required name=search_term_string',
+    ],
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+?>
+<script type="application/ld+json">{!! $searchJsonLd !!}</script>
+@endpush
 
 @section('content')
 <div class="container">

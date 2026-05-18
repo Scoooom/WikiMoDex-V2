@@ -48,4 +48,24 @@
         </div>
     </div>
 </div>
+<script>
+// Open search modal with pre-filled query if ?q= is in the URL (e.g. from Google SiteLinksSearchBox)
+(function() {
+    const q = new URLSearchParams(window.location.search).get('q');
+    if (!q) return;
+    const tryOpen = () => {
+        const input = document.getElementById('wikiSearchInput');
+        const modal = document.getElementById('wikiSearchModal');
+        if (!input || !modal) { setTimeout(tryOpen, 100); return; }
+        input.value = q;
+        input.dispatchEvent(new Event('input'));
+        document.getElementById('wikiSearchOpen')?.click();
+    };
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', tryOpen);
+    } else {
+        tryOpen();
+    }
+})();
+</script>
 @endsection
