@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
 @section('title', 'Wiki — PokéVoid')
+@section('meta_description', 'Browse the PokéVoid Wiki — game mechanics, champions, rivals, items, builds, and more. Your complete guide to the PokéVoid fan game.')
+@push('meta')
+<meta property="og:image" content="{{ asset('og/smittom.png') }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ asset('og/smittom.png') }}">
+@endpush
 
 @section('content')
 <div class="wiki-index-page">

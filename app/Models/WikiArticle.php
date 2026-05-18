@@ -61,4 +61,30 @@ class WikiArticle extends Model
             'Items & Shop',
         ];
     }
+
+    /** Strip markdown and HTML, return plain-text excerpt for meta description. */
+    public function plainTextExcerpt(int $length = 155): string
+    {
+        $text = $this->content;
+        $text = preg_replace('/^#{1,6}\s+/m', '', $text);
+        $text = preg_replace('/!\[.*?\]\(.*?\)/', '', $text);
+        $text = preg_replace('/\[([^\]]+)\]\([^\)]+\)/', '$1', $text);
+        $text = preg_replace('/[*_]{1,3}([^*_]+)[*_]{1,3}/', '$1', $text);
+        $text = preg_replace('/`{1,3}[^`]*`{1,3}/', '', $text);
+        $text = preg_replace('/^\|.*\|$/m', '', $text);
+        $text = preg_replace('/^[-*+]\s+/m', '', $text);
+        $text = strip_tags($text);
+        $text = preg_replace('/\s+/', ' ', $text);
+        return \Illuminate\Support\Str::limit(trim($text), $length);
+    }
+
+    /** Return the best OG image URL for this article. */
+    public function ogImageUrl(): string
+    {
+        if ($this->category === 'Champions' &&
+            file_exists(public_path("og/rivals/{$this->slug}.png"))) {
+            return asset("og/rivals/{$this->slug}.png");
+        }
+        return asset('og/smittom.png');
+    }
 }

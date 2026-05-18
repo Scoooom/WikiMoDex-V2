@@ -1,5 +1,13 @@
 @extends('layouts.app')
 @section('title', 'Rivals — PokéVoid Wiki')
+@section('meta_description', 'Meet the rivals of PokéVoid — their lore, battle conditions, and full team layouts. A complete rival guide for the PokéVoid fan game.')
+@push('meta')
+<meta property="og:image" content="{{ asset('og/smittom.png') }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ asset('og/smittom.png') }}">
+@endpush
 
 @section('content')
 

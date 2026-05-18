@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>WikiMoDex{{ View::hasSection('title') ? ' — ' . View::yieldContent('title') : '' }}</title>
 
+    {{-- SEO: pages can override via @push('meta') --}}
+    <meta name="robots" content="index, follow">
+    @hasSection('meta_description')
+        <meta name="description" content="@yield('meta_description')">
+        <meta property="og:description" content="@yield('meta_description')">
+    @else
+        <meta name="description" content="WikiMoDex — the community wiki for PokéVoid, the Pokémon fan game. Mechanics, builds, rivals, items, and more.">
+        <meta property="og:description" content="WikiMoDex — the community wiki for PokéVoid, the Pokémon fan game. Mechanics, builds, rivals, items, and more.">
+    @endif
+    <meta property="og:title" content="WikiMoDex{{ View::hasSection('title') ? ' — ' . View::yieldContent('title') : '' }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <link rel="canonical" href="{{ url()->current() }}">
+    @stack('meta')
+
     @stack('head')
 
     <link rel="preconnect" href="https://fonts.googleapis.com">

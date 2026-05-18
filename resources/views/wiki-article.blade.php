@@ -1,6 +1,29 @@
 @extends('layouts.app')
 
 @section('title', $article->title . ' — PokéVoid Wiki')
+@section('meta_description', $article->plainTextExcerpt())
+@push('meta')
+<meta property="og:image" content="{{ $article->ogImageUrl() }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ $article->ogImageUrl() }}">
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": {{ Js::from($article->title . ' — PokéVoid Wiki') }},
+    "description": {{ Js::from($article->plainTextExcerpt()) }},
+    "url": "{{ url()->current() }}",
+    "image": "{{ $article->ogImageUrl() }}",
+    "dateModified": "{{ $article->updated_at->toIso8601String() }}",
+    "publisher": {
+        "@type": "Organization",
+        "name": "WikiMoDex"
+    }
+}
+</script>
+@endpush
 
 @section('content')
 

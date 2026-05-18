@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
 @section('title', 'Changelog — PokéVoid Wiki')
+@section('meta_description', 'WikiMoDex — the PokéVoid fan game wiki. Guides, builds, items, rivals, and more.')
+@push('meta')
+<meta property="og:image" content="{{ asset('og/smittom.png') }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ asset('og/smittom.png') }}">
+@endpush
 
 @section('content')
 

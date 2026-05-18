@@ -1,5 +1,23 @@
 @extends('layouts.app')
 @section('title', $rival->name . ' — PokéVoid Rivals')
+@section('meta_description', $rival->name . ' is a ' . $rival->role . ' rival in PokéVoid. View their full team, encounter conditions, and battle details on WikiMoDex.')
+@push('meta')
+<meta property="og:image" content="{{ asset('og/rivals/' . $rival->slug . '.png') }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ asset('og/rivals/' . $rival->slug . '.png') }}">
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "name": {{ Js::from($rival->name . ' — PokéVoid Rivals') }},
+    "description": {{ Js::from($rival->name . ' is a ' . $rival->role . ' rival in PokéVoid. View their full team, encounter conditions, and battle details on WikiMoDex.') }},
+    "url": "{{ url()->current() }}",
+    "image": "{{ asset('og/rivals/' . $rival->slug . '.png') }}"
+}
+</script>
+@endpush
 
 @section('content')
 
