@@ -24,6 +24,7 @@
                 {{ $faq['question'] }}
                 <span class="faq-chevron">▾</span>
             </button>
+            <a class="faq-anchor" href="#faq-{{ $faq['slug'] }}" aria-label="Link to this question">#</a>
             <div class="faq-answer">
                 <div class="faq-answer-inner">
                     {!! $faq['answer_html'] !!}
