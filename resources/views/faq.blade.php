@@ -52,11 +52,7 @@ if (window.location.hash) {
     const el = document.getElementById('faq-' + slug);
     if (el) {
         el.classList.add('open');
-        setTimeout(() => {
-            const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h') || '54');
-            const top = el.getBoundingClientRect().top + window.scrollY - navH - 24;
-            window.scrollTo({ top, behavior: 'instant' });
-        }, 50);
+        setTimeout(() => el.scrollIntoView({ behavior: 'instant', block: 'start' }), 100);
     }
 }
 </script>
