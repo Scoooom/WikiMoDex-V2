@@ -59,7 +59,7 @@
                                 <span class="type-badge type-{{ $mon2->primaryType }}">
                                     {{ \App\Services\PokemonService::getTypeName($mon2->primaryType) }}
                                 </span>
-                                @if(isset($mon2->secondaryType) && $mon2->secondaryType !== $mon2->primaryType)
+                                @if(isset($mon2->secondaryType))
                                 <span class="type-badge type-{{ $mon2->secondaryType }}">
                                     {{ \App\Services\PokemonService::getTypeName($mon2->secondaryType) }}
                                 </span>
