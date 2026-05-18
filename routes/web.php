@@ -351,13 +351,18 @@ Route::get('/sitemap.xml', function () {
     $rivals   = \App\Models\Rival::all(['slug']);
 
     $urls = collect([
-        ['loc' => url('/'),                     'changefreq' => 'daily',   'priority' => '1.0'],
-        ['loc' => url('/rivals.html'),           'changefreq' => 'weekly',  'priority' => '0.8'],
-        ['loc' => url('/wiki.html'),             'changefreq' => 'weekly',  'priority' => '0.8'],
-        ['loc' => url('/wiki:alt-builds.html'),  'changefreq' => 'weekly',  'priority' => '0.7'],
-        ['loc' => url('/wiki:items.html'),       'changefreq' => 'weekly',  'priority' => '0.7'],
-        ['loc' => url('/wiki:changelog.html'),   'changefreq' => 'weekly',  'priority' => '0.6'],
-        ['loc' => url('/faq.html'),              'changefreq' => 'monthly', 'priority' => '0.5'],
+        ['loc' => url('/'),                       'changefreq' => 'daily',   'priority' => '1.0'],
+        ['loc' => url('/rivals.html'),             'changefreq' => 'weekly',  'priority' => '0.8'],
+        ['loc' => url('/wiki.html'),               'changefreq' => 'weekly',  'priority' => '0.8'],
+        ['loc' => url('/wiki:alt-builds.html'),    'changefreq' => 'weekly',  'priority' => '0.7'],
+        ['loc' => url('/wiki:items.html'),         'changefreq' => 'weekly',  'priority' => '0.7'],
+        ['loc' => url('/wiki:changelog.html'),     'changefreq' => 'weekly',  'priority' => '0.6'],
+        ['loc' => url('/faq.html'),                'changefreq' => 'monthly', 'priority' => '0.5'],
+        ['loc' => url('/gallery.html'),            'changefreq' => 'weekly',  'priority' => '0.7'],
+        ['loc' => url('/galleryCore.html'),        'changefreq' => 'weekly',  'priority' => '0.7'],
+        ['loc' => url('/gallerySmitty.html'),      'changefreq' => 'weekly',  'priority' => '0.7'],
+        ['loc' => url('/gallerySmittyForm.html'),  'changefreq' => 'weekly',  'priority' => '0.7'],
+        ['loc' => url('/gacha.html'),              'changefreq' => 'daily',   'priority' => '0.6'],
     ]);
 
     foreach ($articles as $article) {
