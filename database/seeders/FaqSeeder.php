@@ -241,6 +241,16 @@ class FaqSeeder extends Seeder
                 'open_by_default'  => false,
             ],
 
+            [
+                'group'            => 'Omega System & Progression',
+                'order'            => 5,
+                'question'         => 'Why does my Better Luck / Luck EX / SMITTY Luck run out so fast?',
+                'answer_html'      => '<p>Luck ΩItems don\'t just deplete once per wave — they deplete based on <strong>loot generation</strong>. Every time the game generates path node loot, there is a <strong>50% chance</strong> a charge is consumed. Since multiple loot nodes can appear in a single wave, the item can lose several charges per wave without you noticing.</p>
+<p>This is intentional — the item is improving your loot quality behind the scenes each time it triggers, it just isn\'t always visible.</p>',
+                'answer_plain'     => "Luck ΩItems deplete based on loot generation, not just per wave. Every time the game generates path node loot there is a 50% chance a charge is consumed. Since multiple loot nodes can appear in a single wave, the item can lose several charges per wave. This is intentional — the item is improving loot quality each time it triggers.",
+                'open_by_default'  => false,
+            ],
+
             // ── Saving & Technical ───────────────────────────────────────
 
             [
