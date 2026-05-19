@@ -85,7 +85,7 @@ body { background:transparent; width:480px; }
 
 .tc-body {
     background:linear-gradient(160deg, ${s.bg1} 0%, ${s.bg2} 100%);
-    ${activeType ? `background-image: linear-gradient(160deg, ${s.bg1}99 0%, ${s.bg2}99 100%), url('${TYPE_ICON_BASE}/${data.tcType}.svg'); background-size: auto, 80px 80px; background-repeat: no-repeat, repeat;` : ''}
+    ${activeType ? `background-image: linear-gradient(160deg, ${s.bg1}bb 0%, ${s.bg2}bb 100%), url('${TYPE_ICON_BASE}/${data.tcType}.svg'); background-size: auto, 80px 80px; background-repeat: no-repeat, repeat;` : ''}
     padding:14px;
     display:grid; grid-template-columns:1fr 96px; gap:12px;
 }
@@ -94,7 +94,7 @@ body { background:transparent; width:480px; }
 
 .tc-field {
     display:flex; align-items:center; gap:8px;
-    background:rgba(0,0,0,.18); border-radius:3px; padding:5px 8px;
+    background:rgba(0,0,0,.55); border-radius:3px; padding:5px 8px;
 }
 .tc-field-label { font-size:6px; color:${s.field}; min-width:60px; letter-spacing:.5px; }
 .tc-field-value { font-size:8px; color:${s.text}; text-shadow:1px 1px 0 ${s.dark}; }
