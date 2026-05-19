@@ -71,31 +71,31 @@ function usernameToSeed(str) {
 function generateTypeIcons(containerId, width, height, count, tcType, iconUrl) {
     const rng = seededRng(usernameToSeed(data.username + containerId));
 
-    // Lay out icons in a grid, then jitter each within its cell
-    const cols = Math.ceil(Math.sqrt(count * (width / height)));
-    const rows = Math.ceil(count / cols);
-    const cellW = Math.floor(width / cols);
-    const cellH = Math.floor(height / rows);
-    const size = Math.min(cellW, cellH) - 10; // icon fits inside cell with margin
+    // Fixed icon size
+    const size = 52;
+    const margin = 6;
+
+    // Divide X into equal columns, but give Y a much wider jitter range
+    const cols = count;
+    const colW = Math.floor(width / cols);
+    const maxY = Math.max(0, height - size - margin);
 
     const icons = [];
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            if (icons.length >= count) break;
-            const jitterX = Math.floor(rng() * Math.max(0, cellW - size));
-            const jitterY = Math.floor(rng() * Math.max(0, cellH - size));
-            const x = j * cellW + jitterX;
-            const y = i * cellH + jitterY;
-            const rotation = Math.floor(rng() * 40) - 20;
-            icons.push(
-                `<img src="${iconUrl}" style="` +
-                `position:absolute;left:${x}px;top:${y}px;` +
-                `width:${size}px;height:${size}px;` +
-                `opacity:0.2;` +
-                `border:1.5px solid rgba(255,255,255,0.25);border-radius:6px;` +
-                `transform:rotate(${rotation}deg);pointer-events:none;" />`
-            );
-        }
+    for (let j = 0; j < count; j++) {
+        // X: contained within column with small jitter
+        const jitterX = Math.floor(rng() * Math.max(0, colW - size - margin));
+        const x = j * colW + jitterX;
+        // Y: full range of available height
+        const y = margin + Math.floor(rng() * maxY);
+        const rotation = Math.floor(rng() * 50) - 25;
+        icons.push(
+            `<img src="${iconUrl}" style="` +
+            `position:absolute;left:${x}px;top:${y}px;` +
+            `width:${size}px;height:${size}px;` +
+            `opacity:0.2;` +
+            `border:1.5px solid rgba(255,255,255,0.25);border-radius:6px;` +
+            `transform:rotate(${rotation}deg);pointer-events:none;" />`
+        );
     }
     return icons.join('');
 }
