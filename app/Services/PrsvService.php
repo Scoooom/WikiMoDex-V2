@@ -86,7 +86,7 @@ class PrsvService
         foreach ($quests as $quest) {
             if ($quest->state == 2 && $this->isGlitchQuest($quest)) {
                 $k = BuiltInService::loadCoreGlitchByMonID($quest->questUnlockData->rewardId);
-                if ($k !== false && !in_array($k->name, $questIDs)) {
+                if ($k !== null && !in_array($k->name, $questIDs)) {
                     $completed[] = $k;
                     $questIDs[] = $k->name;
                 }
@@ -103,7 +103,7 @@ class PrsvService
         foreach ($quests as $quest) {
             if ($quest->state == 2 && $this->isSmittyQuest($quest)) {
                 $k = BuiltInService::loadCoreSmittyByMonID($quest->questUnlockData->rewardId);
-                if ($k !== false && !in_array($k->name, $questIDs)) {
+                if ($k !== null && !in_array($k->name, $questIDs)) {
                     $completed[] = $k;
                     $questIDs[] = $k->name;
                 }
