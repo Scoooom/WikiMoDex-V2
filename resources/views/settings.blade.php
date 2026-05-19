@@ -48,8 +48,46 @@
             <div class="card-header">Trainer Card</div>
             <div class="card-body" style="display:flex;flex-direction:column;gap:18px">
 
-                {{-- Color --}}
-                <div class="settings-field">
+                {{-- Type (overrides colour) --}}
+                @php
+                    $currentType = $user->tc_type ?? '';
+                    $typeMap = [
+                        'normal'=>'#A8A77A','fire'=>'#EE8130','water'=>'#6390F0','electric'=>'#F7D02C',
+                        'grass'=>'#7AC74C','ice'=>'#96D9D6','fighting'=>'#C22E28','poison'=>'#A33EA1',
+                        'ground'=>'#E2BF65','flying'=>'#A98FF3','psychic'=>'#F95587','bug'=>'#A6B91A',
+                        'rock'=>'#B6A136','ghost'=>'#735797','dragon'=>'#6F35FC','dark'=>'#705746',
+                        'steel'=>'#B7B7CE','fairy'=>'#D685AD',
+                    ];
+                @endphp
+                <div class="settings-field" id="tc-type-field">
+                    <label class="settings-label">Card type <span class="settings-hint-inline">(overrides colour when set)</span></label>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;align-items:center">
+                        {{-- None option --}}
+                        <label class="settings-color-option" id="tc-type-none-label">
+                            <input type="radio" name="tc_type" id="tc-type-none" value=""
+                                   {{ $currentType === '' ? 'checked' : '' }}>
+                            <span class="settings-color-swatch {{ $currentType === '' ? 'active' : '' }}"
+                                  style="background:var(--border);color:var(--muted);font-size:10px;display:flex;align-items:center;justify-content:center">✕</span>
+                            <span class="settings-color-label">None</span>
+                        </label>
+                        @foreach($typeMap as $t => $hex)
+                        <label class="settings-color-option">
+                            <input type="radio" name="tc_type" value="{{ $t }}"
+                                   {{ $currentType === $t ? 'checked' : '' }}>
+                            <span class="settings-color-swatch {{ $currentType === $t ? 'active' : '' }}"
+                                  style="background:{{ $hex }};position:relative;overflow:hidden">
+                                <img src="https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/{{ $t }}.svg"
+                                     style="width:22px;height:22px;object-fit:contain;display:block;margin:0 auto"
+                                     alt="{{ $t }}" onerror="this.style.display='none'">
+                            </span>
+                            <span class="settings-color-label">{{ ucfirst($t) }}</span>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Color (hidden when type is active) --}}
+                <div class="settings-field" id="tc-color-field" style="{{ $currentType ? 'display:none' : '' }}">
                     <label class="settings-label">Card colour</label>
                     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px">
                         @php
@@ -153,8 +191,21 @@
 // Activate swatch on radio change
 document.querySelectorAll('.settings-color-option input').forEach(radio => {
     radio.addEventListener('change', () => {
-        document.querySelectorAll('.settings-color-swatch').forEach(s => s.classList.remove('active'));
+        // Only deactivate swatches within the same field group
+        const field = radio.closest('.settings-field');
+        field.querySelectorAll('.settings-color-swatch').forEach(s => s.classList.remove('active'));
         radio.nextElementSibling.classList.add('active');
+    });
+});
+
+// Type <-> Color mutual exclusion
+const typeRadios = document.querySelectorAll('input[name="tc_type"]');
+const colorField = document.getElementById('tc-color-field');
+
+typeRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+        const hasType = radio.value !== '';
+        colorField.style.display = hasType ? 'none' : '';
     });
 });
 </script>

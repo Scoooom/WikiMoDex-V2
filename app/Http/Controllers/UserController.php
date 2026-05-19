@@ -175,7 +175,12 @@ class UserController extends Controller
         $user->pronouns     = substr(strip_tags($request->input('pronouns', '')), 0, 32) ?: null;
         $user->bio          = substr(strip_tags($request->input('bio', '')), 0, 300) ?: null;
 
-        // Trainer card color
+        // Trainer card type (overrides color when set)
+        $allowedTypes = ['normal','fire','water','electric','grass','ice','fighting','poison','ground','flying','psychic','bug','rock','ghost','dragon','dark','steel','fairy'];
+        $tcType = $request->input('tc_type', '');
+        $user->tc_type = in_array($tcType, $allowedTypes) ? $tcType : null;
+
+        // Trainer card color (only used when tc_type is not set)
         $allowed = ['blue', 'red', 'green', 'gold', 'purple', 'black', 'maroon'];
         $color = $request->input('tc_color', 'maroon');
         $user->tc_color = in_array($color, $allowed) ? $color : 'maroon';
@@ -303,6 +308,7 @@ class UserController extends Controller
                 'favMonUrl'     => $favMonUrl,
                 'favMonName'    => $user->tc_favorite_mon,
                 'color'         => $user->tc_color ?? 'maroon',
+                'tcType'        => $user->tc_type ?? null,
                 'sections'      => $user->getTcSections(),
                 'glitchCount'   => count($glitchUnlocks) + $modCount,
                 'smittyCount'   => count($smittyUnlocks) + $uniSmittyCount,

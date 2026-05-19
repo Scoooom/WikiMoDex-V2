@@ -26,7 +26,34 @@ const schemes = {
     maroon: { bg1:'#800000', bg2:'#500000', header:'#300000', field:'#f0a0a0', text:'#ffffff', dark:'#100000', bar:'#f0c040', barBg:'#300000' },
 };
 
-const s = schemes[data.color] ?? schemes['maroon'];
+const typeColors = {
+    normal:   { hex: '#A8A77A', dark: '#6a6a4e', text: '#ffffff' },
+    fire:     { hex: '#EE8130', dark: '#a84e0a', text: '#ffffff' },
+    water:    { hex: '#6390F0', dark: '#2a50c0', text: '#ffffff' },
+    electric: { hex: '#F7D02C', dark: '#b09000', text: '#000000' },
+    grass:    { hex: '#7AC74C', dark: '#3a7a1a', text: '#ffffff' },
+    ice:      { hex: '#96D9D6', dark: '#3a9090', text: '#000000' },
+    fighting: { hex: '#C22E28', dark: '#7a0a08', text: '#ffffff' },
+    poison:   { hex: '#A33EA1', dark: '#5a0a5a', text: '#ffffff' },
+    ground:   { hex: '#E2BF65', dark: '#a07820', text: '#000000' },
+    flying:   { hex: '#A98FF3', dark: '#5a3ab0', text: '#ffffff' },
+    psychic:  { hex: '#F95587', dark: '#b0003a', text: '#ffffff' },
+    bug:      { hex: '#A6B91A', dark: '#5a6a00', text: '#ffffff' },
+    rock:     { hex: '#B6A136', dark: '#6a5a00', text: '#ffffff' },
+    ghost:    { hex: '#735797', dark: '#2a1a4a', text: '#ffffff' },
+    dragon:   { hex: '#6F35FC', dark: '#2a00b0', text: '#ffffff' },
+    dark:     { hex: '#705746', dark: '#2a1a0a', text: '#ffffff' },
+    steel:    { hex: '#B7B7CE', dark: '#5a5a7a', text: '#000000' },
+    fairy:    { hex: '#D685AD', dark: '#8a2a5a', text: '#ffffff' },
+};
+
+const TYPE_ICON_BASE = 'https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons';
+
+
+const activeType = data.tcType && typeColors[data.tcType] ? typeColors[data.tcType] : null;
+const s = activeType
+    ? { bg1: activeType.hex, bg2: activeType.dark, header: activeType.dark, field: activeType.hex, text: activeType.text, dark: activeType.dark, bar: '#4caf7d', barBg: activeType.dark }
+    : (schemes[data.color] ?? schemes['maroon']);
 const rivalPct = data.totalRivals > 0 ? Math.round((data.beatenRivals / data.totalRivals) * 100) : 0;
 
 const html = `<!DOCTYPE html>
@@ -58,6 +85,7 @@ body { background:transparent; width:480px; }
 
 .tc-body {
     background:linear-gradient(160deg, ${s.bg1} 0%, ${s.bg2} 100%);
+    ${activeType ? `background-image: linear-gradient(160deg, ${s.bg1}dd 0%, ${s.bg2}dd 100%), url('${TYPE_ICON_BASE}/${data.tcType}.svg'); background-size: auto, 72px 72px; background-repeat: no-repeat, repeat;` : ''}
     padding:14px;
     display:grid; grid-template-columns:1fr 96px; gap:12px;
 }
@@ -87,6 +115,7 @@ body { background:transparent; width:480px; }
 
 .tc-rivals-section {
     background:${s.header};
+    ${activeType ? `background-image: linear-gradient(${s.header}ee, ${s.header}ee), url('${TYPE_ICON_BASE}/${data.tcType}.svg'); background-size: auto, 72px 72px; background-repeat: no-repeat, repeat;` : ''}
     padding:10px 14px;
     border-top:2px solid ${s.dark};
 }

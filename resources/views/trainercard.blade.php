@@ -38,6 +38,32 @@
 
 <style>
 .tc-grid { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
+
+@php
+$tcType = $user->tc_type ?? null;
+$typeColors = [
+    'normal'   => ['hex'=>'#A8A77A','dark'=>'#6a6a4e','text'=>'#ffffff'],
+    'fire'     => ['hex'=>'#EE8130','dark'=>'#a84e0a','text'=>'#ffffff'],
+    'water'    => ['hex'=>'#6390F0','dark'=>'#2a50c0','text'=>'#ffffff'],
+    'electric' => ['hex'=>'#F7D02C','dark'=>'#b09000','text'=>'#000000'],
+    'grass'    => ['hex'=>'#7AC74C','dark'=>'#3a7a1a','text'=>'#ffffff'],
+    'ice'      => ['hex'=>'#96D9D6','dark'=>'#3a9090','text'=>'#000000'],
+    'fighting' => ['hex'=>'#C22E28','dark'=>'#7a0a08','text'=>'#ffffff'],
+    'poison'   => ['hex'=>'#A33EA1','dark'=>'#5a0a5a','text'=>'#ffffff'],
+    'ground'   => ['hex'=>'#E2BF65','dark'=>'#a07820','text'=>'#000000'],
+    'flying'   => ['hex'=>'#A98FF3','dark'=>'#5a3ab0','text'=>'#ffffff'],
+    'psychic'  => ['hex'=>'#F95587','dark'=>'#b0003a','text'=>'#ffffff'],
+    'bug'      => ['hex'=>'#A6B91A','dark'=>'#5a6a00','text'=>'#ffffff'],
+    'rock'     => ['hex'=>'#B6A136','dark'=>'#6a5a00','text'=>'#ffffff'],
+    'ghost'    => ['hex'=>'#735797','dark'=>'#2a1a4a','text'=>'#ffffff'],
+    'dragon'   => ['hex'=>'#6F35FC','dark'=>'#2a00b0','text'=>'#ffffff'],
+    'dark'     => ['hex'=>'#705746','dark'=>'#2a1a0a','text'=>'#ffffff'],
+    'steel'    => ['hex'=>'#B7B7CE','dark'=>'#5a5a7a','text'=>'#000000'],
+    'fairy'    => ['hex'=>'#D685AD','dark'=>'#8a2a5a','text'=>'#ffffff'],
+];
+$tc = $tcType && isset($typeColors[$tcType]) ? $typeColors[$tcType] : null;
+$typeIconBase = 'https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons';
+@endphp
 .tc-section { margin-bottom: 20px; }
 .tc-mon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
 .tc-mon-item { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 10px 8px; text-align: center; transition: border-color .15s; }
@@ -56,8 +82,27 @@
 .rival-name { font-size: 10px; color: var(--muted); }
 .tc-owner-notice { font-size: 12px; color: var(--muted); margin-bottom: 16px; display:flex; align-items:center; gap:8px; }
 </style>
+@if($tc)
+<style>
+.tc-type-themed .card-header {
+    background: {{ $tc['dark'] }};
+    color: {{ $tc['text'] }};
+    border-color: {{ $tc['dark'] }};
+}
+.tc-type-themed .card {
+    border-color: {{ $tc['dark'] }}80;
+}
+.tc-type-themed .card-body {
+    background:
+        linear-gradient(160deg, {{ $tc['hex'] }}22, {{ $tc['dark'] }}33),
+        url('{{ $typeIconBase }}/{{ $tcType }}.svg');
+    background-size: auto, 64px 64px;
+    background-repeat: no-repeat, repeat;
+}
+</style>
+@endif
 
-<div class="container mt-2">
+<div class="container mt-2" @if($tc) class="tc-type-themed" @endif>
 
     @if($isOwner)
     <div class="tc-owner-notice">
@@ -72,8 +117,8 @@
 
         {{-- Sidebar --}}
         <div>
-            <div class="card">
-                <div class="card-body" style="text-align:center">
+            <div class="card" @if($tc) style="border-color:{{ $tc['dark'] }}" @endif>
+                <div class="card-body" style="text-align:center; @if($tc) background: linear-gradient(160deg, {{ $tc['hex'] }}cc, {{ $tc['dark'] }}cc); background-image: linear-gradient(160deg, {{ $tc['hex'] }}cc, {{ $tc['dark'] }}cc), url('{{ $typeIconBase }}/{{ $tcType }}.svg'); background-size: auto, 64px 64px; background-repeat: no-repeat, repeat; color: {{ $tc['text'] }}; @endif">
                     <img src="{{ $user->getAvatarURL() }}" class="profile-avatar mb-3" alt="{{ $user->username }}">
                     <div class="mon-name" style="font-size:18px">{{ $user->getDisplayName() }}</div>
                     @if($user->pronouns)
