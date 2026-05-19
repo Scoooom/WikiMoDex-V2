@@ -194,8 +194,7 @@ body { background:transparent; width:480px; }
             <div class="tc-field">
                 <span class="tc-field-label">■ GLITCHES</span>
                 <span class="tc-field-value">${data.glitchCount}</span>
-                </div>
-    </div>` : ''}
+            </div>` : ''}
             ${(data.sections.smitty || data.sections.unismitty) ? `
             <div class="tc-field">
                 <span class="tc-field-label">■ SMITTY</span>
@@ -219,14 +218,15 @@ body { background:transparent; width:480px; }
     <div class="tc-rivals-section">
         ${activeType ? generateTypeIcons('rivals', 454, 120, 8, data.tcType, TYPE_ICON_BASE + '/' + data.tcType + '.svg') : ''}
         <div style="position:relative;z-index:1">
-        <div class="tc-rivals-label">■ RIVALS DEFEATED</div>
-        <div class="tc-bar-track"><div class="tc-bar-fill"></div></div>
-        <div class="tc-bar-count">${data.beatenRivals} / ${data.totalRivals}</div>
-        <div class="tc-rival-sprites">
-            ${data.rivals.map(r => `
-            <div class="tc-rival-pip ${r.beaten ? 'beaten' : ''}" title="${r.name}">
-                <img src="${r.imgUrl}" alt="${r.name}" onerror="this.parentElement.style.display='none'">
-            </div>`).join('')}
+            <div class="tc-rivals-label">■ RIVALS DEFEATED</div>
+            <div class="tc-bar-track"><div class="tc-bar-fill"></div></div>
+            <div class="tc-bar-count">${data.beatenRivals} / ${data.totalRivals}</div>
+            <div class="tc-rival-sprites">
+                ${data.rivals.map(r => `
+                <div class="tc-rival-pip ${r.beaten ? 'beaten' : ''}" title="${r.name}">
+                    <img src="${r.imgUrl}" alt="${r.name}" onerror="this.parentElement.style.display='none'">
+                </div>`).join('')}
+            </div>
         </div>
     </div>` : ''}
 </div>
