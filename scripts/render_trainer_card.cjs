@@ -51,6 +51,43 @@ const TYPE_ICON_BASE = 'https://raw.githubusercontent.com/duiker101/pokemon-type
 
 
 const activeType = data.tcType && typeColors[data.tcType] ? typeColors[data.tcType] : null;
+// Seeded RNG (mulberry32) so icon positions are consistent per user
+function seededRng(seed) {
+    let s = seed;
+    return function() {
+        s |= 0; s = s + 0x6D2B79F5 | 0;
+        let t = Math.imul(s ^ s >>> 15, 1 | s);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+}
+
+function usernameToSeed(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = Math.imul(31, h) + str.charCodeAt(i) | 0;
+    return h;
+}
+
+function generateTypeIcons(containerId, width, height, count, tcType, iconUrl) {
+    const rng = seededRng(usernameToSeed(data.username + containerId));
+    const icons = [];
+    for (let i = 0; i < count; i++) {
+        const size = 44 + Math.floor(rng() * 32); // 44–76px
+        const x = Math.floor(rng() * (width - size));
+        const y = Math.floor(rng() * (height - size));
+        const rotation = Math.floor(rng() * 40) - 20; // -20 to +20 deg
+        icons.push(
+            `<img src="${iconUrl}" style="` +
+            `position:absolute;left:${x}px;top:${y}px;` +
+            `width:${size}px;height:${size}px;` +
+            `opacity:0.18;` +
+            `border:1.5px solid rgba(255,255,255,0.25);border-radius:6px;` +
+            `transform:rotate(${rotation}deg);pointer-events:none;" />`
+        );
+    }
+    return icons.join('');
+}
+
 const s = activeType
     ? { bg1: activeType.hex, bg2: activeType.dark, header: activeType.dark, field: activeType.hex, text: activeType.text, dark: activeType.dark, bar: '#4caf7d', barBg: activeType.dark }
     : (schemes[data.color] ?? schemes['maroon']);
@@ -85,9 +122,9 @@ body { background:transparent; width:480px; }
 
 .tc-body {
     background:linear-gradient(160deg, ${s.bg1} 0%, ${s.bg2} 100%);
-    ${activeType ? `background-image: linear-gradient(160deg, ${s.bg1}bb 0%, ${s.bg2}bb 100%), url('${TYPE_ICON_BASE}/${data.tcType}.svg'); background-size: auto, 80px 80px; background-repeat: no-repeat, repeat;` : ''}
     padding:14px;
     display:grid; grid-template-columns:1fr 96px; gap:12px;
+    position:relative; overflow:hidden;
 }
 
 .tc-fields { display:flex; flex-direction:column; gap:7px; }
@@ -115,9 +152,9 @@ body { background:transparent; width:480px; }
 
 .tc-rivals-section {
     background:${s.header};
-    ${activeType ? `background-image: linear-gradient(${s.header}aa, ${s.header}aa), url('${TYPE_ICON_BASE}/${data.tcType}.svg'); background-size: auto, 80px 80px; background-repeat: no-repeat, repeat;` : ''}
     padding:10px 14px;
     border-top:2px solid ${s.dark};
+    position:relative; overflow:hidden;
 }
 .tc-rivals-label { font-size:6px; color:${s.field}; letter-spacing:1px; margin-bottom:7px; }
 
@@ -147,7 +184,8 @@ body { background:transparent; width:480px; }
         <span class="tc-header-id">ID No.${String(data.userId).padStart(5, '0')}</span>
     </div>
     <div class="tc-body">
-        <div class="tc-fields">
+        ${activeType ? generateTypeIcons('body', 454, 160, 12, data.tcType, TYPE_ICON_BASE + '/' + data.tcType + '.svg') : ''}
+        <div class="tc-fields" style="position:relative;z-index:1">
             <div class="tc-field">
                 <span class="tc-field-label">■ NAME</span>
                 <span class="tc-field-value">${data.username.toUpperCase()}</span>
@@ -156,7 +194,8 @@ body { background:transparent; width:480px; }
             <div class="tc-field">
                 <span class="tc-field-label">■ GLITCHES</span>
                 <span class="tc-field-value">${data.glitchCount}</span>
-            </div>` : ''}
+                </div>
+    </div>` : ''}
             ${(data.sections.smitty || data.sections.unismitty) ? `
             <div class="tc-field">
                 <span class="tc-field-label">■ SMITTY</span>
@@ -168,7 +207,7 @@ body { background:transparent; width:480px; }
                 <span class="tc-field-value">${data.submittedCount}</span>
             </div>` : ''}
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="display:flex;flex-direction:column;align-items:center;position:relative;z-index:1">
             <img class="tc-avatar" src="${data.avatarUrl}" alt="${data.username}">
             ${data.favMonUrl ? `
             <div class="tc-fav-mon">
@@ -178,6 +217,8 @@ body { background:transparent; width:480px; }
     </div>
     ${data.sections.rivals ? `
     <div class="tc-rivals-section">
+        ${activeType ? generateTypeIcons('rivals', 454, 120, 8, data.tcType, TYPE_ICON_BASE + '/' + data.tcType + '.svg') : ''}
+        <div style="position:relative;z-index:1">
         <div class="tc-rivals-label">■ RIVALS DEFEATED</div>
         <div class="tc-bar-track"><div class="tc-bar-fill"></div></div>
         <div class="tc-bar-count">${data.beatenRivals} / ${data.totalRivals}</div>
