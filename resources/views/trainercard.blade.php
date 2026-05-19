@@ -120,11 +120,11 @@ $typeIconBase = 'https://raw.githubusercontent.com/duiker101/pokemon-type-svg-ic
             <div class="card" @if($tc) style="border-color:{{ $tc['dark'] }}" @endif>
                 <div class="card-body" style="text-align:center; @if($tc) background: linear-gradient(160deg, {{ $tc['hex'] }}cc, {{ $tc['dark'] }}cc); background-image: linear-gradient(160deg, {{ $tc['hex'] }}cc, {{ $tc['dark'] }}cc), url('{{ $typeIconBase }}/{{ $tcType }}.svg'); background-size: auto, 64px 64px; background-repeat: no-repeat, repeat; color: {{ $tc['text'] }}; @endif">
                     <img src="{{ $user->getAvatarURL() }}" class="profile-avatar mb-3" alt="{{ $user->username }}">
-                    <div class="mon-name" style="font-size:18px">{{ $user->getDisplayName() }}</div>
+                    <div class="mon-name" style="font-size:18px; @if($tc) text-shadow: 0 1px 4px rgba(0,0,0,.7); @endif">{{ $user->getDisplayName() }}</div>
                     @if($user->pronouns)
-                    <div style="font-size:12px;color:var(--muted);margin-top:2px">{{ $user->pronouns }}</div>
+                    <div style="font-size:12px;margin-top:2px; @if($tc) color:{{ $tc['text'] }};text-shadow:0 1px 3px rgba(0,0,0,.7); @else color:var(--muted); @endif">{{ $user->pronouns }}</div>
                     @endif
-                    <div style="font-size:12px;color:var(--muted);margin-top:4px">Trainer Card</div>
+                    <div style="font-size:12px;margin-top:4px; @if($tc) color:{{ $tc['text'] }};text-shadow:0 1px 3px rgba(0,0,0,.7);opacity:.8; @else color:var(--muted); @endif">Trainer Card</div>
                 </div>
             </div>
         </div>
