@@ -71,31 +71,34 @@ function usernameToSeed(str) {
 function generateTypeIcons(containerId, width, height, count, tcType, iconUrl) {
     const rng = seededRng(usernameToSeed(data.username + containerId));
 
-    // Fixed icon size
-    const size = 52;
-    const margin = 6;
+    const size = 48;
+    const colSpacing = size * 1.15;
+    const rowSpacing = size * 1.0;
+    const hexOffset  = colSpacing / 2;
 
-    // Divide X into equal columns, but give Y a much wider jitter range
-    const cols = count;
-    const colW = Math.floor(width / cols);
-    const maxY = Math.max(0, height - size - margin);
+    const cols = Math.floor(width / colSpacing) + 1;
+    const rows = Math.floor(height / rowSpacing) + 1;
 
     const icons = [];
-    for (let j = 0; j < count; j++) {
-        // X: contained within column with small jitter
-        const jitterX = Math.floor(rng() * Math.max(0, colW - size - margin));
-        const x = j * colW + jitterX;
-        // Y: full range of available height
-        const y = margin + Math.floor(rng() * maxY);
-        const rotation = Math.floor(rng() * 50) - 25;
-        icons.push(
-            `<img src="${iconUrl}" style="` +
-            `position:absolute;left:${x}px;top:${y}px;` +
-            `width:${size}px;height:${size}px;` +
-            `opacity:0.2;` +
-            `border:1.5px solid rgba(255,255,255,0.25);border-radius:6px;` +
-            `transform:rotate(${rotation}deg);pointer-events:none;" />`
-        );
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const cx = col * colSpacing + (row % 2 === 1 ? hexOffset : 0);
+            const cy = row * rowSpacing;
+            if (cx + size > width + colSpacing || cy + size > height + rowSpacing) continue;
+            const jx = (rng() - 0.5) * 8;
+            const jy = (rng() - 0.5) * 8;
+            const rotation = Math.floor(rng() * 30) - 15;
+            const x = Math.round(cx + jx);
+            const y = Math.round(cy + jy);
+            icons.push(
+                '<img src="' + iconUrl + '" style="' +
+                'position:absolute;left:' + x + 'px;top:' + y + 'px;' +
+                'width:' + size + 'px;height:' + size + 'px;' +
+                'opacity:0.2;' +
+                'border:1.5px solid rgba(255,255,255,0.25);border-radius:6px;' +
+                'transform:rotate(' + rotation + 'deg);pointer-events:none;" />'
+            );
+        }
     }
     return icons.join('');
 }
