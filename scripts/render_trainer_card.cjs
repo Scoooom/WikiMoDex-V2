@@ -131,7 +131,7 @@ body { background:transparent; width:480px; }
 }
 .tc-bar-count { font-size:7px; color:${s.field}; margin-top:5px; text-align:right; }
 
-.tc-rival-sprites { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+.tc-rival-sprites { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; background:rgba(0,0,0,.45); border-radius:6px; padding:6px; }
 .tc-rival-pip {
     width:24px; height:24px; border-radius:50%; overflow:hidden;
     border:1px solid ${s.dark}; opacity:.3; filter:grayscale(1);
