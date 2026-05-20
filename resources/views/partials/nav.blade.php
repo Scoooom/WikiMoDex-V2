@@ -17,6 +17,8 @@
                     <a class="nav-dropdown-item" href="/galleryCore.html">Core Glitches</a>
                     <a class="nav-dropdown-item" href="/gallerySmitty.html">SMITTY Pokémon</a>
                     <a class="nav-dropdown-item" href="/gallerySmittyForm.html">SMITTY Forms</a>
+                    <div class="nav-dropdown-divider"></div>
+                    <a class="nav-dropdown-item" href="/downloadAll.html">⬇ Download All Mods</a>
                 </div>
             </div>
 

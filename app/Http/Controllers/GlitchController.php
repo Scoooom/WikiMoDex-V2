@@ -107,6 +107,28 @@ class GlitchController extends Controller
         ]);
     }
 
+    public function downloadAll()
+    {
+        $glitches = Glitch::all();
+
+        $zip = new \ZipArchive();
+        $tmpPath = tempnam(sys_get_temp_dir(), 'allGlitches') . '.zip';
+
+        if ($zip->open($tmpPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            abort(500, 'Failed to create archive');
+        }
+
+        foreach ($glitches as $glitch) {
+            $zip->addFromString($glitch->filename, $glitch->json_data);
+        }
+
+        $zip->close();
+
+        return response()->download($tmpPath, 'allGlitches.zip', [
+            'Content-Type' => 'application/zip',
+        ])->deleteFileAfterSend(true);
+    }
+
     public function galleryCore()
     {
         $glitches = \App\Services\BuiltInService::load();

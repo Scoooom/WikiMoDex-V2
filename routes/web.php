@@ -45,6 +45,7 @@ Route::middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, sta
 Route::get('/create.html', [GlitchController::class, 'create'])->middleware('cache:no-store');
 Route::post('/upload.html', [GlitchController::class, 'store']);
 Route::get('/d:{id}.html', [GlitchController::class, 'download'])->middleware('cache:no-store');
+Route::get('/downloadAll.html', [GlitchController::class, 'downloadAll'])->middleware('cache:no-store');
 
 // Sprites — browser AND CDN cache for a year, URL is ID-based so never stale
 Route::middleware(['nosession', 'cache:public, max-age=0, s-maxage=31536000, stale-while-revalidate=30'])->group(function () {
