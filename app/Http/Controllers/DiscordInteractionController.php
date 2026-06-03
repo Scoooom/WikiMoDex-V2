@@ -1010,12 +1010,15 @@ class DiscordInteractionController extends Controller
 
         $maxOrder = \App\Models\HelpMessage::max('order') ?? 0;
 
+        $creatorId = $data['member']['user']['id'] ?? ($data['user']['id'] ?? null);
+
         \App\Models\HelpMessage::create([
-            'order'  => $maxOrder + 1,
-            'name'   => $name,
-            'slug'   => $slug,
-            'header' => $header,
-            'body'   => $body,
+            'order'                 => $maxOrder + 1,
+            'name'                  => $name,
+            'slug'                  => $slug,
+            'header'                => $header,
+            'body'                  => $body,
+            'created_by_discord_id' => $creatorId,
         ]);
 
         return response()->json([
@@ -1125,11 +1128,26 @@ class DiscordInteractionController extends Controller
             return $this->ephemeralError("A help message with the name **{$name}** already exists.");
         }
 
+        $editorId = $data['member']['user']['id'] ?? ($data['user']['id'] ?? null);
+
+        // Build diffs — only record fields that actually changed
+        $nameDiff   = $message->name   !== $name   ? ['before' => $message->name,   'after' => $name]   : null;
+        $headerDiff = $message->header !== $header  ? ['before' => $message->header, 'after' => $header] : null;
+        $bodyDiff   = $message->body   !== $body    ? ['before' => $message->body,   'after' => $body]   : null;
+
         $message->update([
             'name'   => $name,
             'slug'   => $newSlug,
             'header' => $header,
             'body'   => $body,
+        ]);
+
+        \App\Models\HelpMessageEdit::create([
+            'help_message_id'   => $message->id,
+            'editor_discord_id' => $editorId,
+            'name_diff'         => $nameDiff,
+            'header_diff'       => $headerDiff,
+            'body_diff'         => $bodyDiff,
         ]);
 
         return response()->json([
