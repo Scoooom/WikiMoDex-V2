@@ -892,6 +892,7 @@ class DiscordInteractionController extends Controller
         '1417906479104528445',
         '1368668177675845813',
         '1368679296251596821',
+        '1353801271903129692',
     ];
 
     private function isStaff(array $data): bool
