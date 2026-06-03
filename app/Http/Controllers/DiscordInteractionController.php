@@ -108,6 +108,10 @@ class DiscordInteractionController extends Controller
             return $this->autocompleteHelp($query);
         }
 
+        if ($commandName === 'edithelp') {
+            return $this->autocompleteHelp($query);
+        }
+
         return $this->autocompleteForm($query);
     }
 
@@ -256,6 +260,14 @@ class DiscordInteractionController extends Controller
 
         if ($commandName === 'addhelp') {
             return $this->openAddHelpModal($data);
+        }
+
+        if ($commandName === 'edithelp') {
+            $slug = '';
+            foreach ($data['data']['options'] ?? [] as $option) {
+                if ($option['name'] === 'name') { $slug = $option['value']; break; }
+            }
+            return $this->openEditHelpModal($data, $slug);
         }
 
         return response()->json([
@@ -957,6 +969,11 @@ class DiscordInteractionController extends Controller
             return $this->handleAddHelpSubmit($data);
         }
 
+        if (str_starts_with($customId, 'edithelp_modal:')) {
+            $slug = substr($customId, strlen('edithelp_modal:'));
+            return $this->handleEditHelpSubmit($data, $slug);
+        }
+
         return response()->json([
             'type' => self::CHANNEL_MESSAGE,
             'data' => ['content' => 'Unknown modal submission.', 'flags' => 64],
@@ -1010,6 +1027,120 @@ class DiscordInteractionController extends Controller
                     'description' => "**{$header}**\n\n{$body}",
                     'color'       => 0x7c5cbf,
                     'footer'      => ['text' => "Slug: {$slug}"],
+                ]],
+            ],
+        ]);
+    }
+
+    private function openEditHelpModal(array $data, string $slug): \Illuminate\Http\JsonResponse
+    {
+        if (!$this->isStaff($data)) {
+            return $this->ephemeralError('You need a staff role to use this command.');
+        }
+
+        $message = \App\Models\HelpMessage::where('slug', $slug)->first();
+
+        if (!$message) {
+            return $this->ephemeralError("No help message found for `{$slug}`.");
+        }
+
+        return response()->json([
+            'type' => self::MODAL,
+            'data' => [
+                'custom_id'  => 'edithelp_modal:' . $slug,
+                'title'      => 'Edit Help Message',
+                'components' => [
+                    [
+                        'type'       => 1,
+                        'components' => [[
+                            'type'        => 4,
+                            'custom_id'   => 'name',
+                            'label'       => 'Name (shown in autocomplete)',
+                            'style'       => 1,
+                            'required'    => true,
+                            'max_length'  => 100,
+                            'value'       => $message->name,
+                        ]],
+                    ],
+                    [
+                        'type'       => 1,
+                        'components' => [[
+                            'type'        => 4,
+                            'custom_id'   => 'header',
+                            'label'       => 'Header (embed title)',
+                            'style'       => 1,
+                            'required'    => true,
+                            'max_length'  => 256,
+                            'value'       => $message->header,
+                        ]],
+                    ],
+                    [
+                        'type'       => 1,
+                        'components' => [[
+                            'type'        => 4,
+                            'custom_id'   => 'body',
+                            'label'       => 'Body (embed description)',
+                            'style'       => 2,
+                            'required'    => true,
+                            'max_length'  => 2000,
+                            'value'       => $message->body,
+                        ]],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    private function handleEditHelpSubmit(array $data, string $slug): \Illuminate\Http\JsonResponse
+    {
+        if (!$this->isStaff($data)) {
+            return $this->ephemeralError('You need a staff role to use this command.');
+        }
+
+        $message = \App\Models\HelpMessage::where('slug', $slug)->first();
+
+        if (!$message) {
+            return $this->ephemeralError("Help message `{$slug}` no longer exists.");
+        }
+
+        $fields = [];
+        foreach ($data['data']['components'] ?? [] as $row) {
+            foreach ($row['components'] ?? [] as $component) {
+                $fields[$component['custom_id']] = trim($component['value'] ?? '');
+            }
+        }
+
+        $name   = $fields['name']   ?? '';
+        $header = $fields['header'] ?? '';
+        $body   = $fields['body']   ?? '';
+
+        if (!$name || !$header || !$body) {
+            return $this->ephemeralError('All three fields are required.');
+        }
+
+        $newSlug = \App\Models\HelpMessage::slugFor($name);
+
+        // If the name changed, check the new slug isn't already taken by a different entry
+        if ($newSlug !== $slug && \App\Models\HelpMessage::where('slug', $newSlug)->exists()) {
+            return $this->ephemeralError("A help message with the name **{$name}** already exists.");
+        }
+
+        $message->update([
+            'name'   => $name,
+            'slug'   => $newSlug,
+            'header' => $header,
+            'body'   => $body,
+        ]);
+
+        return response()->json([
+            'type' => self::CHANNEL_MESSAGE,
+            'data' => [
+                'flags'  => 64,
+                'embeds' => [[
+                    'title'       => '✅ Help message updated',
+                    'description' => "**{$header}**\n\n{$body}",
+                    'color'       => 0x7c5cbf,
+                    'footer'      => ['text' => "Slug: {$newSlug}"],
                 ]],
             ],
         ]);
