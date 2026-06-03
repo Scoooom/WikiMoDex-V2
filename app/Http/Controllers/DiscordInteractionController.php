@@ -188,7 +188,7 @@ class DiscordInteractionController extends Controller
                     'embeds' => [[
                         'title'       => 'WikiMoDex',
                         'description' => 'The PokéVoid community wiki and Pokémon form database.',
-                        'color'       => 0x7c5cbf,
+                        'color'       => 0x800000,
                         'fields'      => [
                             ['name' => '📖 Wiki',          'value' => "[Game mechanics, champions, items & more](<https://pokevoid.wiki/wiki.html>)",                   'inline' => false],
                             ['name' => '🎒 Items',         'value' => "[Full item reference by tier](<https://pokevoid.wiki/wiki:items.html>)",                         'inline' => true],
@@ -365,7 +365,7 @@ class DiscordInteractionController extends Controller
             return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
                 'title'       => $title,
                 'description' => $excerpt,
-                'color'       => 0x7c5cbf,
+                'color'       => 0x800000,
                 'fields'      => [['name' => 'Category', 'value' => $section->article_category, 'inline' => true]],
                 'url'         => $url,
                 'footer'      => ['text' => 'WikiMoDex • Wiki'],
@@ -384,7 +384,7 @@ class DiscordInteractionController extends Controller
             return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
                 'title'       => $article->title,
                 'description' => $excerpt,
-                'color'       => 0x7c5cbf,
+                'color'       => 0x800000,
                 'fields'      => [['name' => 'Category', 'value' => $article->category, 'inline' => true]],
                 'url'         => $url,
                 'footer'      => ['text' => 'WikiMoDex • Wiki'],
@@ -402,7 +402,7 @@ class DiscordInteractionController extends Controller
             return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
                 'title'       => $item->name,
                 'description' => $item->description ?: 'No description available.',
-                'color'       => 0x7c5cbf,
+                'color'       => 0x800000,
                 'fields'      => $fields,
                 'url'         => "https://pokevoid.wiki/wiki:items.html",
                 'footer'      => ['text' => 'WikiMoDex • Items Reference'],
@@ -498,7 +498,7 @@ class DiscordInteractionController extends Controller
         $embed = [
             'title'       => "{$build->species} — {$build->name}",
             'description' => "Champion: **{$champion}**",
-            'color'       => 0x7c5cbf,
+            'color'       => 0x800000,
             'thumbnail'   => ['url' => $spriteUrl],
             'fields'      => $fields,
             'footer'      => ['text' => 'WikiMoDex • Alt Builds'],
@@ -630,7 +630,7 @@ class DiscordInteractionController extends Controller
                 'embeds' => [[
                     'title'       => $ability->name,
                     'description' => $ability->description,
-                    'color'       => 0x7c5cbf,
+                    'color'       => 0x800000,
                     'footer'      => ['text' => 'WikiMoDex • Ability']
                 ]]
             ]
@@ -811,7 +811,7 @@ class DiscordInteractionController extends Controller
                     'embeds' => [[
                         'title'     => $title,
                         'url'       => $pageUrl,
-                        'color'     => 0x7c5cbf,
+                        'color'     => 0x800000,
                         'thumbnail' => ['url' => $frontUrl],
                         'fields'    => $fields,
                         'footer'    => ['text' => $footerLabel],
@@ -875,7 +875,7 @@ class DiscordInteractionController extends Controller
         $embed = [
             'title'       => $build->title,
             'url'         => $url,
-            'color'       => 0x7c5cbf,
+            'color'       => 0x800000,
             'description' => "by **{$build->user->username}** · {$build->votes} ▲ · {$build->team_size} Pokémon",
             'fields'      => $fields,
             'footer'      => ['text' => "WikiMoDex • Community Build · ID: {$build->slug}"],
@@ -1025,7 +1025,7 @@ class DiscordInteractionController extends Controller
                 'embeds' => [[
                     'title'       => '✅ Help message added',
                     'description' => "**{$header}**\n\n{$body}",
-                    'color'       => 0x7c5cbf,
+                    'color'       => 0x800000,
                     'footer'      => ['text' => "Slug: {$slug}"],
                 ]],
             ],
@@ -1139,7 +1139,7 @@ class DiscordInteractionController extends Controller
                 'embeds' => [[
                     'title'       => '✅ Help message updated',
                     'description' => "**{$header}**\n\n{$body}",
-                    'color'       => 0x7c5cbf,
+                    'color'       => 0x800000,
                     'footer'      => ['text' => "Slug: {$newSlug}"],
                 ]],
             ],
@@ -1181,7 +1181,7 @@ class DiscordInteractionController extends Controller
                 'embeds' => [[
                     'title'       => $message->header,
                     'description' => $message->body,
-                    'color'       => 0x7c5cbf,
+                    'color'       => 0x800000,
                     'footer'      => ['text' => 'WikiMoDex • Help'],
                 ]],
             ],
@@ -1237,7 +1237,7 @@ class DiscordInteractionController extends Controller
         return response()->json(['type' => self::CHANNEL_MESSAGE, 'data' => ['embeds' => [[
             'title'       => $entry->question,
             'description' => $entry->answer_plain,
-            'color'       => 0x7c5cbf,
+            'color'       => 0x800000,
             'fields'      => [['name' => 'Category', 'value' => $entry->group, 'inline' => true]],
             'url'         => $url,
             'footer'      => ['text' => 'WikiMoDex • FAQ'],
