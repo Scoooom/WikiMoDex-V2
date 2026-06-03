@@ -97,6 +97,23 @@ class RegisterSlashCommands extends Command
                     ]
                 ]
             ],
+            [
+                'name'        => 'help',
+                'description' => 'Send a canned help message for a common question',
+                'options'     => [
+                    [
+                        'type'         => 3,
+                        'name'         => 'name',
+                        'description'  => 'The topic you want to send a message for',
+                        'required'     => true,
+                        'autocomplete' => true,
+                    ]
+                ]
+            ],
+            [
+                'name'        => 'addhelp',
+                'description' => 'Add a new canned help message (staff only)',
+            ],
         ];
 
         $response = Http::withHeaders([

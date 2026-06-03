@@ -15,10 +15,12 @@ class DiscordInteractionController extends Controller
     const PING          = 1;
     const APPLICATION   = 2;
     const AUTOCOMPLETE  = 4;
+    const MODAL_SUBMIT  = 5;
 
     // Response types
     const PONG                         = 1;
     const CHANNEL_MESSAGE              = 4;
+    const MODAL                        = 9;
     const AUTOCOMPLETE_RESULT          = 8;
 
     public function handle(Request $request)
@@ -39,6 +41,11 @@ class DiscordInteractionController extends Controller
         // Autocomplete
         if ($type === self::AUTOCOMPLETE) {
             return $this->handleAutocomplete($data);
+        }
+
+        // Modal submit
+        if ($type === self::MODAL_SUBMIT) {
+            return $this->handleModalSubmit($data);
         }
 
         // Slash command
@@ -95,6 +102,10 @@ class DiscordInteractionController extends Controller
 
         if ($commandName === 'faq') {
             return $this->autocompleteFaq($query);
+        }
+
+        if ($commandName === 'help') {
+            return $this->autocompleteHelp($query);
         }
 
         return $this->autocompleteForm($query);
@@ -233,6 +244,18 @@ class DiscordInteractionController extends Controller
                 if ($option['name'] === 'id') { $input = trim($option['value']); break; }
             }
             return $this->handleCommunityBuild($input);
+        }
+
+        if ($commandName === 'help') {
+            $slug = '';
+            foreach ($data['data']['options'] ?? [] as $option) {
+                if ($option['name'] === 'name') { $slug = $option['value']; break; }
+            }
+            return $this->handleHelp($slug);
+        }
+
+        if ($commandName === 'addhelp') {
+            return $this->openAddHelpModal($data);
         }
 
         return response()->json([
@@ -850,6 +873,190 @@ class DiscordInteractionController extends Controller
         return response()->json([
             'type' => self::CHANNEL_MESSAGE,
             'data' => ['embeds' => [$embed]],
+        ]);
+    }
+
+    const STAFF_ROLE_IDS = [
+        '1417906479104528445',
+        '1368668177675845813',
+        '1368679296251596821',
+    ];
+
+    private function isStaff(array $data): bool
+    {
+        $memberRoles = $data['member']['roles'] ?? [];
+        return count(array_intersect(self::STAFF_ROLE_IDS, $memberRoles)) > 0;
+    }
+
+    private function ephemeralError(string $message): \Illuminate\Http\JsonResponse
+    {
+        return response()->json([
+            'type' => self::CHANNEL_MESSAGE,
+            'data' => ['content' => $message, 'flags' => 64],
+        ]);
+    }
+
+    private function openAddHelpModal(array $data): \Illuminate\Http\JsonResponse
+    {
+        if (!$this->isStaff($data)) {
+            return $this->ephemeralError('You need a staff role to use this command.');
+        }
+
+        return response()->json([
+            'type' => self::MODAL,
+            'data' => [
+                'custom_id' => 'addhelp_modal',
+                'title'     => 'Add Help Message',
+                'components' => [
+                    [
+                        'type'       => 1, // Action Row
+                        'components' => [[
+                            'type'        => 4, // Text Input
+                            'custom_id'   => 'name',
+                            'label'       => 'Name (shown in autocomplete)',
+                            'style'       => 1, // Short
+                            'required'    => true,
+                            'max_length'  => 100,
+                            'placeholder' => 'e.g. Not Pokémon Void',
+                        ]],
+                    ],
+                    [
+                        'type'       => 1,
+                        'components' => [[
+                            'type'        => 4,
+                            'custom_id'   => 'header',
+                            'label'       => 'Header (embed title)',
+                            'style'       => 1, // Short
+                            'required'    => true,
+                            'max_length'  => 256,
+                            'placeholder' => 'e.g. PokéVoid ≠ Pokémon Void',
+                        ]],
+                    ],
+                    [
+                        'type'       => 1,
+                        'components' => [[
+                            'type'        => 4,
+                            'custom_id'   => 'body',
+                            'label'       => 'Body (embed description)',
+                            'style'       => 2, // Paragraph
+                            'required'    => true,
+                            'max_length'  => 2000,
+                            'placeholder' => 'The full message to send...',
+                        ]],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    private function handleModalSubmit(array $data): \Illuminate\Http\JsonResponse
+    {
+        $customId = $data['data']['custom_id'] ?? '';
+
+        if ($customId === 'addhelp_modal') {
+            return $this->handleAddHelpSubmit($data);
+        }
+
+        return response()->json([
+            'type' => self::CHANNEL_MESSAGE,
+            'data' => ['content' => 'Unknown modal submission.', 'flags' => 64],
+        ]);
+    }
+
+    private function handleAddHelpSubmit(array $data): \Illuminate\Http\JsonResponse
+    {
+        if (!$this->isStaff($data)) {
+            return $this->ephemeralError('You need a staff role to use this command.');
+        }
+
+        // Extract values from the action row components
+        $fields = [];
+        foreach ($data['data']['components'] ?? [] as $row) {
+            foreach ($row['components'] ?? [] as $component) {
+                $fields[$component['custom_id']] = trim($component['value'] ?? '');
+            }
+        }
+
+        $name   = $fields['name']   ?? '';
+        $header = $fields['header'] ?? '';
+        $body   = $fields['body']   ?? '';
+
+        if (!$name || !$header || !$body) {
+            return $this->ephemeralError('All three fields are required.');
+        }
+
+        $slug = \App\Models\HelpMessage::slugFor($name);
+
+        if (\App\Models\HelpMessage::where('slug', $slug)->exists()) {
+            return $this->ephemeralError("A help message with the name **{$name}** already exists.");
+        }
+
+        $maxOrder = \App\Models\HelpMessage::max('order') ?? 0;
+
+        \App\Models\HelpMessage::create([
+            'order'  => $maxOrder + 1,
+            'name'   => $name,
+            'slug'   => $slug,
+            'header' => $header,
+            'body'   => $body,
+        ]);
+
+        return response()->json([
+            'type' => self::CHANNEL_MESSAGE,
+            'data' => [
+                'flags'  => 64, // Ephemeral — only visible to the submitting user
+                'embeds' => [[
+                    'title'       => '✅ Help message added',
+                    'description' => "**{$header}**\n\n{$body}",
+                    'color'       => 0x7c5cbf,
+                    'footer'      => ['text' => "Slug: {$slug}"],
+                ]],
+            ],
+        ]);
+    }
+
+    private function autocompleteHelp(string $query): \Illuminate\Http\JsonResponse
+    {
+        $messages = \App\Models\HelpMessage::when(strlen($query) >= 1, function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('header', 'like', "%{$query}%");
+            })
+            ->orderBy('order')
+            ->limit(25)
+            ->get(['name', 'slug']);
+
+        $choices = $messages->map(fn($m) => [
+            'name'  => mb_substr($m->name, 0, 100),
+            'value' => $m->slug,
+        ])->values()->all();
+
+        return response()->json([
+            'type' => self::AUTOCOMPLETE_RESULT,
+            'data' => ['choices' => $choices],
+        ]);
+    }
+
+    private function handleHelp(string $slug): \Illuminate\Http\JsonResponse
+    {
+        $message = \App\Models\HelpMessage::where('slug', $slug)->first();
+
+        if (!$message) {
+            return response()->json([
+                'type' => self::CHANNEL_MESSAGE,
+                'data' => ['content' => 'Help message not found.'],
+            ]);
+        }
+
+        return response()->json([
+            'type' => self::CHANNEL_MESSAGE,
+            'data' => [
+                'embeds' => [[
+                    'title'       => $message->header,
+                    'description' => $message->body,
+                    'color'       => 0x7c5cbf,
+                    'footer'      => ['text' => 'WikiMoDex • Help'],
+                ]],
+            ],
         ]);
     }
 
