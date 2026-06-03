@@ -1172,10 +1172,7 @@ class DiscordInteractionController extends Controller
         $message = \App\Models\HelpMessage::where('slug', $slug)->first();
 
         if (!$message) {
-            return response()->json([
-                'type' => self::CHANNEL_MESSAGE,
-                'data' => ['content' => 'Help message not found.'],
-            ]);
+            return $this->ephemeralError("No help message found. Try using the autocomplete to pick a valid entry.");
         }
 
         return response()->json([
