@@ -34,10 +34,10 @@
 
     @if(app()->environment('production'))
     <!-- Privacy-friendly analytics by Plausible -->
-    <script async src="https://stats.scooom.xyz/js/pa-dbuwMAtytRej1UrBohPqo.js" data-outbound-links></script>
+    <script async src="https://stats.pokevoid.wiki/js/pa-w2teavSLYnGZaSFqWqr7r.js"></script>
     <script>
-        window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-        plausible.init()
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
     </script>
     @endif
 </head>
