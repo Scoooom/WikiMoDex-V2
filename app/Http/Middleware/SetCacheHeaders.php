@@ -8,8 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetCacheHeaders
 {
-    public function handle(Request $request, Closure $next, string $directive = 'no-store'): Response
+    public function handle(Request $request, Closure $next, string ...$parts): Response
     {
+        $directive = implode(', ', $parts);
         $response = $next($request);
 
         if (!$request->isMethod('GET') || $response->getStatusCode() >= 400) {
